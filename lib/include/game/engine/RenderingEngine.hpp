@@ -45,17 +45,17 @@ private:
 
 private:
     const static inline auto INTERNAL_GAME_RESOLUTION =
-        sf::Vector2f { 1280.f, 720.f };
+        sf::Vector2f { 128.f, 228.f };
 
     Scene& scene;
     const AppSettings& settings;
     const TouchController& touchController;
+    dgm::TextureAtlas atlas;
     dgm::Camera worldCamera;
     dgm::Camera hudCamera;
-
     FpsCounter fpsCounter;
     sf::Text text;
 
-    sf::Sprite sprite;
-    sf::RectangleShape ground;
+    dgm::TextureAtlas::ResourceLocation<dgm::Clip> playbgrLocation;
+    sf::Sprite background;
 };

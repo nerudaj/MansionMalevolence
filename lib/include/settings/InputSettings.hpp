@@ -7,7 +7,7 @@ struct [[nodiscard]] InputSettings final
 {
     float cursorSpeed = 500_px_per_second;
     float gamepadDeadzone = 10.f;
-    bool showTouchControls = true;
+    bool showTouchControls = false;
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(

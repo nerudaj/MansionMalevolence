@@ -8,20 +8,17 @@ RenderingEngine::RenderingEngine(
     : scene(scene)
     , settings(settings)
     , touchController(touchController)
+    , atlas(1024, 1024)
     , worldCamera(createFullscreenCamera(
           sf::Vector2f(settings.video.resolution), INTERNAL_GAME_RESOLUTION))
     , hudCamera(
           sf::FloatRect { { 0.f, 0.f }, { 1.f, 1.f } },
           sf::Vector2f(settings.video.resolution))
     , text(resmgr.get<sf::Font>("ChunkFive-Regular.ttf"))
-    , sprite(resmgr.get<sf::Texture>("mrman.png"))
+    , playbgrLocation(atlas.addImage(resmgr.get<sf::Texture>("playbgr.png")).value())
+    , background(atlas.getTexture())
 {
-    sprite.setOrigin(
-        sf::Vector2f(scene.dummy.animation.getCurrentFrame().size) / 2.f);
-    ground.setPosition(scene.groundPosition);
-    ground.setFillColor(sf::Color(128, 192, 0));
-    ground.setSize({ INTERNAL_GAME_RESOLUTION.x,
-                     INTERNAL_GAME_RESOLUTION.y - scene.groundPosition.y });
+    background.setTextureRect(atlas.getClip(playbgrLocation).getFrame(0));
 }
 
 void RenderingEngine::update(const dgm::Time& time)
@@ -75,13 +72,7 @@ dgm::Camera RenderingEngine::createFullscreenCamera(
 
 void RenderingEngine::renderWorld(dgm::Window& window)
 {
-    sprite.setTextureRect(scene.dummy.animation.getCurrentFrame());
-    sprite.setPosition(scene.dummy.body.getCenter());
-    sprite.setScale({ scene.dummy.facingLeft ? -1.f : 1.f, 1.f });
-
-    scene.dummy.body.debugRender(window); // rendering hitbox
-    window.draw(ground);
-    window.draw(sprite);
+    window.draw(background);
 }
 
 void RenderingEngine::renderHud(dgm::Window& window)

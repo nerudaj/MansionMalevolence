@@ -1,6 +1,8 @@
 [![CI-Windows](https://github.com/nerudaj/dgm-template/actions/workflows/ci-windows.yml/badge.svg?branch=main)](https://github.com/nerudaj/dgm-template/actions/workflows/ci-windows.yml) [![CI-Android](https://github.com/nerudaj/dgm-template/actions/workflows/ci-android.yml/badge.svg?branch=main)](https://github.com/nerudaj/dgm-template/actions/workflows/ci-android.yml)
 
-# dgm project template
+# Mansion Malevolence
+
+A solitaire survival-horror card game inspired by Resident Evil.
 
 ## Table of Contents
 
