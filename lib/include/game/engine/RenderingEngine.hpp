@@ -43,6 +43,12 @@ private:
 
     void renderTouchControls(dgm::Window& window);
 
+    void renderCard(
+        dgm::Window& window,
+        const Card& card,
+        const sf::Vector2f& offset,
+        float scale = 1.f);
+
 private:
     const static inline auto INTERNAL_GAME_RESOLUTION =
         sf::Vector2f { 128.f, 228.f };
@@ -57,5 +63,8 @@ private:
     sf::Text text;
 
     dgm::TextureAtlas::ResourceLocation<dgm::Clip> playbgrLocation;
-    sf::Sprite background;
+    dgm::TextureAtlas::ResourceLocation<dgm::Clip> cardbgrLocation;
+    dgm::TextureAtlas::ResourceLocation<dgm::Clip> iconsLocation;
+    dgm::TextureAtlas::ResourceLocation<dgm::Clip> imagesLocation;
+    sf::Sprite sprite;
 };

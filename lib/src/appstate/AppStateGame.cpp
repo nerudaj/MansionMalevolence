@@ -50,5 +50,8 @@ void AppStateGame::restoreFocusImpl(const std::string& msg)
 
 Scene AppStateGame::buildScene(const dgm::ResourceManager& resmgr)
 {
-    return Scene {};
+    return Scene { .deck = { CARD_DEFS.at(CardType::Pistol) },
+                   .inventory = { CARD_DEFS.at(CardType::Shotgun),
+                                  CARD_DEFS.at(CardType::Shotgun),
+                                  CARD_DEFS.at(CardType::Shotgun) } };
 }

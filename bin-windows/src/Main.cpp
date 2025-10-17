@@ -30,7 +30,7 @@ int main(int, char*[])
     }
     catch (const std::exception& ex)
     {
-        std::cerr << ex.what() << std::endl;
+        sf::err() << ex.what() << std::endl;
         return 1;
     }
 
