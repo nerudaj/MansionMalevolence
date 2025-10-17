@@ -1,0 +1,90 @@
+plugins {
+    id("com.android.application")
+}
+
+android {
+    namespace = "@ANDROID_ORG@"
+    ndkVersion = "@ANDROID_NDK_VERSION@"
+    compileSdk = @ANDROID_TARGET_SDK@
+	
+	sourceSets {
+        getByName("main") {
+            assets.srcDirs("@PROJECT_SOURCE_DIR@/assets")
+        }
+	}
+	
+    defaultConfig {
+        applicationId = "@ANDROID_ORG@"
+        minSdk = @ANDROID_MIN_SDK@
+        targetSdk = @ANDROID_TARGET_SDK@
+        versionCode = 1
+        versionName = "@CMAKE_PROJECT_VERSION@"
+
+        ndk {
+            abiFilters.add("@ANDROID_ARCH_ABI@")
+        }
+        externalNativeBuild {
+            cmake {
+                arguments.add("-DANDROID_STL=c++_shared")
+                arguments.add("-DSFML_STATIC_LIBRARIES=OFF")
+            }
+        }
+    }
+    
+    signingConfigs {
+        val storeFilePath = System.getenv("APK_KEYSTORE_PATH")
+        val storePassword = System.getenv("APK_KEYSTORE_PASSWORD")
+        val keyAlias = System.getenv("APK_SIGNING_KEY_ALIAS")
+        val keyPassword = System.getenv("APK_SIGNING_KEY_PASSWORD")
+        
+        if (
+            !storeFilePath.isNullOrBlank() &&
+            !storePassword.isNullOrBlank() &&
+            !keyAlias.isNullOrBlank() &&
+            !keyPassword.isNullOrBlank()
+        ) {
+            create("release") {
+                storeFile = file(storeFilePath)
+                this.storePassword = storePassword
+                this.keyAlias = keyAlias
+                this.keyPassword = keyPassword
+            }
+        }
+    }
+	
+    buildTypes {
+        release {
+            // By default, assembleRelease uses RelWithDebInfo build type
+            externalNativeBuild {
+                cmake {
+                    arguments.add("-DCMAKE_BUILD_TYPE=Release")
+                }
+            }
+
+            signingConfig = signingConfigs.findByName("release")
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro")
+        }
+    }
+    
+    externalNativeBuild {
+        cmake {
+            path("@PROJECT_SOURCE_DIR@/bin-android/CMakeLists.txt")
+			version = "3.28.1"
+        }
+    }
+    
+    // Override default name which is app-<configuration>-unsigned.apk
+    applicationVariants.all {
+        val variant = this
+        variant.outputs
+            .map { it as com.android.build.gradle.internal.api.BaseVariantOutputImpl }
+            .forEach { output ->
+                output.outputFileName = "@THE_PROJECT_NAME@-v@CMAKE_PROJECT_VERSION@.apk"
+            }
+    }
+}
+
+dependencies {
+    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
+}

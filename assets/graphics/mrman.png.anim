@@ -1,0 +1,114 @@
+{
+    "states": [
+        {
+            "nframes": 6, 
+            "name": "swim", 
+            "bounds": {
+                "width": 384, 
+                "top": 0, 
+                "height": 64, 
+                "left": 0
+            }
+        }, 
+        {
+            "nframes": 6, 
+            "name": "run", 
+            "bounds": {
+                "width": 384, 
+                "top": 64, 
+                "height": 64, 
+                "left": 0
+            }
+        }, 
+        {
+            "nframes": 4, 
+            "name": "idle", 
+            "bounds": {
+                "width": 256, 
+                "top": 128, 
+                "height": 64, 
+                "left": 0
+            }
+        }, 
+        {
+            "nframes": 3, 
+            "name": "punch", 
+            "bounds": {
+                "width": 192, 
+                "top": 192, 
+                "height": 64, 
+                "left": 0
+            }
+        }, 
+        {
+            "nframes": 1, 
+            "name": "kick", 
+            "bounds": {
+                "width": 64, 
+                "top": 192, 
+                "height": 64, 
+                "left": 192
+            }
+        }, 
+        {
+            "nframes": 1, 
+            "name": "win", 
+            "bounds": {
+                "width": 64, 
+                "top": 192, 
+                "height": 64, 
+                "left": 256
+            }
+        }, 
+        {
+            "nframes": 1, 
+            "name": "death", 
+            "bounds": {
+                "width": 64, 
+                "top": 192, 
+                "height": 64, 
+                "left": 320
+            }
+        }, 
+        {
+            "nframes": 1, 
+            "name": "land", 
+            "bounds": {
+                "width": 64, 
+                "top": 256, 
+                "height": 64, 
+                "left": 0
+            }
+        }, 
+        {
+            "nframes": 1, 
+            "name": "fall", 
+            "bounds": {
+                "width": 64, 
+                "top": 256, 
+                "height": 64, 
+                "left": 64
+            }
+        }, 
+        {
+            "nframes": 1, 
+            "name": "jump", 
+            "bounds": {
+                "width": 64, 
+                "top": 256, 
+                "height": 64, 
+                "left": 128
+            }
+        }
+    ], 
+    "defaults": {
+        "frame": {
+            "width": 64, 
+            "height": 64
+        }, 
+        "spacing": {
+            "horizontal": 0, 
+            "vertical": 0
+        }
+    }
+}

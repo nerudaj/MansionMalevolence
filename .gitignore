@@ -1,0 +1,13 @@
+_build
+_build-windows
+_build-android
+lib/include/misc/CMakeVars.hpp
+tests/include/Paths.hpp
+
+bin-android/local.properties
+bin-android/app/build.gradle.kts
+bin-android/app/src/main/AndroidManifest.xml
+bin-android/app/.cxx
+bin-android/app/build
+bin-android/.idea
+bin-android/.gradle

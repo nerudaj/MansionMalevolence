@@ -1,0 +1,7 @@
+#pragma once
+
+namespace CMakeVars
+{
+    constexpr const char* TITLE = "@THE_PROJECT_NAME@";
+    constexpr const char* VERSION = "@CMAKE_PROJECT_VERSION@";
+}

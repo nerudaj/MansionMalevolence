@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+    <script type="text/javascript">
+        const ColorBlack = "rgba(0, 0, 0, 255)";
+        const ColorDarkBlue = "rgba(29, 43, 83, 255)";
+        const ColorDarkPurple = "rgba(126, 37, 83, 255)";
+        const ColorDarkGreen = "rgba(0, 135, 81, 255)";
+        const ColorBrown = "rgba(171, 82, 54, 255)";
+        const ColorDarkGrey = "rgba(95, 87, 79, 255)";
+        const ColorLightGrey = "rgba(194, 195, 199, 255)";
+        const ColorWhite = "rgba(255, 241, 232, 255)";
+        const ColorRed = "rgba(255, 0, 77, 255)";
+        const ColorOrange = "rgba(255, 163, 0, 255)";
+        const ColorYellow = "rgba(255, 236, 39, 255)";
+        const ColorGreen = "rgba(0, 228, 54, 255)";
+        const ColorBlue = "rgba(41, 173, 255, 255)";
+        const ColorLavender = "rgba(131, 118, 156, 255)";
+        const ColorPink = "rgba(255, 119, 168, 255)";
+        const ColorLightPeach = "rgba(255, 204, 170, 255)";
+
+        let colorPrimary = ColorGreen;
+        let colorPrimaryLight = ColorLightPeach;
+        let colorPrimaryDark = ColorDarkGreen;
+
+        let colorBackgroundDark = ColorDarkGrey;
+        let colorBackgroundLight = ColorLightGrey;
+
+        let outlineColor = ColorBlack;
+
+        let textColorDark = ColorBlack;
+        let textColorLight = ColorWhite;
+
+        let textOutlineThickness = 1;
+        let borderThickness = 2;
+
+        function main() {
+            var output = document.getElementById("output");
+
+            output.innerHTML = `
+TextColor = ${textColorLight};
+
+ArrowBackgroundColor = ${colorPrimaryDark};
+ArrowColor = ${colorPrimary};
+ArrowColorHover = ${colorPrimaryLight};
+
+Label 
+{
+    TextColor = ${textColorLight};
+    TextOutlineColor = ${outlineColor};
+    TextOutlineThickness = ${textOutlineThickness};
+}
+
+Panel
+{
+    BackgroundColor = ${colorBackgroundDark};
+    BorderColor = ${outlineColor};
+    Borders = ${borderThickness};
+}
+
+ScrollablePanel
+{
+    BackgroundColor = ${colorBackgroundDark};
+    BorderColor = ${outlineColor};
+    Borders = ${borderThickness};
+}
+
+Button
+{
+    Borders = ${borderThickness};
+
+    BackgroundColor = ${colorBackgroundLight};
+    TextColor = ${textColorDark};
+    BorderColor = ${outlineColor};
+
+    BackgroundColorHover = ${colorPrimaryDark};
+    TextColorHover = ${colorPrimaryLight};
+    BorderColorHover = ${colorPrimaryLight};
+
+    BackgroundColorDown = ${colorBackgroundDark};
+    TextColorDown = ${textColorLight};
+    BorderColorDown = ${outlineColor};
+}
+
+Scrollbar
+{
+    TrackColor = ${colorPrimaryDark};
+
+    ThumbColor = ${colorPrimary};
+    ThumbColorHover = ${colorPrimaryLight};
+}
+
+Slider
+{
+    TrackColor = ${colorPrimaryDark};
+
+    ThumbColor = ${colorPrimary};
+    ThumbColorHover = ${colorPrimaryLight};
+
+    Borders = ${borderThickness};
+    BorderColor = ${outlineColor};
+}
+
+CheckBox
+{
+    Borders = ${borderThickness};
+    BorderColor = ${outlineColor};
+
+    BackgroundColor = ${colorPrimaryDark};
+
+    CheckColor = ${colorPrimary};
+
+    CheckColorHover = ${colorPrimaryLight};
+    BackgroundColorHover = ${colorPrimaryDark};
+    BorderColorHover = ${colorPrimaryLight};
+}
+
+ComboBox
+{
+    Borders = ${borderThickness};
+    BorderColor = ${outlineColor};
+
+    BackgroundColor = ${colorPrimaryDark};
+}
+
+ListBox
+{
+    Borders = ${borderThickness};
+    BorderColor = ${outlineColor};
+
+    TextColor = ${textColorDark};
+    BackgroundColor = ${colorBackgroundLight};
+
+    SelectedTextColor = ${textColorLight};
+    SelectedBackgroundColor = ${colorBackgroundDark};
+
+    TextColorHover = ${colorPrimaryLight};
+    BackgroundColorHover = ${colorPrimaryDark};
+}
+
+Tabs
+{
+    Borders = ${borderThickness};
+    BorderColor = ${outlineColor};
+
+    BackgroundColor = ${colorBackgroundLight};
+    TextColor = ${textColorDark};
+
+    SelectedBorderColor = ${outlineColor};
+    SelectedBackgroundColor = ${colorBackgroundDark};
+    SelectedTextColor = ${textColorLight};
+
+    TextColorHover = ${colorPrimaryLight};
+    BackgroundColorHover = ${colorPrimaryDark};
+    BorderColorHover = ${colorPrimaryLight};
+}
+`;
+        }
+    </script>
+</head>
+<body onload="main()">
+    <pre id="output"></pre>
+</body>
+</html>

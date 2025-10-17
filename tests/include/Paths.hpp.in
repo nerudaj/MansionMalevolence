@@ -1,0 +1,7 @@
+#pragma once
+
+#include <filesystem>
+
+const std::filesystem::path ROOT_DIR = "@PROJECT_SOURCE_DIR@";
+const std::filesystem::path ASSETS_PATH = "@PROJECT_SOURCE_DIR@/assets";
+const std::filesystem::path TESTFILES_PATH = "@CMAKE_CURRENT_SOURCE_DIR@/testfiles";
