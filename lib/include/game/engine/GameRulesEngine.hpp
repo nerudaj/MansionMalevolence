@@ -22,6 +22,10 @@ public:
 public:
     void update(const dgm::Time& time);
 
+    void updateActiveAnimation(const dgm::Time& time);
+
+    std::optional<size_t> getEmptyInventorySlot() const;
+
 private:
     EventQueue<GameEvent>& gameEventQueue;
     Scene& scene;

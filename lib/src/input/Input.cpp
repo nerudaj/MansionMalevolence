@@ -11,17 +11,14 @@ void Input::forceRelease(InputKind action)
     controller.forceRelease(action);
 }
 
-float Input::getHorizontalVelocity() const
+bool Input::isTakeButtonPressed() const
 {
-    return -controller.readAnalog(InputKind::Left)
-           + controller.readAnalog(InputKind::Right)
-           + touchController.getHorizontalVelocity();
+    return touchController.isTakePressed();
 }
 
-bool Input::isJumpPressed() const
+bool Input::isSkipButtonPressed() const
 {
-    return controller.readDigital(InputKind::Jump)
-           || touchController.isJumpPressed();
+    return touchController.isSkipPressed();
 }
 
 [[nodiscard]] bool Input::isMenuCycleLeftPressed() const
@@ -36,7 +33,8 @@ bool Input::isJumpPressed() const
 
 bool Input::isBackButtonPressed() const
 {
-    return readAndRelease(InputKind::BackButton) || touchController.isBackPressed();
+    return readAndRelease(InputKind::BackButton)
+           || touchController.isBackPressed();
 }
 
 bool Input::isConfirmPressed() const

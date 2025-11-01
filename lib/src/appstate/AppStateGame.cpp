@@ -9,11 +9,29 @@ void AppStateGame::input()
         app.pushState<AppStatePause>(dic, settings);
     }
 
+    dic.virtualCursor.update(app.time, settings.input.cursorSpeed);
+
     while (const auto event = app.window.pollEvent())
     {
         if (event->is<sf::Event::Closed>())
         {
             app.exit();
+        }
+        else if (event->is<sf::Event::MouseButtonPressed>())
+        {
+            std::optional<sf::Event> e = sf::Event::TouchBegan {
+                .finger = 0,
+                .position =
+                    event->getIf<sf::Event::MouseButtonPressed>()->position,
+            };
+            dic.touchController.processEvent(e);
+        }
+        else if (event->is<sf::Event::MouseButtonReleased>())
+        {
+            std::optional<sf::Event> e = sf::Event::TouchBegan {
+                .finger = 0,
+            };
+            dic.touchController.processEvent(e);
         }
         else
         {
@@ -27,17 +45,13 @@ void AppStateGame::update()
     gameRulesEngine.update(app.time);
     renderingEngine.update(app.time);
 
-    gameEvents.processEvents(
-        [&](const DummyGameEvent& e)
-        {
-            sound.setBuffer(dic.resmgr.get<sf::SoundBuffer>(e.soundName));
-            sound.play();
-        });
+    gameEvents.processEvents([&](const DummyGameEvent&) {});
 }
 
 void AppStateGame::draw()
 {
     renderingEngine.draw(app.window);
+    dic.virtualCursor.draw();
 }
 
 void AppStateGame::restoreFocusImpl(const std::string& msg)
@@ -50,8 +64,17 @@ void AppStateGame::restoreFocusImpl(const std::string& msg)
 
 Scene AppStateGame::buildScene(const dgm::ResourceManager& resmgr)
 {
-    return Scene { .deck = { CARD_DEFS.at(CardType::Pistol) },
-                   .inventory = { CARD_DEFS.at(CardType::Shotgun),
-                                  CARD_DEFS.at(CardType::Shotgun),
-                                  CARD_DEFS.at(CardType::Shotgun) } };
+    auto randomCardType = []
+    {
+        return static_cast<CardType>(
+            rand() % std::to_underlying(CardType::Max));
+    };
+
+    return Scene { .deck =
+                       std::views::iota(0u, 20u)
+                       | std::views::transform(
+                           [&](size_t) -> CardType { return randomCardType(); })
+                       | std::views::transform(CardBuilder::createCard)
+                       | uniranges::to<std::list>(),
+                   .inventory = {} };
 }

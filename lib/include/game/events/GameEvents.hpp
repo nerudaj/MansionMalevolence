@@ -2,9 +2,8 @@
 
 #include <variant>
 
-struct DummyGameEvent
+struct [[nodiscard]] DummyGameEvent final
 {
-    std::string soundName = "";
 };
 
 using GameEvent = std::variant<DummyGameEvent>;

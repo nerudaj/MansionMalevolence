@@ -17,14 +17,17 @@ void TouchInput::reset()
 TouchModel::TouchModel(const sf::Vector2u& windowSize)
     : objects(std::array {
           TouchInput(
-              TouchObjectKind::Joystick,
-              { 150.f, windowSize.y - 150.f },
-              150.f),
+              TouchObjectKind::Button,
+              { windowSize.x * 0.12f, windowSize.x * 0.12f },
+              windowSize.x * 0.08f),
           TouchInput(
               TouchObjectKind::Button,
-              { windowSize.x - 150.f, windowSize.y - 150.f },
-              150.f),
-          TouchInput(TouchObjectKind::Button, { 100.f, 100.f }, 100.f),
+              { windowSize.x * 0.852f, windowSize.y * 0.258f },
+              windowSize.x * 0.123f),
+          TouchInput(
+              TouchObjectKind::Button,
+              { windowSize.x * 0.852f, windowSize.y * 0.5375f },
+              windowSize.x * 0.123f),
       })
 {
 }
@@ -39,19 +42,19 @@ void TouchController::processEvent(const std::optional<sf::Event>& e)
         processEvent(*e->getIf<sf::Event::TouchMoved>());
 }
 
-[[nodiscard]] float TouchController::getHorizontalVelocity() const
-{
-    return model.leftJoystick.readJoystick().x;
-}
-
-[[nodiscard]] bool TouchController::isJumpPressed() const
-{
-    return model.jumpButton.readButton();
-}
-
 [[nodiscard]] bool TouchController::isBackPressed() const
 {
     return model.pauseButton.readButton();
+}
+
+bool TouchController::isTakePressed() const
+{
+    return model.takeButton.readButton();
+}
+
+bool TouchController::isSkipPressed() const
+{
+    return model.skipButton.readButton();
 }
 
 void TouchController::processEvent(const sf::Event::TouchBegan& e)

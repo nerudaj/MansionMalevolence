@@ -35,9 +35,12 @@ public:
         reset();
     }
 
-    [[nodiscard]] bool readButton() const
+    [[nodiscard]] bool readButton()
     {
-        return dgm::Collision::basic(touchArea, sf::Vector2i(touchPosition));
+        const bool result =
+            dgm::Collision::basic(touchArea, sf::Vector2i(touchPosition));
+        if (result) reset();
+        return result;
     }
 
     [[nodiscard]] sf::Vector2f readJoystick() const
@@ -64,16 +67,16 @@ public:
     TouchModel(const sf::Vector2u& windowSize);
 
 public:
-    std::array<TouchInput, 3u> objects;
+    mutable std::array<TouchInput, 3u> objects;
     std::map<unsigned, size_t>
         fingerToTouchObject = {}; ///< Each event has finger index associated
                                   ///< with it so we can pair touch begin, touch
                                   ///< moved and touch ended with a single touch
                                   ///< input
 
-    TouchInput& leftJoystick = objects[0];
-    TouchInput& jumpButton = objects[1];
-    TouchInput& pauseButton = objects[2];
+    TouchInput& pauseButton = objects[0];
+    TouchInput& takeButton = objects[1];
+    TouchInput& skipButton = objects[2];
 };
 
 class [[nodiscard]] TouchController final
@@ -89,15 +92,11 @@ public:
         return model;
     }
 
-#pragma region For dummy entity, can be removed
-
-    [[nodiscard]] float getHorizontalVelocity() const;
-
-    [[nodiscard]] bool isJumpPressed() const;
-
-#pragma endregion
-
     [[nodiscard]] bool isBackPressed() const;
+
+    [[nodiscard]] bool isTakePressed() const;
+
+    [[nodiscard]] bool isSkipPressed() const;
 
 private:
     void processEvent(const sf::Event::TouchBegan& e);

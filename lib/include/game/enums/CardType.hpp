@@ -3,7 +3,7 @@
 enum class [[nodiscard]] CardType
 {
     // Weapons
-    Pistol,
+    Pistol = 0,
     Shotgun,
     Ammo,
 
@@ -19,4 +19,6 @@ enum class [[nodiscard]] CardType
     // Enemies
     Zombie,
     Licker,
+
+    Max,
 };

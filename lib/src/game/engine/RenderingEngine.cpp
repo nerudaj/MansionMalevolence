@@ -50,13 +50,13 @@ void RenderingEngine::draw(dgm::Window& window)
     // Render everything hud-related
     renderHud(window);
 
+    // Restore camera view for menus, etc
+    window.setViewFromCamera(hudCamera);
+
     if (settings.input.showTouchControls)
     {
         renderTouchControls(window);
     }
-
-    // Restore camera view for menus, etc
-    window.setViewFromCamera(hudCamera);
 }
 
 dgm::Camera RenderingEngine::createFullscreenCamera(
@@ -71,7 +71,11 @@ dgm::Camera RenderingEngine::createFullscreenCamera(
     const auto&& desiredAspectRatio = desiredResolution.x / desiredResolution.y;
     const auto&& currentAspectRatio = currentResolution.x / currentResolution.y;
 
-    if (currentAspectRatio > desiredAspectRatio)
+    if (std::abs(desiredAspectRatio - currentAspectRatio) < 0.01f)
+    {
+        // do nothing, aspect ratios are equal
+    }
+    else if (currentAspectRatio > desiredAspectRatio)
     {
         // Narrow desired into wider current
         viewport.size.x = desiredResolution.y / currentResolution.y;
@@ -112,9 +116,17 @@ void RenderingEngine::renderHud(dgm::Window& window)
     sprite.setPosition({ 3.f, 3.f });
     window.draw(sprite);
 
+    // Take button
+    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
+        scene.deck.front().traits & CardTrait::Pickable ? Icon::GreenTake
+                                                        : Icon::RedTake)));
+    sprite.setPosition({ 96.f, 50.f });
+    window.draw(sprite);
+
     // Skip button
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
-        scene.deck.front().bites ? Icon::RedSkip : Icon::GreenSkip)));
+        scene.deck.front().traits & CardTrait::Enemy ? Icon::RedSkip
+                                                     : Icon::GreenSkip)));
     sprite.setPosition({ 96.f, 110.f });
     window.draw(sprite);
 
@@ -171,12 +183,12 @@ void RenderingEngine::renderCard(
     window.draw(sprite);
 
     auto& iconsClip = atlas.getClip(iconsLocation);
-    if (card.ammo > 0)
+    if (card.quantity > 0 && card.traits & CardTrait::Weapon)
     {
         sprite.setTextureRect(
             iconsClip.getFrame(std::to_underlying(Icon::Bullet)));
 
-        for (auto i = 0; i < card.ammo; ++i)
+        for (auto i = 0; i < card.quantity; ++i)
         {
             sprite.setPosition(
                 offset + sf::Vector2f { 0.f, 13.f + i * 6.f } * scale);
