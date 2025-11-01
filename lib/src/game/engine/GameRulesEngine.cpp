@@ -2,6 +2,22 @@
 #include <algorithm>
 #include <limits>
 
+void GameRulesEngine::operator()(const CardTakenGameEvent& e)
+{
+    scene.inventory[e.inventorySlotIdx] = scene.deck.front();
+    scene.deck.pop_front();
+}
+
+void GameRulesEngine::operator()(const CardSkippedGameEvent&)
+{
+    auto card = scene.deck.front();
+    if (card.traits & CardTrait::Enemy) scene.hearts -= card.power;
+    // TODO: trigger slash animation
+
+    scene.deck.push_back(card);
+    scene.deck.pop_front();
+}
+
 void GameRulesEngine::update(const dgm::Time& time)
 {
     updateActiveAnimation(time);
@@ -36,16 +52,12 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
     {
         if (scene.activeAnimation->kind == AnimationKind::SkipCard)
         {
-            if (scene.deck.front().traits & CardTrait::Enemy)
-                scene.hearts -= scene.deck.front().power;
-
-            scene.deck.push_back(scene.deck.front());
-            scene.deck.pop_front();
+            gameEventQueue.pushEvent<CardSkippedGameEvent>();
         }
         else if (scene.activeAnimation->kind == AnimationKind::TakeCard)
         {
-            scene.inventory[scene.activeAnimation->data] = scene.deck.front();
-            scene.deck.pop_front();
+            gameEventQueue.pushEvent<CardTakenGameEvent>(
+                scene.activeAnimation->data);
         }
 
         scene.activeAnimation = std::nullopt;
@@ -54,7 +66,7 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 
 std::optional<size_t> GameRulesEngine::getEmptyInventorySlot() const
 {
-    for (auto&& [idx, slot] : uniranges::enumerate_view(scene.inventory))
+    for (auto&& [idx, slot] : std::ranges::views::enumerate(scene.inventory))
     {
         if (!slot) return idx;
     }

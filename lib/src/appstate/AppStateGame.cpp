@@ -45,7 +45,7 @@ void AppStateGame::update()
     gameRulesEngine.update(app.time);
     renderingEngine.update(app.time);
 
-    gameEvents.processEvents([&](const DummyGameEvent&) {});
+    gameEvents.processEvents(gameRulesEngine);
 }
 
 void AppStateGame::draw()

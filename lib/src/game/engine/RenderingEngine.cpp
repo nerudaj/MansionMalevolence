@@ -99,7 +99,7 @@ void RenderingEngine::renderWorld(dgm::Window& window)
 
     renderCard(window, scene.deck.front(), { 7.f, 35.f });
 
-    for (auto&& [idx, card] : uniranges::enumerate_view(scene.inventory))
+    for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
     {
         if (!card) continue;
 
@@ -120,7 +120,7 @@ void RenderingEngine::renderHud(dgm::Window& window)
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
         scene.deck.front().traits & CardTrait::Pickable ? Icon::GreenTake
                                                         : Icon::RedTake)));
-    sprite.setPosition({ 96.f, 50.f });
+    sprite.setPosition({ 96.f, 48.f });
     window.draw(sprite);
 
     // Skip button

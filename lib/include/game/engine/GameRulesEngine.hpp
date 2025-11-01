@@ -20,6 +20,11 @@ public:
     GameRulesEngine(const GameRulesEngine&) = delete;
 
 public:
+    void operator()(const CardTakenGameEvent& e);
+
+    void operator()(const CardSkippedGameEvent& e);
+
+public:
     void update(const dgm::Time& time);
 
     void updateActiveAnimation(const dgm::Time& time);
