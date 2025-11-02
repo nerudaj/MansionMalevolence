@@ -97,14 +97,14 @@ void RenderingEngine::renderWorld(dgm::Window& window)
     sprite.setPosition({ 0.f, 0.f });
     window.draw(sprite);
 
-    renderCard(window, scene.deck.front(), { 7.f, 35.f });
+    renderTopDeckCard(window);
 
     for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
     {
         if (!card) continue;
 
         renderCard(
-            window, card.value(), { 8.f + idx * 43.5f, 161.f }, 1.f / 3.f);
+            window, card.value(), getNthInventoryCardOffset(idx), 1.f / 3.f);
     }
 }
 
@@ -233,4 +233,73 @@ void RenderingEngine::renderCard(
 
     text.setScale({ 1.f, 1.f });
     sprite.setScale({ 1.f, 1.f });
+}
+
+static float easeInOut(float x)
+{
+    return x < 0.5 ? 4 * std::pow(x, 3.f) : 1 - std::pow(-2 * x + 2, 3) / 2;
+}
+
+static float easeOutThenBack(float x)
+{
+    return -4.f * std::pow(x - 0.5f, 2.f) + 1;
+}
+
+void RenderingEngine::renderTopDeckCard(dgm::Window& window)
+{
+    const auto deckOffset = getDeckCardOffset();
+
+    if (scene.activeAnimation)
+    {
+        const float f =
+            scene.activeAnimation->elapsed / scene.activeAnimation->duration;
+
+        if (scene.activeAnimation->kind == AnimationKind::TakeCard)
+        {
+            const auto animationOffset =
+                (getNthInventoryCardOffset(scene.activeAnimation->data)
+                 - deckOffset)
+                * easeInOut(f);
+
+            renderCard(
+                window,
+                scene.deck.front(),
+                deckOffset + animationOffset,
+                std::lerp(1.f, 1.f / 3.f, f));
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::SkipCard)
+        {
+            const auto animationOffset =
+                (sf::Vector2f { deckOffset.x + 76.f * 1.5f, deckOffset.y }
+                 - deckOffset)
+                * easeOutThenBack(f);
+
+            if (f < 0.5f)
+            {
+                renderSecondTopDeckCard(window);
+                renderCard(
+                    window, scene.deck.front(), deckOffset + animationOffset);
+            }
+            else
+            {
+                renderCard(
+                    window, scene.deck.front(), deckOffset + animationOffset);
+                renderSecondTopDeckCard(window);
+            }
+        }
+        else
+        {
+            renderCard(window, scene.deck.front(), deckOffset);
+        }
+    }
+    else
+    {
+        renderCard(window, scene.deck.front(), deckOffset);
+    }
+}
+
+void RenderingEngine::renderSecondTopDeckCard(dgm::Window& window)
+{
+    if (scene.deck.size() > 1)
+        renderCard(window, *(++scene.deck.begin()), getDeckCardOffset());
 }

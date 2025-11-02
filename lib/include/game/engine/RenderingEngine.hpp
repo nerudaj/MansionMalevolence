@@ -49,6 +49,21 @@ private:
         const sf::Vector2f& offset,
         float scale = 1.f);
 
+    void renderTopDeckCard(dgm::Window& window);
+
+    void renderSecondTopDeckCard(dgm::Window& window);
+
+    [[nodiscard]] sf::Vector2f getDeckCardOffset() const noexcept
+    {
+        return sf::Vector2f { 7.f, 35.f };
+    }
+
+    [[nodiscard]] sf::Vector2f
+    getNthInventoryCardOffset(size_t idx) const noexcept
+    {
+        return sf::Vector2f { 8.f + idx * 43.5f, 161.f };
+    }
+
 private:
     const static inline auto INTERNAL_GAME_RESOLUTION =
         sf::Vector2f { 128.f, 228.f };
