@@ -8,6 +8,22 @@
 
 const auto SETTINGS_FILE_NAME = std::filesystem::path("settings.json");
 
+auto getVerticalResolution()
+{
+    auto&& modes = sf::VideoMode::getFullscreenModes();
+    for (auto&& mode : modes)
+    {
+        if (mode.size.x < mode.size.y) return mode.size;
+    }
+
+    if (!modes.empty())
+    {
+        return modes[0].size;
+    }
+
+    return sf::Vector2u { 405, 720 };
+}
+
 int main(int, char*[])
 {
     try
@@ -18,7 +34,7 @@ int main(int, char*[])
         // which has resolution of 2400x1080 (as reported by getFullscreenModes)
         auto&& modes = sf::VideoMode::getFullscreenModes();
         if (!modes.empty())
-          settings.video.resolution = modes[0].size;
+          settings.video.resolution = getVerticalResolution();
 
         auto&& window = dgm::Window(dgm::WindowSettings {
             .resolution = settings.video.resolution,
