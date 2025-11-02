@@ -21,4 +21,11 @@ struct [[nodiscard]] Scene final
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = 5;
     std::optional<Animation> activeAnimation;
+
+    /*dgm::Rect mainCardBody;
+    dgm::Rect healthbarBody;
+    dgm::Rect trashBody;
+    dgm::Rect inventory1Body;
+    dgm::Rect inventory2Body;
+    dgm::Rect inventory3Body;*/
 };

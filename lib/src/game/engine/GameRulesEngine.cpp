@@ -4,7 +4,16 @@
 
 void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 {
-    scene.inventory[e.inventorySlotIdx] = scene.deck.front();
+    if (scene.inventory[e.inventorySlotIdx].has_value())
+    {
+        scene.inventory[e.inventorySlotIdx] =
+            CardBuilder::createCard(CardType::MixedHerbs);
+    }
+    else
+    {
+        scene.inventory[e.inventorySlotIdx] = scene.deck.front();
+    }
+
     scene.deck.pop_front();
 }
 
@@ -26,7 +35,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     if (input.isTakeButtonPressed()
         && scene.deck.front().traits & CardTrait::Pickable)
     {
-        if (auto&& slotIdx = getEmptyInventorySlot())
+        if (auto&& slotIdx = getUsableInventorySlot(scene.deck.front()))
         {
             scene.activeAnimation = Animation {
                 .kind = AnimationKind::TakeCard,
@@ -64,12 +73,26 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
     }
 }
 
-std::optional<size_t> GameRulesEngine::getEmptyInventorySlot() const
+std::optional<size_t>
+GameRulesEngine::getUsableInventorySlot(const Card& card) const
 {
+    // First check combinable cards
+    for (auto&& [idx, slot] : std::ranges::views::enumerate(scene.inventory))
+    {
+        if (slot && canCardsCombine(*slot, card)) return idx;
+    }
+
+    // Then empty slots
     for (auto&& [idx, slot] : std::ranges::views::enumerate(scene.inventory))
     {
         if (!slot) return idx;
     }
 
     return std::nullopt;
+}
+
+bool GameRulesEngine::canCardsCombine(const Card& a, const Card& b)
+{
+    return std::max(a.image, b.image) == CardImage::GreenHerb
+           && std::min(a.image, b.image) == CardImage::RedHerb;
 }

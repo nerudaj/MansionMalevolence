@@ -29,7 +29,9 @@ public:
 
     void updateActiveAnimation(const dgm::Time& time);
 
-    std::optional<size_t> getEmptyInventorySlot() const;
+    std::optional<size_t> getUsableInventorySlot(const Card& card) const;
+
+    static bool canCardsCombine(const Card& a, const Card& b);
 
 private:
     EventQueue<GameEvent>& gameEventQueue;

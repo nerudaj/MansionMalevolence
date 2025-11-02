@@ -10,6 +10,7 @@ enum class [[nodiscard]] CardType
     // Healing
     GreenHerb,
     RedHerb,
+    MixedHerbs,
     FirstAid,
 
     // Items

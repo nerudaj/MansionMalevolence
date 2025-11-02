@@ -44,7 +44,7 @@ namespace nlohmann
         {
             if (!j.contains("type")) return;
 
-            std::string type = j["type"].get<std::string>();
+            const std::string type = j["type"].get<std::string>();
             if (type == "key")
             {
                 using T = sf::Keyboard::Key;
@@ -107,7 +107,7 @@ namespace nlohmann
         {
             if (!j.contains("type")) return;
 
-            std::string type = j["type"].get<std::string>();
+            const std::string type = j["type"].get<std::string>();
             if (type == "btn")
             {
                 auto value = j["value"].get<unsigned>();

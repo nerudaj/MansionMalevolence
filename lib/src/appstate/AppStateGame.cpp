@@ -19,7 +19,7 @@ void AppStateGame::input()
         }
         else if (event->is<sf::Event::MouseButtonPressed>())
         {
-            std::optional<sf::Event> e = sf::Event::TouchBegan {
+            const std::optional<sf::Event> e = sf::Event::TouchBegan {
                 .finger = 0,
                 .position =
                     event->getIf<sf::Event::MouseButtonPressed>()->position,
@@ -28,7 +28,7 @@ void AppStateGame::input()
         }
         else if (event->is<sf::Event::MouseButtonReleased>())
         {
-            std::optional<sf::Event> e = sf::Event::TouchBegan {
+            const std::optional<sf::Event> e = sf::Event::TouchBegan {
                 .finger = 0,
             };
             dic.touchController.processEvent(e);
@@ -70,11 +70,16 @@ Scene AppStateGame::buildScene(const dgm::ResourceManager& resmgr)
             rand() % std::to_underlying(CardType::Max));
     };
 
-    return Scene { .deck =
-                       std::views::iota(0u, 20u)
-                       | std::views::transform(
-                           [&](size_t) -> CardType { return randomCardType(); })
-                       | std::views::transform(CardBuilder::createCard)
-                       | uniranges::to<std::list>(),
+    std::ignore = std::views::iota(0u, 20u)
+                  | std::views::transform(
+                      [&](size_t) -> CardType { return randomCardType(); })
+                  | std::views::transform(CardBuilder::createCard)
+                  | uniranges::to<std::list>();
+
+    return Scene { .deck = { CardBuilder::createCard(CardType::RedHerb),
+                             CardBuilder::createCard(CardType::GreenHerb),
+                             CardBuilder::createCard(CardType::Pistol),
+                             CardBuilder::createCard(CardType::Zombie),
+                             CardBuilder::createCard(CardType::Licker) },
                    .inventory = {} };
 }

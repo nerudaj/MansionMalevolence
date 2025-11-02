@@ -28,7 +28,7 @@ template<class Range>
 [[nodiscard]] static tgui::Container::Ptr
 createCell(const tgui::Widget::Ptr& content, size_t column, size_t totalColumns)
 {
-    size_t columnWidth = 100 / totalColumns;
+    const size_t columnWidth = 100 / totalColumns;
 
     auto cell = tgui::Group::create(
         { tgui::Layout(std::to_string(columnWidth) + "%"), "100%" });

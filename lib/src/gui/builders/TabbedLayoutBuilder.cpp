@@ -7,7 +7,7 @@ TabbedLayoutBuilder& TabbedLayoutBuilder::addTab(
     const StringId stringId,
     const std::function<void(tgui::Container::Ptr)> onTabSelected)
 {
-    std::string tabName = strings.getString(stringId);
+    const std::string tabName = strings.getString(stringId);
     tabNames.push_back(tabName);
     tabCallbacks[tabName] = onTabSelected;
     return *this;

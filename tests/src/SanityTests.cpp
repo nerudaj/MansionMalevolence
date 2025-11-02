@@ -1,4 +1,5 @@
 #include "Helper.hpp"
+#include "game/engine/GameRulesEngine.hpp"
 #include <catch_amalgamated.hpp>
 
 TEST_CASE("[Sanity]")
@@ -14,5 +15,15 @@ TEST_CASE("[Sanity]")
     {
         const std::string& json = nlohmann::json(AppSettings {}).dump(4);
         const AppSettings settings = nlohmann::json::parse(json);
+    }
+
+    SECTION("Red and green herbs can mix")
+    {
+        REQUIRE(GameRulesEngine::canCardsCombine(
+            CardBuilder::createCard(CardType::RedHerb),
+            CardBuilder::createCard(CardType::GreenHerb)));
+        REQUIRE(GameRulesEngine::canCardsCombine(
+            CardBuilder::createCard(CardType::GreenHerb),
+            CardBuilder::createCard(CardType::RedHerb)));
     }
 }
