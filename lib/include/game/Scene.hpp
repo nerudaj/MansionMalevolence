@@ -7,6 +7,9 @@
 #include <list>
 #include <optional>
 
+const static inline auto INTERNAL_GAME_RESOLUTION =
+    sf::Vector2f { 128.f, 228.f };
+
 struct [[nodiscard]] Animation final
 {
     AnimationKind kind = {};
