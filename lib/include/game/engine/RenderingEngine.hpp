@@ -11,7 +11,7 @@ class [[nodiscard]] RenderingEngine final
 public:
     RenderingEngine(
         dgm::ResourceManager& resmgr,
-        Scene& scene,
+        const Scene& scene,
         const AppSettings& settings,
         const TouchController& touchController) noexcept;
 
