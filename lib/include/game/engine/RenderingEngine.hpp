@@ -65,7 +65,7 @@ private:
     }
 
 private:
-    Scene& scene;
+    const Scene& scene;
     const AppSettings& settings;
     const TouchController& touchController;
     dgm::TextureAtlas atlas;
