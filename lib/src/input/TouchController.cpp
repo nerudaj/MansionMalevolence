@@ -28,6 +28,10 @@ TouchModel::TouchModel(const sf::Vector2u& windowSize)
               TouchObjectKind::Button,
               { windowSize.x * 0.852f, windowSize.y * 0.5375f },
               windowSize.x * 0.123f),
+          TouchInput(
+              TouchObjectKind::Joystick,
+              { 0.f, 0.f },
+              sf::Vector2f(windowSize).length()),
       })
 {
 }
@@ -55,6 +59,11 @@ bool TouchController::isTakePressed() const
 bool TouchController::isSkipPressed() const
 {
     return model.skipButton.readButton();
+}
+
+sf::Vector2f TouchController::getDragPosition() const
+{
+    return model.dragJoystick.readJoystick();
 }
 
 void TouchController::processEvent(const sf::Event::TouchBegan& e)

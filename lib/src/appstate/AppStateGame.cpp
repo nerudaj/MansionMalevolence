@@ -33,6 +33,16 @@ void AppStateGame::input()
             };
             dic.touchController.processEvent(e);
         }
+        else if (
+            event->is<sf::Event::MouseMoved>()
+            && sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+        {
+            const std::optional<sf::Event> e = sf::Event::TouchMoved {
+                .finger = 0,
+                .position = event->getIf<sf::Event::MouseMoved>()->position,
+            };
+            dic.touchController.processEvent(e);
+        }
         else
         {
             dic.touchController.processEvent(event);
@@ -62,7 +72,8 @@ void AppStateGame::restoreFocusImpl(const std::string& msg)
     }
 }
 
-Scene AppStateGame::buildScene(const dgm::ResourceManager& resmgr)
+Scene AppStateGame::buildScene(
+    const dgm::ResourceManager& resmgr, const VideoSettings& settings)
 {
     auto randomCardType = []
     {
@@ -76,10 +87,27 @@ Scene AppStateGame::buildScene(const dgm::ResourceManager& resmgr)
                   | std::views::transform(CardBuilder::createCard)
                   | uniranges::to<std::list>();
 
-    return Scene { .deck = { CardBuilder::createCard(CardType::RedHerb),
-                             CardBuilder::createCard(CardType::GreenHerb),
-                             CardBuilder::createCard(CardType::Pistol),
-                             CardBuilder::createCard(CardType::Zombie),
-                             CardBuilder::createCard(CardType::Licker) },
-                   .inventory = {} };
+    const sf::Vector2f CARD_SIZE = { 76.f, 114.f };
+
+    return Scene {
+        .deck = { CardBuilder::createCard(CardType::RedHerb),
+                  CardBuilder::createCard(CardType::GreenHerb),
+                  CardBuilder::createCard(CardType::Pistol),
+                  CardBuilder::createCard(CardType::Zombie),
+                  CardBuilder::createCard(CardType::Licker) },
+        .inventory = {},
+        .mainCardBody =
+            dgm::Rect(RenderingEngine::getDeckCardOffset(), CARD_SIZE),
+        .healthbarBody = dgm::Rect({ 35.f, 7.f }, { 85.f, 16.f }),
+        .trashBody = dgm::Rect({ 7.f, 211.f }, { 114.f, 10.f }),
+        .inventoryBodies = { dgm::Rect(
+                                 RenderingEngine::getNthInventoryCardOffset(0),
+                                 CARD_SIZE / 3.f),
+                             dgm::Rect(
+                                 RenderingEngine::getNthInventoryCardOffset(1),
+                                 CARD_SIZE / 3.f),
+                             dgm::Rect(
+                                 RenderingEngine::getNthInventoryCardOffset(2),
+                                 CARD_SIZE / 3.f), },
+    };
 }

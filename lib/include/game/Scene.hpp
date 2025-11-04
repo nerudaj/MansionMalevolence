@@ -18,17 +18,22 @@ struct [[nodiscard]] Animation final
     size_t data = 0;
 };
 
+struct [[nodiscard]] DragDrop final
+{
+    std::optional<size_t> inventoryIdx;
+    sf::Vector2f position;
+};
+
 struct [[nodiscard]] Scene final
 {
     std::list<Card> deck;
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = 5;
     std::optional<Animation> activeAnimation;
+    std::optional<DragDrop> dragDrop;
 
-    /*dgm::Rect mainCardBody;
+    dgm::Rect mainCardBody;
     dgm::Rect healthbarBody;
     dgm::Rect trashBody;
-    dgm::Rect inventory1Body;
-    dgm::Rect inventory2Body;
-    dgm::Rect inventory3Body;*/
+    std::array<dgm::Rect, 3u> inventoryBodies;
 };

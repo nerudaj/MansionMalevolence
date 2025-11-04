@@ -21,6 +21,11 @@ bool Input::isSkipButtonPressed() const
     return touchController.isSkipPressed();
 }
 
+sf::Vector2f Input::getDragPosition() const
+{
+    return touchController.getDragPosition();
+}
+
 [[nodiscard]] bool Input::isMenuCycleLeftPressed() const
 {
     return readAndRelease(InputKind::MenuCycleLeft);

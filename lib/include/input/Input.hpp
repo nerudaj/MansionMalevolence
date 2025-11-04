@@ -32,6 +32,8 @@ public:
 
     [[nodiscard]] bool isSkipButtonPressed() const;
 
+    [[nodiscard]] sf::Vector2f getDragPosition() const;
+
     [[nodiscard]] bool isMenuCycleLeftPressed() const;
 
     [[nodiscard]] bool isMenuCycleRightPressed() const;

@@ -107,7 +107,13 @@ void RenderingEngine::renderWorld(dgm::Window& window)
         if (!card) continue;
 
         renderCard(
-            window, card.value(), getNthInventoryCardOffset(idx), 1.f / 3.f);
+            window,
+            card.value(),
+            scene.dragDrop.value_or(DragDrop {}).inventoryIdx.value_or(-1)
+                    == idx
+                ? scene.dragDrop.value_or(DragDrop {}).position
+                : getNthInventoryCardOffset(idx),
+            1.f / 3.f);
     }
 }
 
@@ -149,6 +155,13 @@ void RenderingEngine::renderHud(dgm::Window& window)
     text.setPosition({ 0.f, 0.f });
     text.setString(fpsCounter.getText());
     window.draw(text);
+
+    /*scene.mainCardBody.debugRender(window);
+    scene.healthbarBody.debugRender(window);
+    scene.trashBody.debugRender(window);
+    scene.inventoryBodies[0].debugRender(window);
+    scene.inventoryBodies[1].debugRender(window);
+    scene.inventoryBodies[2].debugRender(window);*/
 }
 
 void RenderingEngine::renderTouchControls(dgm::Window& window)

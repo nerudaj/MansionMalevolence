@@ -17,8 +17,8 @@ public:
         : dgm::AppState(app)
         , dic(dic)
         , settings(settings)
-        , scene(buildScene(dic.resmgr))
-        , gameRulesEngine(gameEvents, scene, dic.input)
+        , scene(buildScene(dic.resmgr, settings.video))
+        , gameRulesEngine(gameEvents, scene, dic.input, settings.video)
         , renderingEngine(dic.resmgr, scene, settings, dic.touchController)
         , sound(dic.resmgr.get<sf::SoundBuffer>("land.wav"))
     {
@@ -35,7 +35,8 @@ public:
 private:
     void restoreFocusImpl(const std::string& msg) override;
 
-    static Scene buildScene(const dgm::ResourceManager& resmgr);
+    static Scene buildScene(
+        const dgm::ResourceManager& resmgr, const VideoSettings& settings);
 
 private:
     DependencyContainer& dic;

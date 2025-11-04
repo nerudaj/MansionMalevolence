@@ -23,6 +23,17 @@ public:
 
     void draw(dgm::Window& window);
 
+    [[nodiscard]] static sf::Vector2f getDeckCardOffset() noexcept
+    {
+        return sf::Vector2f { 7.f, 35.f };
+    }
+
+    [[nodiscard]] static sf::Vector2f
+    getNthInventoryCardOffset(size_t idx) noexcept
+    {
+        return sf::Vector2f { 8.f + idx * 43.5f, 161.f };
+    }
+
 private:
     /**
      * \brief Create fullscreen camera with a fixed resolution and aspect ratio
@@ -52,17 +63,6 @@ private:
     void renderTopDeckCard(dgm::Window& window);
 
     void renderSecondTopDeckCard(dgm::Window& window);
-
-    [[nodiscard]] sf::Vector2f getDeckCardOffset() const noexcept
-    {
-        return sf::Vector2f { 7.f, 35.f };
-    }
-
-    [[nodiscard]] sf::Vector2f
-    getNthInventoryCardOffset(size_t idx) const noexcept
-    {
-        return sf::Vector2f { 8.f + idx * 43.5f, 161.f };
-    }
 
 private:
     const Scene& scene;

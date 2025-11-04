@@ -27,6 +27,11 @@ void GameRulesEngine::operator()(const CardSkippedGameEvent&)
     scene.deck.pop_front();
 }
 
+void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
+{
+    scene.inventory[e.inventorySlotIdx].reset();
+}
+
 void GameRulesEngine::update(const dgm::Time& time)
 {
     updateActiveAnimation(time);
@@ -49,6 +54,43 @@ void GameRulesEngine::update(const dgm::Time& time)
             .kind = AnimationKind::SkipCard,
         };
     }
+    else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
+    { // drag'n'drop started/moved
+        const auto worldPos = screenToWorld(pos);
+        if (!scene.dragDrop.has_value())
+        { // started
+            scene.dragDrop = DragDrop {
+                .inventoryIdx = findCollidingInventoryIdx(worldPos),
+                .position = worldPos,
+            };
+        }
+        else
+        { // moved
+            scene.dragDrop->position = worldPos;
+        }
+    }
+    else if (scene.dragDrop.has_value())
+    { // drag'n'drop ended, evaluate
+        if (scene.dragDrop->inventoryIdx.has_value())
+        {
+            if (dgm::Collision::basic(
+                    scene.mainCardBody, scene.dragDrop->position))
+            {
+            }
+            else if (dgm::Collision::basic(
+                         scene.healthbarBody, scene.dragDrop->position))
+            {
+            }
+            else if (dgm::Collision::basic(
+                         scene.trashBody, scene.dragDrop->position))
+            {
+                gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
+                    scene.dragDrop->inventoryIdx.value());
+            }
+        }
+
+        scene.dragDrop.reset();
+    }
 }
 
 void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
@@ -69,7 +111,7 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
                 scene.activeAnimation->data);
         }
 
-        scene.activeAnimation = std::nullopt;
+        scene.activeAnimation.reset();
     }
 }
 
@@ -95,4 +137,34 @@ bool GameRulesEngine::canCardsCombine(const Card& a, const Card& b)
 {
     return std::max(a.image, b.image) == CardImage::GreenHerb
            && std::min(a.image, b.image) == CardImage::RedHerb;
+}
+
+sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)
+{
+    // precondition check
+    if (settings.resolution.x > settings.resolution.y)
+        throw std::runtime_error(
+            "Playing on landscape resolution is unsupported");
+
+    // NOTE: I assume this game will always be played on a portrait aspect ratio
+    // therefore the viewport can be offset on Y axis, but not on X axis.
+    const float scale = settings.resolution.x / INTERNAL_GAME_RESOLUTION.x;
+    const float yoffsetRelative =
+        1 - (INTERNAL_GAME_RESOLUTION.y * scale / settings.resolution.y);
+
+    return pos / scale
+           - sf::Vector2f { 0.f, INTERNAL_GAME_RESOLUTION.y * yoffsetRelative };
+}
+
+std::optional<size_t>
+GameRulesEngine::findCollidingInventoryIdx(const sf::Vector2f& pointerPos)
+{
+    for (auto&& [idx, body] : std::views::enumerate(scene.inventoryBodies))
+    {
+        if (scene.inventory[idx].has_value()
+            && dgm::Collision::basic(body, pointerPos))
+            return idx;
+    }
+
+    return std::nullopt;
 }

@@ -4,6 +4,7 @@
 #include "game/events/EventQueue.hpp"
 #include "game/events/GameEvents.hpp"
 #include "input/Input.hpp"
+#include "settings/VideoSettings.hpp"
 
 class [[nodiscard]] GameRulesEngine final
 {
@@ -11,8 +12,12 @@ public:
     GameRulesEngine(
         EventQueue<GameEvent>& gameEventQueue,
         Scene& scene,
-        Input& input) noexcept
-        : gameEventQueue(gameEventQueue), scene(scene), input(input)
+        Input& input,
+        const VideoSettings& settings) noexcept
+        : gameEventQueue(gameEventQueue)
+        , scene(scene)
+        , input(input)
+        , settings(settings)
     {
     }
 
@@ -24,6 +29,8 @@ public:
 
     void operator()(const CardSkippedGameEvent& e);
 
+    void operator()(const InventoryCardTrashedGameEvent& e);
+
 public:
     void update(const dgm::Time& time);
 
@@ -34,7 +41,14 @@ public:
     static bool canCardsCombine(const Card& a, const Card& b);
 
 private:
+    sf::Vector2f screenToWorld(const sf::Vector2f& pos);
+
+    std::optional<size_t>
+    findCollidingInventoryIdx(const sf::Vector2f& pointerPos);
+
+private:
     EventQueue<GameEvent>& gameEventQueue;
     Scene& scene;
     Input& input;
+    const VideoSettings& settings;
 };

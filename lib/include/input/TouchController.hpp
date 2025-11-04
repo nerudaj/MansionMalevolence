@@ -45,7 +45,7 @@ public:
 
     [[nodiscard]] sf::Vector2f readJoystick() const
     {
-        return dgm::Math::toUnit(touchPosition - touchArea.getPosition());
+        return touchPosition - touchArea.getPosition();
     }
 
     void reset();
@@ -67,7 +67,7 @@ public:
     TouchModel(const sf::Vector2u& windowSize);
 
 public:
-    mutable std::array<TouchInput, 3u> objects;
+    mutable std::array<TouchInput, 4u> objects;
     std::map<unsigned, size_t>
         fingerToTouchObject = {}; ///< Each event has finger index associated
                                   ///< with it so we can pair touch begin, touch
@@ -77,6 +77,7 @@ public:
     TouchInput& pauseButton = objects[0];
     TouchInput& takeButton = objects[1];
     TouchInput& skipButton = objects[2];
+    TouchInput& dragJoystick = objects[3];
 };
 
 class [[nodiscard]] TouchController final
@@ -97,6 +98,8 @@ public:
     [[nodiscard]] bool isTakePressed() const;
 
     [[nodiscard]] bool isSkipPressed() const;
+
+    [[nodiscard]] sf::Vector2f getDragPosition() const;
 
 private:
     void processEvent(const sf::Event::TouchBegan& e);
