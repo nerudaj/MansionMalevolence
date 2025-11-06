@@ -6,6 +6,7 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 {
     if (scene.inventory[e.inventorySlotIdx].has_value())
     {
+        // TODO: play sound
         scene.inventory[e.inventorySlotIdx] =
             CardBuilder::createCard(CardType::MixedHerbs);
     }
@@ -19,17 +20,75 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 
 void GameRulesEngine::operator()(const CardSkippedGameEvent&)
 {
-    auto card = scene.deck.front();
-    if (card.traits & CardTrait::Enemy) scene.hearts -= card.power;
-    // TODO: trigger slash animation
-
-    scene.deck.push_back(card);
+    scene.deck.push_back(scene.deck.front());
     scene.deck.pop_front();
 }
 
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
     scene.inventory[e.inventorySlotIdx].reset();
+}
+
+void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
+{
+    auto& card = scene.inventory[e.inventorySlotIdx].value();
+    if (!(card.traits & CardTrait::Healing))
+    {
+        // TODO: trigger return animation
+        // TODO: play sound
+        return;
+    }
+
+    scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
+    // TODO: play healing sound
+    scene.inventory[e.inventorySlotIdx].reset();
+}
+
+void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
+{
+    auto& card = scene.inventory[e.inventorySlotIdx].value();
+    if (card.traits & CardTrait::Weapon
+        && scene.deck.front().traits & CardTrait::Enemy)
+    {
+        // TODO: play sound
+        scene.deck.front().power -= card.power;
+        --card.quantity;
+
+        if (scene.deck.front().power <= 0)
+        {
+            scene.activeAnimation = Animation {
+                .kind = AnimationKind::TrashMainCard,
+            };
+        }
+        else
+        {
+            gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
+                "skipCardAfterReaction"_false);
+        }
+    }
+    // TODO: keys
+    else
+    {
+        // TODO: trigger return animation
+        // TODO: play sound
+    }
+}
+
+void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
+{
+    scene.hearts -= scene.deck.front().power;
+    // TODO: trigger slash animation
+    // TODO: play sound
+
+    if (e.skipCardAfterReaction)
+    {
+        gameEventQueue.pushEvent<CardSkippedGameEvent>();
+    }
+}
+
+void GameRulesEngine::operator()(const MainCardTrashedGameEvent& e)
+{
+    scene.deck.pop_front();
 }
 
 void GameRulesEngine::update(const dgm::Time& time)
@@ -50,9 +109,15 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else if (input.isSkipButtonPressed())
     {
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::SkipCard,
-        };
+        if (scene.deck.front().traits & CardTrait::Enemy)
+            gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
+                "skipCardAfterReaction"_true);
+        else
+        {
+            scene.activeAnimation = Animation {
+                .kind = AnimationKind::SkipCard,
+            };
+        }
     }
     else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
     { // drag'n'drop started/moved
@@ -76,10 +141,14 @@ void GameRulesEngine::update(const dgm::Time& time)
             if (dgm::Collision::basic(
                     scene.mainCardBody, scene.dragDrop->position))
             {
+                gameEventQueue.pushEvent<InventoryCardUsedOnMainCardGameEvent>(
+                    scene.dragDrop->inventoryIdx.value());
             }
             else if (dgm::Collision::basic(
                          scene.healthbarBody, scene.dragDrop->position))
             {
+                gameEventQueue.pushEvent<InventoryCardUsedForHealingGameEvent>(
+                    scene.dragDrop->inventoryIdx.value());
             }
             else if (dgm::Collision::basic(
                          scene.trashBody, scene.dragDrop->position))
@@ -109,6 +178,10 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
         {
             gameEventQueue.pushEvent<CardTakenGameEvent>(
                 scene.activeAnimation->data);
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::TrashMainCard)
+        {
+            gameEventQueue.pushEvent<MainCardTrashedGameEvent>();
         }
 
         scene.activeAnimation.reset();

@@ -9,6 +9,7 @@
 
 const static inline auto INTERNAL_GAME_RESOLUTION =
     sf::Vector2f { 128.f, 228.f };
+constexpr const int MAX_HEARTS = 5;
 
 struct [[nodiscard]] Animation final
 {
@@ -28,7 +29,7 @@ struct [[nodiscard]] Scene final
 {
     std::list<Card> deck;
     std::array<std::optional<Card>, 3u> inventory = {};
-    int hearts = 5;
+    int hearts = MAX_HEARTS;
     std::optional<Animation> activeAnimation;
     std::optional<DragDrop> dragDrop;
 

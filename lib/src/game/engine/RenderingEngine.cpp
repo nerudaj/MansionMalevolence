@@ -1,4 +1,5 @@
 #include "game/engine/RenderingEngine.hpp"
+#include "game/enums/BackgroundType.hpp"
 #include "game/enums/Icon.hpp"
 
 RenderingEngine::RenderingEngine(
@@ -16,8 +17,11 @@ RenderingEngine::RenderingEngine(
           sf::FloatRect { { 0.f, 0.f }, { 1.f, 1.f } },
           sf::Vector2f(settings.video.resolution))
     , text(resmgr.get<sf::Font>("pico-8.ttf"))
-    , playbgrLocation(
-          atlas.addImage(resmgr.get<sf::Texture>("playbgr.png")).value())
+    , playbgrLocation(atlas
+                          .addTileset(
+                              resmgr.get<sf::Texture>("playbgr.png"),
+                              resmgr.get<dgm::Clip>("playbgr.png.clip"))
+                          .value())
     , cardbgrLocation(
           atlas.addImage(resmgr.get<sf::Texture>("cardbgr.png")).value())
     , iconsLocation(atlas
@@ -96,7 +100,7 @@ dgm::Camera RenderingEngine::createFullscreenCamera(
 
 void RenderingEngine::renderWorld(dgm::Window& window)
 {
-    sprite.setTextureRect(atlas.getClip(playbgrLocation).getFrame(0));
+    renderBackground();
     sprite.setPosition({ 0.f, 0.f });
     window.draw(sprite);
 
@@ -114,6 +118,41 @@ void RenderingEngine::renderWorld(dgm::Window& window)
                 ? scene.dragDrop.value_or(DragDrop {}).position
                 : getNthInventoryCardOffset(idx),
             1.f / 3.f);
+    }
+}
+
+void RenderingEngine::renderBackground()
+{
+    const auto isDragRelevant =
+        scene.dragDrop.value_or({}).inventoryIdx.has_value();
+    const auto dragPosition = scene.dragDrop.value_or({}).position;
+    if (isDragRelevant
+        && dgm::Collision::basic(scene.mainCardBody, dragPosition))
+    {
+        sprite.setTextureRect(
+            atlas.getClip(playbgrLocation)
+                .getFrame(std::to_underlying(BackgroundType::MainCard)));
+    }
+    else if (
+        isDragRelevant
+        && dgm::Collision::basic(scene.healthbarBody, dragPosition))
+    {
+        sprite.setTextureRect(
+            atlas.getClip(playbgrLocation)
+                .getFrame(std::to_underlying(BackgroundType::HealthBar)));
+    }
+    else if (
+        isDragRelevant && dgm::Collision::basic(scene.trashBody, dragPosition))
+    {
+        sprite.setTextureRect(
+            atlas.getClip(playbgrLocation)
+                .getFrame(std::to_underlying(BackgroundType::Trash)));
+    }
+    else
+    {
+        sprite.setTextureRect(
+            atlas.getClip(playbgrLocation)
+                .getFrame(std::to_underlying(BackgroundType::Plain)));
     }
 }
 
@@ -141,7 +180,7 @@ void RenderingEngine::renderHud(dgm::Window& window)
 
     // Trash button
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Trash)));
-    sprite.setPosition({ 54.f, 204.f });
+    sprite.setPosition(getTrashIconOffset());
     window.draw(sprite);
 
     // Hearts
@@ -302,6 +341,16 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
                     window, scene.deck.front(), deckOffset + animationOffset);
                 renderSecondTopDeckCard(window);
             }
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::TrashMainCard)
+        {
+            const auto animationOffset =
+                (getTrashIconOffset() - deckOffset) * easeInOut(f);
+            renderCard(
+                window,
+                scene.deck.front(),
+                deckOffset + animationOffset,
+                std::lerp(1.f, 1.f / 10.f, f));
         }
         else
         {

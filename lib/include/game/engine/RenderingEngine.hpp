@@ -34,6 +34,11 @@ public:
         return sf::Vector2f { 8.f + idx * 43.5f, 161.f };
     }
 
+    [[nodiscard]] static sf::Vector2f getTrashIconOffset() noexcept
+    {
+        return sf::Vector2f { 54.f, 204.f };
+    }
+
 private:
     /**
      * \brief Create fullscreen camera with a fixed resolution and aspect ratio
@@ -49,6 +54,8 @@ private:
         const sf::Vector2f& desiredResolution);
 
     void renderWorld(dgm::Window& window);
+
+    void renderBackground();
 
     void renderHud(dgm::Window& window);
 

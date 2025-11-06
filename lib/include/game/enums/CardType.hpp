@@ -19,7 +19,10 @@ enum class [[nodiscard]] CardType
 
     // Enemies
     Zombie,
+    CrimsonHead,
     Licker,
+
+    BookCase,
 
     Max,
 };

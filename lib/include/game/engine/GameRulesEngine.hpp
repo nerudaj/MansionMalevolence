@@ -31,6 +31,14 @@ public:
 
     void operator()(const InventoryCardTrashedGameEvent& e);
 
+    void operator()(const InventoryCardUsedForHealingGameEvent& e);
+
+    void operator()(const InventoryCardUsedOnMainCardGameEvent& e);
+
+    void operator()(const MonsterReactionTriggeredGameEvent& e);
+
+    void operator()(const MainCardTrashedGameEvent& e);
+
 public:
     void update(const dgm::Time& time);
 

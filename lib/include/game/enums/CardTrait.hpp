@@ -6,6 +6,7 @@ enum class [[nodiscard]] CardTrait
     Pickable = 1,
     Enemy = 2,
     Weapon = 4,
+    Healing = 8,
 };
 
 constexpr CardTrait operator|(CardTrait a, CardTrait b)
