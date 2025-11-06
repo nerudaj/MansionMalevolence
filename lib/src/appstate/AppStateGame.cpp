@@ -56,6 +56,9 @@ void AppStateGame::update()
     renderingEngine.update(app.time);
 
     gameEvents.processEvents(gameRulesEngine);
+
+    // TODO: victory or losing screens
+    if (scene.won || scene.lost) app.popState();
 }
 
 void AppStateGame::draw()

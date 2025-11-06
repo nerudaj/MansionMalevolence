@@ -66,7 +66,12 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
                 "skipCardAfterReaction"_false);
         }
     }
-    // TODO: keys
+    else if (
+        card.image == CardImage::Key
+        && scene.deck.front().image == CardImage::Door)
+    {
+        scene.won = true;
+    }
     else
     {
         // TODO: trigger return animation
@@ -79,6 +84,8 @@ void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
     scene.hearts -= scene.deck.front().power;
     // TODO: trigger slash animation
     // TODO: play sound
+
+    scene.lost = scene.hearts <= 0;
 
     if (e.skipCardAfterReaction)
     {
