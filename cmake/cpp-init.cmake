@@ -274,10 +274,10 @@ endfunction ()
 
 # NOTE: C++23 doesn't go well with .clang-tidy v17 currently installed in MSVC
 function ( enable_linter TARGET )
-	file ( COPY_FILE
-		"${CLANG_TIDY_PATH}"
-		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
-	)
+	#file ( COPY_FILE
+	#	"${CLANG_TIDY_PATH}"
+	#	"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
+	#)
 
 	target_sources ( ${TARGET} PRIVATE 
 		"${CMAKE_CURRENT_SOURCE_DIR}/.clang-tidy"
@@ -359,7 +359,7 @@ download_file_if_not_there (
 )
 
 set ( CLANG_TIDY_PATH "${CMAKE_BINARY_DIR}/.clang-tidy" )
-download_file_if_not_there (
-    "https://raw.githubusercontent.com/nerudaj/cpp-init/refs/${CPP_INIT_REF}/.clang-tidy"
-    "${CLANG_TIDY_PATH}"
-)
+#download_file_if_not_there (
+#    "https://raw.githubusercontent.com/nerudaj/cpp-init/refs/${CPP_INIT_REF}/.clang-tidy"
+#    "${CLANG_TIDY_PATH}"
+#)

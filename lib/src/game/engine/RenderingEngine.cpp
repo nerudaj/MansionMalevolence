@@ -110,7 +110,7 @@ void RenderingEngine::renderWorld(dgm::Window& window)
             window,
             card.value(),
             scene.dragDrop.value_or(DragDrop {}).inventoryIdx.value_or(-1)
-                    == idx
+                    == static_cast<size_t>(idx)
                 ? scene.dragDrop.value_or(DragDrop {}).position
                 : getNthInventoryCardOffset(idx),
             1.f / 3.f);

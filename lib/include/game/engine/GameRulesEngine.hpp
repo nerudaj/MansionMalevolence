@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/Scene.hpp"
+#include "game/definitions/Scene.hpp"
 #include "game/events/EventQueue.hpp"
 #include "game/events/GameEvents.hpp"
 #include "input/Input.hpp"

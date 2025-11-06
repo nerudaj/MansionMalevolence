@@ -1,0 +1,12 @@
+Checks: >
+  -*,
+  misc-const-correctness,
+  cppcoreguidelines-avoid-non-const-global-variables,
+  clang-diagnostic-unused-variable,
+  bugprone-assignment-in-if-condition,
+  bugprone-optional-value-conversion,
+  bugprone-use-after-move
+WarningsAsErrors: '*'
+HeaderFilterRegex: '.*'
+ExcludeHeaderFilterRegex: 'catch_amalgamated.*'
+FormatStyle: none

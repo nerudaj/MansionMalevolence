@@ -8,7 +8,7 @@ TEST_CASE("[TiledLoader]")
 {
     SECTION("Can load demo file")
     {
-        tiled::FiniteMapModel model =
+        const tiled::FiniteMapModel model =
             TiledLoader::loadLevel(TESTFILES_PATH / "tiled-map-01.json");
 
         REQUIRE(model.width == 64u);
@@ -21,7 +21,7 @@ TEST_CASE("[TiledLoader]")
 
     SECTION("Can load demo file #2")
     {
-        tiled::FiniteMapModel model =
+        const tiled::FiniteMapModel model =
             TiledLoader::loadLevel(TESTFILES_PATH / "tiled-map-02.json");
 
         REQUIRE(model.layers.size() == 2u);

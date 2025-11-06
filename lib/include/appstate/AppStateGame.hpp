@@ -1,6 +1,7 @@
 #pragma once
 
-#include "game/Scene.hpp"
+#include "game/builders/SceneBuilder.hpp"
+#include "game/definitions/Scene.hpp"
 #include "game/engine/GameRulesEngine.hpp"
 #include "game/engine/RenderingEngine.hpp"
 #include "game/events/EventQueue.hpp"
@@ -17,7 +18,7 @@ public:
         : dgm::AppState(app)
         , dic(dic)
         , settings(settings)
-        , scene(buildScene(dic.resmgr, settings.video))
+        , scene(SceneBuilder::createScene())
         , gameRulesEngine(gameEvents, scene, dic.input, settings.video)
         , renderingEngine(dic.resmgr, scene, settings, dic.touchController)
         , sound(dic.resmgr.get<sf::SoundBuffer>("land.wav"))
@@ -34,9 +35,6 @@ public:
 
 private:
     void restoreFocusImpl(const std::string& msg) override;
-
-    static Scene buildScene(
-        const dgm::ResourceManager& resmgr, const VideoSettings& settings);
 
 private:
     DependencyContainer& dic;

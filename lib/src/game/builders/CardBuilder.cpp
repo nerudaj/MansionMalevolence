@@ -1,4 +1,4 @@
-#include "game/CardBuilder.hpp"
+#include "game/builders/CardBuilder.hpp"
 
 const std::map<CardType, Card> CARD_DEFS = {
     // Weapons

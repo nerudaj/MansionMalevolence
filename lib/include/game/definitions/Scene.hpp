@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/CardBuilder.hpp"
+#include "game/builders/CardBuilder.hpp"
 #include "game/enums/AnimationKind.hpp"
 #include <DGM/dgm.hpp>
 #include <array>

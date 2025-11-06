@@ -3,7 +3,7 @@
 #include "game/enums/CardImage.hpp"
 #include "game/enums/CardTrait.hpp"
 #include "game/enums/CardType.hpp"
-#include <map>
+#include <array>
 #include <string>
 
 struct [[nodiscard]] Card final
@@ -17,10 +17,4 @@ struct [[nodiscard]] Card final
     std::array<char, 17> text2 = {};
     std::array<char, 17> text3 = {};
     std::array<char, 17> text4 = {};
-};
-
-class [[nodiscard]] CardBuilder final
-{
-public:
-    static Card createCard(CardType type);
 };

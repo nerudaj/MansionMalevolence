@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/Scene.hpp"
+#include "game/definitions/Scene.hpp"
 #include "input/TouchController.hpp"
 #include "misc/FpsCounter.hpp"
 #include "settings/AppSettings.hpp"
