@@ -1,4 +1,5 @@
 #include "input/TouchController.hpp"
+#include "game/definitions/Scene.hpp"
 #include <SFML/System/Err.hpp>
 
 void TouchInput::reset()
@@ -14,19 +15,28 @@ void TouchInput::reset()
         touchPosition = touchArea.getPosition();
 }
 
+static float yOffset(const sf::Vector2u& windowSize)
+{
+    const float scale = windowSize.x / INTERNAL_GAME_RESOLUTION.x;
+    return (windowSize.y - INTERNAL_GAME_RESOLUTION.y * scale) / 2.f;
+}
+
 TouchModel::TouchModel(const sf::Vector2u& windowSize)
     : objects(std::array {
           TouchInput(
               TouchObjectKind::Button,
-              { windowSize.x * 0.12f, windowSize.x * 0.12f },
+              { windowSize.x * 0.12f,
+                windowSize.x * 0.12f + yOffset(windowSize) },
               windowSize.x * 0.08f),
           TouchInput(
               TouchObjectKind::Button,
-              { windowSize.x * 0.852f, windowSize.y * 0.258f },
+              { windowSize.x * 0.852f,
+                windowSize.x * 0.453f + yOffset(windowSize) },
               windowSize.x * 0.123f),
           TouchInput(
               TouchObjectKind::Button,
-              { windowSize.x * 0.852f, windowSize.y * 0.5375f },
+              { windowSize.x * 0.852f,
+                windowSize.x * 0.953f + yOffset(windowSize) },
               windowSize.x * 0.123f),
           TouchInput(
               TouchObjectKind::Joystick,
