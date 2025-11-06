@@ -124,8 +124,8 @@ void RenderingEngine::renderWorld(dgm::Window& window)
 void RenderingEngine::renderBackground()
 {
     const auto isDragRelevant =
-        scene.dragDrop.value_or({}).inventoryIdx.has_value();
-    const auto dragPosition = scene.dragDrop.value_or({}).position;
+        scene.dragDrop.value_or(DragDrop {}).inventoryIdx.has_value();
+    const auto dragPosition = scene.dragDrop.value_or(DragDrop {}).position;
     if (isDragRelevant
         && dgm::Collision::basic(scene.mainCardBody, dragPosition))
     {
