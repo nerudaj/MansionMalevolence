@@ -89,7 +89,9 @@ void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 
     if (e.skipCardAfterReaction)
     {
-        gameEventQueue.pushEvent<CardSkippedGameEvent>();
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::SkipCard,
+        };
     }
 }
 
@@ -230,10 +232,11 @@ sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)
     // therefore the viewport can be offset on Y axis, but not on X axis.
     const float scale = settings.resolution.x / INTERNAL_GAME_RESOLUTION.x;
     const float yoffsetRelative =
-        1 - (INTERNAL_GAME_RESOLUTION.y * scale / settings.resolution.y);
+        (1.f - (INTERNAL_GAME_RESOLUTION.y * scale / settings.resolution.y))
+        / 2.f;
 
-    return pos / scale
-           - sf::Vector2f { 0.f, INTERNAL_GAME_RESOLUTION.y * yoffsetRelative };
+    return (pos - sf::Vector2f { 0.f, settings.resolution.y * yoffsetRelative })
+           / scale;
 }
 
 std::optional<size_t>
