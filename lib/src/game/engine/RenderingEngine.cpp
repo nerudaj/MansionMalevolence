@@ -187,7 +187,7 @@ void RenderingEngine::renderHud(dgm::Window& window)
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Heart)));
     for (auto i = 0; i < scene.hearts; ++i)
     {
-        sprite.setPosition({ 31.f + i * 18.f, 3.f });
+        sprite.setPosition(getNthHeartOffset(i));
         window.draw(sprite);
     }
 
@@ -300,6 +300,19 @@ static float easeOutThenBack(float x)
     return -4.f * std::pow(x - 0.5f, 2.f) + 1;
 }
 
+static float easeAttack(float x)
+{
+    // note: wolframalpha.com
+    // prompt: interpolating polynomial | {point1} ... {pointN}
+    if (x < 0.4f)
+        return 12.5f * x * x - 5.f * x;
+    else if (x < 0.6f)
+        return 5.f * (x - 0.4f);
+    else if (x < 0.7f)
+        return 1.f;
+    return 193.333f * std::pow(x, 3.f) - 491.f * x * x + 407.967f * x - 110.3;
+}
+
 void RenderingEngine::renderTopDeckCard(dgm::Window& window)
 {
     const auto deckOffset = getDeckCardOffset();
@@ -351,6 +364,13 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
                 scene.deck.front(),
                 deckOffset + animationOffset,
                 std::lerp(1.f, 1.f / 10.f, f));
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::EnemyAttack)
+        {
+            const auto animationOffset =
+                (getNthHeartOffset(0) - deckOffset) * easeAttack(f);
+            renderCard(
+                window, scene.deck.front(), deckOffset + animationOffset);
         }
         else
         {

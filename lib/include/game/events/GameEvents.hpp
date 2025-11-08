@@ -53,6 +53,15 @@ struct [[nodiscard]] MonsterReactionTriggeredGameEvent final
         : skipCardAfterReaction(skipCardAfterReaction) {};
 };
 
+struct [[nodiscard]] MonsterReactionFinishedGameEvent final
+{
+    bool skipCardAfterReaction;
+
+    constexpr explicit MonsterReactionFinishedGameEvent(
+        bool skipCardAfterReaction) noexcept
+        : skipCardAfterReaction(skipCardAfterReaction) {};
+};
+
 struct [[nodiscard]] MainCardTrashedGameEvent final
 {
     MainCardTrashedGameEvent() = default;
@@ -65,4 +74,5 @@ using GameEvent = std::variant<
     InventoryCardUsedForHealingGameEvent,
     InventoryCardUsedOnMainCardGameEvent,
     MonsterReactionTriggeredGameEvent,
+    MonsterReactionFinishedGameEvent,
     MainCardTrashedGameEvent>;

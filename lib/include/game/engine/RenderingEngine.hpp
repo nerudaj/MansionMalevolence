@@ -39,6 +39,11 @@ public:
         return sf::Vector2f { 54.f, 204.f };
     }
 
+    [[nodiscard]] static sf::Vector2f getNthHeartOffset(size_t idx) noexcept
+    {
+        return { 31.f + idx * 18.f, 3.f };
+    }
+
 private:
     /**
      * \brief Create fullscreen camera with a fixed resolution and aspect ratio

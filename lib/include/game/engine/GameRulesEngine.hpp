@@ -37,6 +37,8 @@ public:
 
     void operator()(const MonsterReactionTriggeredGameEvent& e);
 
+    void operator()(const MonsterReactionFinishedGameEvent& e);
+
     void operator()(const MainCardTrashedGameEvent& e);
 
 public:

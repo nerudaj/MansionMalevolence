@@ -5,4 +5,5 @@ enum class [[nodiscard]] AnimationKind
     SkipCard,
     TakeCard,
     TrashMainCard,
+    EnemyAttack,
 };

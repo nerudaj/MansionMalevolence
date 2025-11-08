@@ -81,6 +81,14 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
 
 void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 {
+    scene.activeAnimation = Animation {
+        .kind = AnimationKind::EnemyAttack,
+        .data = static_cast<size_t>(e.skipCardAfterReaction),
+    };
+}
+
+void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
+{
     scene.hearts -= scene.deck.front().power;
     // TODO: trigger slash animation
     // TODO: play sound
@@ -95,7 +103,7 @@ void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
     }
 }
 
-void GameRulesEngine::operator()(const MainCardTrashedGameEvent& e)
+void GameRulesEngine::operator()(const MainCardTrashedGameEvent&)
 {
     scene.deck.pop_front();
 }
@@ -191,6 +199,11 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
         else if (scene.activeAnimation->kind == AnimationKind::TrashMainCard)
         {
             gameEventQueue.pushEvent<MainCardTrashedGameEvent>();
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::EnemyAttack)
+        {
+            gameEventQueue.pushEvent<MonsterReactionFinishedGameEvent>(
+                static_cast<bool>(scene.activeAnimation->data));
         }
 
         scene.activeAnimation.reset();
