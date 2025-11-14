@@ -7,25 +7,20 @@
 {
     // Note always fill the deck with two useless cards so the rendering never
     // breaks
-    auto&& deck = std::vector<Card> {
-        CardBuilder::createCard(CardType::BookCase),
-        CardBuilder::createCard(CardType::BookCase),
-        CardBuilder::createCard(CardType::Door),
-        CardBuilder::createCard(CardType::Key),
-        CardBuilder::createCard(CardType::Pistol),
-        CardBuilder::createCard(CardType::Pistol),
-        CardBuilder::createCard(CardType::Shotgun),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Licker),
-        CardBuilder::createCard(CardType::Licker),
-        CardBuilder::createCard(CardType::RedHerb),
-        CardBuilder::createCard(CardType::GreenHerb),
-        CardBuilder::createCard(CardType::GreenHerb),
-    };
+    auto&& deck =
+        std::vector<Card> { CardBuilder::createCard(CardType::BookCase),
+                            CardBuilder::createCard(CardType::ShieldDoor),
+                            CardBuilder::createCard(CardType::ShieldKey),
+                            CardBuilder::createCard(CardType::Zombie),
+                            CardBuilder::createCard(CardType::Zombie),
+                            CardBuilder::createCard(CardType::Zombie),
+                            CardBuilder::createCard(CardType::Zombie),
+                            CardBuilder::createCard(CardType::Zombie),
+                            CardBuilder::createCard(CardType::GreenHerb),
+                            CardBuilder::createCard(CardType::Crate),
+                            CardBuilder::createCard(CardType::MoonCrestLeft),
+                            CardBuilder::createCard(CardType::Ammo),
+                            CardBuilder::createCard(CardType::MoonCrestDoor) };
 
     /*auto randomCardType = []
     {
@@ -54,7 +49,7 @@ Scene SceneBuilder::createScene()
 
     return Scene {
         .deck = generateDeck(),
-        .inventory = {},
+        .inventory = { CardBuilder::createCard(CardType::Pistol), std::nullopt, std::nullopt },
         .mainCardBody =
             dgm::Rect(RenderingEngine::getDeckCardOffset(), CARD_SIZE),
         .healthbarBody = dgm::Rect({ 35.f, 7.f }, { 85.f, 16.f }),
@@ -69,4 +64,22 @@ Scene SceneBuilder::createScene()
                                  RenderingEngine::getNthInventoryCardOffset(2),
                                  CARD_SIZE / 3.f), },
     };
+}
+
+void SceneBuilder::spawnCardsAfterFirstKeyTarget(Scene& scene)
+{
+    auto&& incoming =
+        std::vector<Card> { CardBuilder::createCard(CardType::Shotgun),
+                            CardBuilder::createCard(CardType::Ammo),
+                            CardBuilder::createCard(CardType::GreenHerb),
+                            CardBuilder::createCard(CardType::RedHerb),
+                            CardBuilder::createCard(CardType::Licker),
+                            CardBuilder::createCard(CardType::Licker),
+                            CardBuilder::createCard(CardType::Cerberus),
+                            CardBuilder::createCard(CardType::MoonCrestRight) };
+
+    auto&& mt = std::mt19937 { std::random_device {}() };
+    std::ranges::shuffle(incoming, mt);
+
+    scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
 }

@@ -2,8 +2,10 @@
 
 enum class [[nodiscard]] CardType
 {
+    Empty = 0,
+
     // Weapons
-    Pistol = 0,
+    Pistol,
     Shotgun,
     Ammo,
 
@@ -14,14 +16,22 @@ enum class [[nodiscard]] CardType
     FirstAid,
 
     // Items
-    Door,
-    Key,
+    MoonCrestLeft,
+    MoonCrestRight,
+    MoonCrest,
+    MoonCrestDoor,
+    ShieldKey,
+    ShieldDoor,
 
     // Enemies
     Zombie,
     CrimsonHead,
     Licker,
+    Cerberus,
+    Hunter,
+    Tyrant,
 
+    Crate,
     BookCase,
 
     Max,

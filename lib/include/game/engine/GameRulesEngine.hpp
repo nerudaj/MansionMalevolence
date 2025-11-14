@@ -41,6 +41,8 @@ public:
 
     void operator()(const MainCardTrashedGameEvent& e);
 
+    void operator()(const CardUsedOnAnotherInventoryCardGameEvent& e);
+
 public:
     void update(const dgm::Time& time);
 
@@ -48,13 +50,21 @@ public:
 
     std::optional<size_t> getUsableInventorySlot(const Card& card) const;
 
-    static bool canCardsCombine(const Card& a, const Card& b);
+    static bool canInventoryCardCombineWithIncoming(
+        const Card& inventoryCard, const Card& incomingCard);
+
+    static bool
+    canCardInteractWithDeck(const Card& a, const std::list<Card>& deck);
 
 private:
     sf::Vector2f screenToWorld(const sf::Vector2f& pos);
 
     std::optional<size_t>
     findCollidingInventoryIdx(const sf::Vector2f& pointerPos);
+
+    void reloadWeapon(Card& weapon, int quantity);
+
+    void popTopDeckCard();
 
 private:
     EventQueue<GameEvent>& gameEventQueue;

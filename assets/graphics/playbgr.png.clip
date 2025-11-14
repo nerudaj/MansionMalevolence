@@ -4,13 +4,13 @@
         "height": 228
     },
     "spacing": {
-        "horizontal": 8,
-        "vertical": 8
+        "horizontal": 2,
+        "vertical": 2
     },
     "bounds": {
-        "left": 8,
-        "top": 8,
-        "width": 264,
-        "height": 464
+        "left": 2,
+        "top": 2,
+        "width": 388,
+        "height": 918
     }
 }

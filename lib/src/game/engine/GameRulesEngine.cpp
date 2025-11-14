@@ -1,4 +1,5 @@
 #include "game/engine/GameRulesEngine.hpp"
+#include "game/builders/SceneBuilder.hpp"
 #include <algorithm>
 #include <limits>
 
@@ -6,22 +7,51 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 {
     if (scene.inventory[e.inventorySlotIdx].has_value())
     {
-        // TODO: play sound
-        scene.inventory[e.inventorySlotIdx] =
-            CardBuilder::createCard(CardType::MixedHerbs);
+        const auto image = scene.inventory[e.inventorySlotIdx].value().image;
+        if (image == CardImage::GreenHerb || image == CardImage::RedHerb)
+        {
+            // TODO: play sound
+            scene.inventory[e.inventorySlotIdx] =
+                CardBuilder::createCard(CardType::MixedHerbs);
+        }
+        else if (
+            image == CardImage::MoonCrestLeft
+            || image == CardImage::MoonCrestRight)
+        {
+            // TODO: play sound
+            scene.inventory[e.inventorySlotIdx] =
+                CardBuilder::createCard(CardType::MoonCrest);
+        }
+        else if (
+            scene.inventory[e.inventorySlotIdx].value().traits
+            & CardTrait::Weapon)
+        {
+            reloadWeapon(
+                *scene.inventory[e.inventorySlotIdx],
+                scene.deck.front().quantity);
+        }
+        else
+        {
+            throw std::runtime_error(uni::format(
+                "CardTakenGameEvent: Trying to mix incoming card {} with "
+                "inventory card {} - operation not defined",
+                std::to_underlying(scene.deck.front().image),
+                std::to_underlying(
+                    scene.inventory[e.inventorySlotIdx]->image)));
+        }
     }
     else
     {
         scene.inventory[e.inventorySlotIdx] = scene.deck.front();
     }
 
-    scene.deck.pop_front();
+    popTopDeckCard();
 }
 
 void GameRulesEngine::operator()(const CardSkippedGameEvent&)
 {
     scene.deck.push_back(scene.deck.front());
-    scene.deck.pop_front();
+    popTopDeckCard();
 }
 
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
@@ -50,6 +80,12 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     if (card.traits & CardTrait::Weapon
         && scene.deck.front().traits & CardTrait::Enemy)
     {
+        if (card.quantity == 0)
+        {
+            // TODO: fail
+            return;
+        }
+
         // TODO: play sound
         scene.deck.front().power -= card.power;
         --card.quantity;
@@ -62,13 +98,22 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         }
         else
         {
-            gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
-                "skipCardAfterReaction"_false);
+            // TODO: trigger only for tyrant
         }
     }
     else if (
-        card.image == CardImage::Key
-        && scene.deck.front().image == CardImage::Door)
+        card.traits & CardTrait::KeyItem1
+        && scene.deck.front().traits & CardTrait::KeyTarget1)
+    {
+        scene.inventory[e.inventorySlotIdx].reset();
+        SceneBuilder::spawnCardsAfterFirstKeyTarget(scene);
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::TrashMainCard,
+        };
+    }
+    else if (
+        card.traits & CardTrait::KeyItem2
+        && scene.deck.front().traits & CardTrait::KeyTarget2)
     {
         scene.won = true;
     }
@@ -105,7 +150,42 @@ void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 
 void GameRulesEngine::operator()(const MainCardTrashedGameEvent&)
 {
-    scene.deck.pop_front();
+    popTopDeckCard();
+}
+
+void GameRulesEngine::operator()(
+    const CardUsedOnAnotherInventoryCardGameEvent& e)
+{
+    if (!scene.inventory[e.sourceCardInventoryIdx].has_value()
+        || !scene.inventory[e.destinationCardInventoryIdx].has_value())
+    {
+        throw std::runtime_error(
+            "CardUsedOnAnotherInventoryCardGameEvent: One of the two inventory "
+            "slots is empty");
+    }
+
+    const auto& src = scene.inventory[e.sourceCardInventoryIdx].value();
+    auto& dst = scene.inventory[e.destinationCardInventoryIdx].value();
+
+    if (dst.traits & CardTrait::Weapon && src.traits & CardTrait::Ammo)
+    {
+        reloadWeapon(dst, src.quantity);
+    }
+    else if (
+        dst.image == CardImage::GreenHerb || src.image == CardImage::GreenHerb)
+    {
+        // TODO: play sound
+        dst = CardBuilder::createCard(CardType::MixedHerbs);
+    }
+    else if (
+        dst.image == CardImage::MoonCrestLeft
+        || src.image == CardImage::MoonCrestLeft)
+    {
+        // TODO: play sound
+        dst = CardBuilder::createCard(CardType::MoonCrest);
+    }
+
+    scene.inventory[e.sourceCardInventoryIdx].reset();
 }
 
 void GameRulesEngine::update(const dgm::Time& time)
@@ -173,6 +253,29 @@ void GameRulesEngine::update(const dgm::Time& time)
                 gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
                     scene.dragDrop->inventoryIdx.value());
             }
+            else
+            {
+                for (auto&& [idx, inventoryBody] :
+                     std::views::enumerate(scene.inventoryBodies))
+                {
+                    if (!scene.inventory[idx].has_value()
+                        || static_cast<size_t>(idx)
+                               == scene.dragDrop->inventoryIdx.value())
+                        continue;
+
+                    if (dgm::Collision::basic(
+                            inventoryBody, scene.dragDrop->position)
+                        && canInventoryCardCombineWithIncoming(
+                            *scene.inventory[idx],
+                            *scene.inventory[*scene.dragDrop->inventoryIdx]))
+                    {
+                        gameEventQueue
+                            .pushEvent<CardUsedOnAnotherInventoryCardGameEvent>(
+                                *scene.dragDrop->inventoryIdx,
+                                static_cast<size_t>(idx));
+                    }
+                }
+            }
         }
 
         scene.dragDrop.reset();
@@ -213,25 +316,47 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 std::optional<size_t>
 GameRulesEngine::getUsableInventorySlot(const Card& card) const
 {
-    // First check combinable cards
-    for (auto&& [idx, slot] : std::ranges::views::enumerate(scene.inventory))
-    {
-        if (slot && canCardsCombine(*slot, card)) return idx;
-    }
-
     // Then empty slots
     for (auto&& [idx, slot] : std::ranges::views::enumerate(scene.inventory))
     {
         if (!slot) return idx;
     }
 
+    // Check combinable cards
+    for (auto&& [idx, slot] : std::ranges::views::enumerate(scene.inventory))
+    {
+        if (slot && canInventoryCardCombineWithIncoming(*slot, card))
+            return idx;
+    }
+
     return std::nullopt;
 }
 
-bool GameRulesEngine::canCardsCombine(const Card& a, const Card& b)
+bool GameRulesEngine::canInventoryCardCombineWithIncoming(
+    const Card& inventoryCard, const Card& incomingCard)
 {
-    return std::max(a.image, b.image) == CardImage::GreenHerb
-           && std::min(a.image, b.image) == CardImage::RedHerb;
+    return std::max(inventoryCard.image, incomingCard.image)
+                   == CardImage::GreenHerb
+               && std::min(inventoryCard.image, incomingCard.image)
+                      == CardImage::RedHerb
+           || inventoryCard.traits & CardTrait::Weapon
+                  && incomingCard.traits & CardTrait::Ammo
+                  && inventoryCard.quantity < MAX_AMMO
+           || std::min(inventoryCard.image, incomingCard.image)
+                      == CardImage::MoonCrestLeft
+                  && std::max(inventoryCard.image, incomingCard.image)
+                         == CardImage::MoonCrestRight;
+}
+
+bool GameRulesEngine::canCardInteractWithDeck(
+    const Card& a, const std::list<Card>& deck)
+{
+    const auto deckTraits = deck.front().traits;
+    return deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
+           || deckTraits & CardTrait::KeyTarget1
+                  && a.traits & CardTrait::KeyItem1
+           || deckTraits & CardTrait::KeyTarget2
+                  && a.traits & CardTrait::KeyItem2;
 }
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)
@@ -263,4 +388,21 @@ GameRulesEngine::findCollidingInventoryIdx(const sf::Vector2f& pointerPos)
     }
 
     return std::nullopt;
+}
+
+void GameRulesEngine::reloadWeapon(Card& weapon, int quantity)
+{
+    // TODO: play sound
+    weapon.quantity = std::clamp(weapon.quantity + quantity, 0, MAX_AMMO);
+}
+
+void GameRulesEngine::popTopDeckCard()
+{
+    scene.deck.pop_front();
+
+    if (scene.deck.front().image == CardImage::Cerberus)
+    {
+        gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
+            "skipCardAfterReaction"_false);
+    }
 }

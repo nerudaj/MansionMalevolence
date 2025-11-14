@@ -19,10 +19,10 @@ TEST_CASE("[Sanity]")
 
     SECTION("Red and green herbs can mix")
     {
-        REQUIRE(GameRulesEngine::canCardsCombine(
+        REQUIRE(GameRulesEngine::canInventoryCardCombineWithIncoming(
             CardBuilder::createCard(CardType::RedHerb),
             CardBuilder::createCard(CardType::GreenHerb)));
-        REQUIRE(GameRulesEngine::canCardsCombine(
+        REQUIRE(GameRulesEngine::canInventoryCardCombineWithIncoming(
             CardBuilder::createCard(CardType::GreenHerb),
             CardBuilder::createCard(CardType::RedHerb)));
     }

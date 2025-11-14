@@ -67,6 +67,20 @@ struct [[nodiscard]] MainCardTrashedGameEvent final
     MainCardTrashedGameEvent() = default;
 };
 
+struct [[nodiscard]] CardUsedOnAnotherInventoryCardGameEvent final
+{
+    size_t sourceCardInventoryIdx;
+    size_t destinationCardInventoryIdx;
+
+    constexpr CardUsedOnAnotherInventoryCardGameEvent(
+        size_t sourceCardInventoryIdx,
+        size_t destinationCardInventoryIdx) noexcept
+        : sourceCardInventoryIdx(sourceCardInventoryIdx)
+        , destinationCardInventoryIdx(destinationCardInventoryIdx)
+    {
+    }
+};
+
 using GameEvent = std::variant<
     CardTakenGameEvent,
     CardSkippedGameEvent,
@@ -75,4 +89,5 @@ using GameEvent = std::variant<
     InventoryCardUsedOnMainCardGameEvent,
     MonsterReactionTriggeredGameEvent,
     MonsterReactionFinishedGameEvent,
-    MainCardTrashedGameEvent>;
+    MainCardTrashedGameEvent,
+    CardUsedOnAnotherInventoryCardGameEvent>;

@@ -1,4 +1,5 @@
 #include "game/engine/RenderingEngine.hpp"
+#include "game/engine/GameRulesEngine.hpp"
 #include "game/enums/BackgroundType.hpp"
 #include "game/enums/Icon.hpp"
 
@@ -100,10 +101,7 @@ dgm::Camera RenderingEngine::createFullscreenCamera(
 
 void RenderingEngine::renderWorld(dgm::Window& window)
 {
-    renderBackground();
-    sprite.setPosition({ 0.f, 0.f });
-    window.draw(sprite);
-
+    renderBackground(window);
     renderTopDeckCard(window);
 
     for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
@@ -121,39 +119,13 @@ void RenderingEngine::renderWorld(dgm::Window& window)
     }
 }
 
-void RenderingEngine::renderBackground()
+void RenderingEngine::renderBackground(dgm::Window& window)
 {
-    const auto isDragRelevant =
-        scene.dragDrop.value_or(DragDrop {}).inventoryIdx.has_value();
-    const auto dragPosition = scene.dragDrop.value_or(DragDrop {}).position;
-    if (isDragRelevant
-        && dgm::Collision::basic(scene.mainCardBody, dragPosition))
-    {
-        sprite.setTextureRect(
-            atlas.getClip(playbgrLocation)
-                .getFrame(std::to_underlying(BackgroundType::MainCard)));
-    }
-    else if (
-        isDragRelevant
-        && dgm::Collision::basic(scene.healthbarBody, dragPosition))
-    {
-        sprite.setTextureRect(
-            atlas.getClip(playbgrLocation)
-                .getFrame(std::to_underlying(BackgroundType::HealthBar)));
-    }
-    else if (
-        isDragRelevant && dgm::Collision::basic(scene.trashBody, dragPosition))
-    {
-        sprite.setTextureRect(
-            atlas.getClip(playbgrLocation)
-                .getFrame(std::to_underlying(BackgroundType::Trash)));
-    }
-    else
-    {
-        sprite.setTextureRect(
-            atlas.getClip(playbgrLocation)
-                .getFrame(std::to_underlying(BackgroundType::Plain)));
-    }
+    sprite.setTextureRect(
+        atlas.getClip(playbgrLocation)
+            .getFrame(std::to_underlying(getAppropriateBackgroundType())));
+    sprite.setPosition({ 0.f, 0.f });
+    window.draw(sprite);
 }
 
 void RenderingEngine::renderHud(dgm::Window& window)
@@ -292,7 +264,7 @@ void RenderingEngine::renderCard(
 
 static float easeInOut(float x)
 {
-    return x < 0.5 ? 4 * std::pow(x, 3.f) : 1 - std::pow(-2 * x + 2, 3) / 2;
+    return x < 0.5f ? 4 * std::pow(x, 3.f) : 1 - std::pow(-2 * x + 2, 3) / 2;
 }
 
 static float easeOutThenBack(float x)
@@ -310,7 +282,7 @@ static float easeAttack(float x)
         return 5.f * (x - 0.4f);
     else if (x < 0.7f)
         return 1.f;
-    return 193.333f * std::pow(x, 3.f) - 491.f * x * x + 407.967f * x - 110.3;
+    return 193.333f * std::pow(x, 3.f) - 491.f * x * x + 407.967f * x - 110.3f;
 }
 
 void RenderingEngine::renderTopDeckCard(dgm::Window& window)
@@ -387,4 +359,54 @@ void RenderingEngine::renderSecondTopDeckCard(dgm::Window& window)
 {
     if (scene.deck.size() > 1)
         renderCard(window, *(++scene.deck.begin()), getDeckCardOffset());
+}
+
+BackgroundType RenderingEngine::getAppropriateBackgroundType() const
+{
+    const auto dragDrop = scene.dragDrop.value_or(DragDrop {});
+    const auto isDragRelevant = dragDrop.inventoryIdx.has_value();
+    const auto dragPosition = dragDrop.position;
+    const auto&& draggedCard =
+        scene.inventory[dragDrop.inventoryIdx.value_or(0)].value_or(
+            CardBuilder::createCard(CardType::Empty));
+
+    if (!isDragRelevant) return BackgroundType::Plain;
+
+    if (dgm::Collision::basic(scene.mainCardBody, dragPosition))
+    {
+        return GameRulesEngine::canCardInteractWithDeck(draggedCard, scene.deck)
+                   ? BackgroundType::MainCard
+                   : BackgroundType::MainCardGreyed;
+    }
+    else if (dgm::Collision::basic(scene.healthbarBody, dragPosition))
+    {
+        return draggedCard.traits & CardTrait::Healing
+                   ? BackgroundType::HealthBar
+                   : BackgroundType::HealthBarGreyed;
+    }
+    else if (dgm::Collision::basic(scene.trashBody, dragPosition))
+    {
+        return BackgroundType::Trash;
+    }
+
+    for (auto&& [idx, inventoryBody] :
+         std::views::enumerate(scene.inventoryBodies))
+    {
+        const bool isIdxOfDraggedItem = static_cast<size_t>(idx)
+                                        == dragDrop.inventoryIdx.value_or(
+                                            std::numeric_limits<size_t>::max());
+        if (!scene.inventory[idx].has_value() || isIdxOfDraggedItem) continue;
+
+        if (dgm::Collision::basic(inventoryBody, dragPosition))
+        {
+            return static_cast<BackgroundType>(
+                GameRulesEngine::canInventoryCardCombineWithIncoming(
+                    scene.inventory[idx].value(), draggedCard)
+                    ? std::to_underlying(BackgroundType::Inventory1) + 2 * idx
+                    : std::to_underlying(BackgroundType::Inventory1Greyed)
+                          + 2 * idx);
+        }
+    }
+
+    return BackgroundType::Plain;
 }

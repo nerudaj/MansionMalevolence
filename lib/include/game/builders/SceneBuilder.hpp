@@ -6,4 +6,6 @@ class [[nodiscard]] SceneBuilder final
 {
 public:
     static Scene createScene();
+
+    static void spawnCardsAfterFirstKeyTarget(Scene& scene);
 };

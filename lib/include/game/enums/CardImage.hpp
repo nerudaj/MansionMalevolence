@@ -2,17 +2,26 @@
 
 enum class [[nodiscard]] CardImage
 {
-    Door,
-    Key,
-    Ammo,
     RedHerb,
     GreenHerb,
-    Pistol,
-    Zombie,
-    FirstAid,
-    Shotgun,
-    Licker,
     MixedHerbs,
+    FirstAid,
+    Ammo,
+    Pistol,
+    Shotgun,
+    RocketLauncher,
+    Crate,
+    Zombie,
+    Licker,
+    Cerberus,
+    Hunter,
+    Tyrant,
+    MoonCrestLeft,
+    MoonCrestRight,
+    MoonCrest,
+    MoonCrestDoor,
+    ShieldKey,
+    ShieldDoor,
 
     Max
 };

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/definitions/Scene.hpp"
+#include "game/enums/BackgroundType.hpp"
 #include "input/TouchController.hpp"
 #include "misc/FpsCounter.hpp"
 #include "settings/AppSettings.hpp"
@@ -60,7 +61,7 @@ private:
 
     void renderWorld(dgm::Window& window);
 
-    void renderBackground();
+    void renderBackground(dgm::Window& window);
 
     void renderHud(dgm::Window& window);
 
@@ -75,6 +76,8 @@ private:
     void renderTopDeckCard(dgm::Window& window);
 
     void renderSecondTopDeckCard(dgm::Window& window);
+
+    BackgroundType getAppropriateBackgroundType() const;
 
 private:
     const Scene& scene;
