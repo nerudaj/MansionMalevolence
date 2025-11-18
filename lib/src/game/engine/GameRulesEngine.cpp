@@ -460,6 +460,6 @@ void GameRulesEngine::popTopDeckCard()
 bool GameRulesEngine::rollForSuccess(float chance)
 {
     const auto DICE_SIDES = 6;
-    auto roll = std::random_device {}();
+    const auto roll = std::random_device {}();
     return chance >= (roll % DICE_SIDES + 1) / static_cast<float>(DICE_SIDES);
 }

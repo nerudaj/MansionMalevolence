@@ -208,8 +208,8 @@ Card CardBuilder::createCard(CardType type)
 
 Card CardBuilder::combineCards(const Card& a, const Card& b)
 {
-    bool isValid = a.special == CardSpecial::Combines && b.special == a.special
-                   && a.link == b.link;
+    const bool isValid = a.special == CardSpecial::Combines
+                         && b.special == a.special && a.link == b.link;
     if (!isValid)
     {
         throw std::runtime_error(uni::format(
