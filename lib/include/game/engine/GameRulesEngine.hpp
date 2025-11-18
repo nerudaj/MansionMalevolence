@@ -27,9 +27,11 @@ public:
 public:
     void operator()(const CardTakenGameEvent& e);
 
-    void operator()(const CardSkippedGameEvent& e);
+    void operator()(const CardSkipStartedGameEvent& e);
 
-    void operator()(const PlayerTryingToSkipGameEvent& e);
+    void operator()(const CardSkipEndedGameEvent& e);
+
+    void operator()(const BeforeCardSkipGameEvent& e);
 
     void operator()(const InventoryCardTrashedGameEvent& e);
 
@@ -41,11 +43,17 @@ public:
 
     void operator()(const MonsterReactionFinishedGameEvent& e);
 
+    void operator()(const MonsterShotAtGameEvent& e);
+
+    void operator()(const MonsterStaggerEndedGameEvent& e);
+
     void operator()(const MainCardTrashedGameEvent& e);
 
     void operator()(const CardUsedOnAnotherInventoryCardGameEvent& e);
 
     void operator()(const ZombieDiedGameEvent& e);
+
+    void operator()(const MainCardResolvedGameEvent& e);
 
 public:
     void update(const dgm::Time& time);

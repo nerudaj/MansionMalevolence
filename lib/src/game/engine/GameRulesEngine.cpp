@@ -41,13 +41,20 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
     popTopDeckCard();
 }
 
-void GameRulesEngine::operator()(const CardSkippedGameEvent&)
+void GameRulesEngine::operator()(const CardSkipStartedGameEvent& e)
+{
+    scene.activeAnimation = Animation {
+        .kind = AnimationKind::SkipCard,
+    };
+}
+
+void GameRulesEngine::operator()(const CardSkipEndedGameEvent&)
 {
     scene.deck.push_back(scene.deck.front());
     popTopDeckCard();
 }
 
-void GameRulesEngine::operator()(const PlayerTryingToSkipGameEvent& e)
+void GameRulesEngine::operator()(const BeforeCardSkipGameEvent& e)
 {
     const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
     const auto special = scene.deck.front().special;
@@ -63,9 +70,7 @@ void GameRulesEngine::operator()(const PlayerTryingToSkipGameEvent& e)
     }
     else
     {
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::SkipCard,
-        };
+        gameEventQueue.pushEvent<CardSkipStartedGameEvent>();
     }
 }
 
@@ -95,46 +100,22 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     auto& deckCard = scene.deck.front();
     if (card.traits & CardTrait::Weapon && deckCard.traits & CardTrait::Enemy)
     {
-        if (card.quantity == 0)
+        if (card.quantity != 0)
         {
-            // TODO: fail
-            return;
-        }
-
-        // TODO: play sound
-        deckCard.power -= card.power;
-        --card.quantity;
-
-        if (deckCard.power <= 0)
-        {
-            scene.activeAnimation = Animation {
-                .kind = AnimationKind::TrashMainCard,
-            };
-
-            if (deckCard.special == CardSpecial::SpawnCrimsonHead)
-            {
-                gameEventQueue.pushEvent<ZombieDiedGameEvent>();
-            }
-        }
-        else if (deckCard.special == CardSpecial::Retaliate)
-        {
-            scene.activeAnimation = Animation {
-                .kind = AnimationKind::EnemyAttack,
-                .data = static_cast<size_t>("skipCardAfterReaction"_false),
-            };
+            gameEventQueue.pushEvent<MonsterShotAtGameEvent>(
+                e.inventorySlotIdx);
         }
     }
     else if (
         card.traits & CardTrait::KeyItem
         && deckCard.traits & CardTrait::KeyTarget && card.link == deckCard.link)
     {
+        scene.inventory[e.inventorySlotIdx].reset();
+        gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
+
         if (card.link == SPECIAL_SHIELD_KEYDOOR)
         {
-            scene.inventory[e.inventorySlotIdx].reset();
             SceneBuilder::spawnCardsAfterFirstKeyTarget(scene);
-            scene.activeAnimation = Animation {
-                .kind = AnimationKind::TrashMainCard,
-            };
         }
         else if (card.link == SPECIAL_CREST_DOOR)
         {
@@ -145,7 +126,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     {
         scene.deck.push_front(*scene.inventory[e.inventorySlotIdx]);
         scene.inventory[e.inventorySlotIdx].reset();
-        gameEventQueue.pushEvent<PlayerTryingToSkipGameEvent>();
+        gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
     }
     else
     {
@@ -172,9 +153,36 @@ void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 
     if (e.skipCardAfterReaction)
     {
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::SkipCard,
-        };
+        gameEventQueue.pushEvent<CardSkipStartedGameEvent>();
+    }
+}
+
+void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
+{
+    auto& weapon = scene.inventory[e.inventoryWeaponIdx].value();
+
+    // TODO: play sound
+    --weapon.quantity;
+
+    scene.activeAnimation = Animation {
+        .kind = AnimationKind::EnemyDamaged,
+        .duration = sf::seconds(0.25f),
+        .data = static_cast<size_t>(weapon.power),
+    };
+}
+
+void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
+{
+    auto& deckCard = scene.deck.front();
+    deckCard.power -= e.damage;
+    if (deckCard.power <= 0)
+    {
+        gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
+    }
+    else if (deckCard.special == CardSpecial::Retaliate)
+    {
+        gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
+            "skipCardAfterReaction"_false);
     }
 }
 
@@ -225,6 +233,18 @@ void GameRulesEngine::operator()(const ZombieDiedGameEvent&)
     scene.deck.push_back(CardBuilder::createCard(CardType::CrimsonHead));
 }
 
+void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
+{
+    if (scene.deck.front().special == CardSpecial::SpawnCrimsonHead)
+    {
+        gameEventQueue.pushEvent<ZombieDiedGameEvent>();
+    }
+
+    scene.activeAnimation = Animation {
+        .kind = AnimationKind::TrashMainCard,
+    };
+}
+
 void GameRulesEngine::update(const dgm::Time& time)
 {
     updateActiveAnimation(time);
@@ -243,7 +263,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else if (input.isSkipButtonPressed())
     {
-        gameEventQueue.pushEvent<PlayerTryingToSkipGameEvent>();
+        gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
     }
     else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
     { // drag'n'drop started/moved
@@ -279,8 +299,16 @@ void GameRulesEngine::update(const dgm::Time& time)
             else if (dgm::Collision::basic(
                          scene.trashBody, scene.dragDrop->position))
             {
-                gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
-                    scene.dragDrop->inventoryIdx.value());
+                const bool isKeyItem =
+                    scene.inventory[scene.dragDrop->inventoryIdx.value()]
+                        .value()
+                        .traits
+                    & CardTrait::KeyItem;
+                if (!isKeyItem)
+                {
+                    gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
+                        scene.dragDrop->inventoryIdx.value());
+                }
             }
             else
             {
@@ -321,7 +349,7 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
     {
         if (scene.activeAnimation->kind == AnimationKind::SkipCard)
         {
-            gameEventQueue.pushEvent<CardSkippedGameEvent>();
+            gameEventQueue.pushEvent<CardSkipEndedGameEvent>();
         }
         else if (scene.activeAnimation->kind == AnimationKind::TakeCard)
         {
@@ -336,6 +364,11 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
         {
             gameEventQueue.pushEvent<MonsterReactionFinishedGameEvent>(
                 static_cast<bool>(scene.activeAnimation->data));
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::EnemyDamaged)
+        {
+            gameEventQueue.pushEvent<MonsterStaggerEndedGameEvent>(
+                static_cast<int>(scene.activeAnimation->data));
         }
 
         scene.activeAnimation.reset();

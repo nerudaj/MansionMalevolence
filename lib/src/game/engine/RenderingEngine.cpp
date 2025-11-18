@@ -285,6 +285,11 @@ static float easeAttack(float x)
     return 193.333f * std::pow(x, 3.f) - 491.f * x * x + 407.967f * x - 110.3f;
 }
 
+static float easeDamage(float x)
+{
+    return std::sin(x * 10.f);
+}
+
 void RenderingEngine::renderTopDeckCard(dgm::Window& window)
 {
     const auto deckOffset = getDeckCardOffset();
@@ -341,6 +346,16 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
         {
             const auto animationOffset =
                 (getNthHeartOffset(0) - deckOffset) * easeAttack(f);
+            renderCard(
+                window, scene.deck.front(), deckOffset + animationOffset);
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::EnemyDamaged)
+        {
+            const auto animationOffset =
+                (sf::Vector2f { deckOffset.x + 76.f * 0.1f,
+                                deckOffset.y + 76.f * 0.1f }
+                 - deckOffset)
+                * easeDamage(f);
             renderCard(
                 window, scene.deck.front(), deckOffset + animationOffset);
         }

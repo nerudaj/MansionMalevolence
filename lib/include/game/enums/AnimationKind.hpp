@@ -6,4 +6,5 @@ enum class [[nodiscard]] AnimationKind
     TakeCard,
     TrashMainCard,
     EnemyAttack,
+    EnemyDamaged,
 };

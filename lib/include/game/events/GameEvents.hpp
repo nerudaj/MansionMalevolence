@@ -12,12 +12,15 @@ struct [[nodiscard]] CardTakenGameEvent final
     }
 };
 
-struct [[nodiscard]] CardSkippedGameEvent final
+struct [[nodiscard]] BeforeCardSkipGameEvent final
 {
-    CardSkippedGameEvent() = default;
 };
 
-struct [[nodiscard]] PlayerTryingToSkipGameEvent final
+struct [[nodiscard]] CardSkipStartedGameEvent final
+{
+};
+
+struct [[nodiscard]] CardSkipEndedGameEvent final
 {
 };
 
@@ -66,9 +69,29 @@ struct [[nodiscard]] MonsterReactionFinishedGameEvent final
         : skipCardAfterReaction(skipCardAfterReaction) {};
 };
 
+struct [[nodiscard]] MonsterShotAtGameEvent final
+{
+    size_t inventoryWeaponIdx;
+
+    constexpr explicit MonsterShotAtGameEvent(
+        size_t inventoryWeaponIdx) noexcept
+        : inventoryWeaponIdx(inventoryWeaponIdx)
+    {
+    }
+};
+
+struct [[nodiscard]] MonsterStaggerEndedGameEvent final
+{
+    int damage;
+
+    constexpr explicit MonsterStaggerEndedGameEvent(int damage) noexcept
+        : damage(damage)
+    {
+    }
+};
+
 struct [[nodiscard]] MainCardTrashedGameEvent final
 {
-    MainCardTrashedGameEvent() = default;
 };
 
 struct [[nodiscard]] CardUsedOnAnotherInventoryCardGameEvent final
@@ -89,15 +112,23 @@ struct [[nodiscard]] ZombieDiedGameEvent final
 {
 };
 
+struct [[nodiscard]] MainCardResolvedGameEvent final
+{
+};
+
 using GameEvent = std::variant<
     CardTakenGameEvent,
-    CardSkippedGameEvent,
-    PlayerTryingToSkipGameEvent,
+    BeforeCardSkipGameEvent,
+    CardSkipStartedGameEvent,
+    CardSkipEndedGameEvent,
     InventoryCardTrashedGameEvent,
     InventoryCardUsedForHealingGameEvent,
     InventoryCardUsedOnMainCardGameEvent,
     MonsterReactionTriggeredGameEvent,
     MonsterReactionFinishedGameEvent,
+    MonsterShotAtGameEvent,
+    MonsterStaggerEndedGameEvent,
     MainCardTrashedGameEvent,
     CardUsedOnAnotherInventoryCardGameEvent,
-    ZombieDiedGameEvent>;
+    ZombieDiedGameEvent,
+    MainCardResolvedGameEvent>;
