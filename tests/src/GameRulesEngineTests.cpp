@@ -15,6 +15,10 @@ TEST_CASE("[GameRulesEngine]")
     {
         SECTION("Returns first slot if inventory is empty")
         {
+            scene.inventory[0].reset();
+            scene.inventory[1].reset();
+            scene.inventory[2].reset();
+
             auto result = engine.getUsableInventorySlot(Card {});
             REQUIRE(result.has_value());
             REQUIRE(result.value() == 0u);
@@ -30,6 +34,8 @@ TEST_CASE("[GameRulesEngine]")
 
         SECTION("Returns index of herb card when it can mix with incoming card")
         {
+            scene.inventory[0] = CardBuilder::createCard(CardType::Empty);
+            scene.inventory[1] = CardBuilder::createCard(CardType::Empty);
             scene.inventory[2] = CardBuilder::createCard(CardType::GreenHerb);
             auto result = engine.getUsableInventorySlot(
                 CardBuilder::createCard(CardType::RedHerb));
