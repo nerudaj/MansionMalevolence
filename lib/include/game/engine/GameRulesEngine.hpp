@@ -29,6 +29,8 @@ public:
 
     void operator()(const CardSkippedGameEvent& e);
 
+    void operator()(const PlayerTryingToSkipGameEvent& e);
+
     void operator()(const InventoryCardTrashedGameEvent& e);
 
     void operator()(const InventoryCardUsedForHealingGameEvent& e);
@@ -42,6 +44,8 @@ public:
     void operator()(const MainCardTrashedGameEvent& e);
 
     void operator()(const CardUsedOnAnotherInventoryCardGameEvent& e);
+
+    void operator()(const ZombieDiedGameEvent& e);
 
 public:
     void update(const dgm::Time& time);
@@ -65,6 +69,8 @@ private:
     void reloadWeapon(Card& weapon, int quantity);
 
     void popTopDeckCard();
+
+    bool rollForSuccess(float chance);
 
 private:
     EventQueue<GameEvent>& gameEventQueue;

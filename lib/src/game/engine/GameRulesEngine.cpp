@@ -2,25 +2,18 @@
 #include "game/builders/SceneBuilder.hpp"
 #include <algorithm>
 #include <limits>
+#include <random>
 
 void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 {
     if (scene.inventory[e.inventorySlotIdx].has_value())
     {
-        const auto image = scene.inventory[e.inventorySlotIdx].value().image;
-        if (image == CardImage::GreenHerb || image == CardImage::RedHerb)
+        const auto& inventoryCard = scene.inventory[e.inventorySlotIdx].value();
+        if (inventoryCard.special == CardSpecial::Combines)
         {
             // TODO: play sound
             scene.inventory[e.inventorySlotIdx] =
-                CardBuilder::createCard(CardType::MixedHerbs);
-        }
-        else if (
-            image == CardImage::MoonCrestLeft
-            || image == CardImage::MoonCrestRight)
-        {
-            // TODO: play sound
-            scene.inventory[e.inventorySlotIdx] =
-                CardBuilder::createCard(CardType::MoonCrest);
+                CardBuilder::combineCards(inventoryCard, scene.deck.front());
         }
         else if (
             scene.inventory[e.inventorySlotIdx].value().traits
@@ -54,6 +47,28 @@ void GameRulesEngine::operator()(const CardSkippedGameEvent&)
     popTopDeckCard();
 }
 
+void GameRulesEngine::operator()(const PlayerTryingToSkipGameEvent& e)
+{
+    const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
+    const auto special = scene.deck.front().special;
+    const bool managedToEvade = rollForSuccess(
+        special == CardSpecial::Blind      ? EVADE_CHANCE_BLIND
+        : special == CardSpecial::Vigilant ? EVADE_CHANCE_VIGILANT
+                                           : EVADE_CHANCE_REGULAR);
+
+    if (isEnemy && !managedToEvade)
+    {
+        gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
+            "skipCardAfterReaction"_true);
+    }
+    else
+    {
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::SkipCard,
+        };
+    }
+}
+
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
     scene.inventory[e.inventorySlotIdx].reset();
@@ -77,8 +92,8 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
 void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
 {
     auto& card = scene.inventory[e.inventorySlotIdx].value();
-    if (card.traits & CardTrait::Weapon
-        && scene.deck.front().traits & CardTrait::Enemy)
+    auto& deckCard = scene.deck.front();
+    if (card.traits & CardTrait::Weapon && deckCard.traits & CardTrait::Enemy)
     {
         if (card.quantity == 0)
         {
@@ -87,35 +102,50 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         }
 
         // TODO: play sound
-        scene.deck.front().power -= card.power;
+        deckCard.power -= card.power;
         --card.quantity;
 
-        if (scene.deck.front().power <= 0)
+        if (deckCard.power <= 0)
         {
             scene.activeAnimation = Animation {
                 .kind = AnimationKind::TrashMainCard,
             };
+
+            if (deckCard.special == CardSpecial::SpawnCrimsonHead)
+            {
+                gameEventQueue.pushEvent<ZombieDiedGameEvent>();
+            }
         }
-        else
+        else if (deckCard.special == CardSpecial::Retaliate)
         {
-            // TODO: trigger only for tyrant
+            scene.activeAnimation = Animation {
+                .kind = AnimationKind::EnemyAttack,
+                .data = static_cast<size_t>("skipCardAfterReaction"_false),
+            };
         }
     }
     else if (
-        card.traits & CardTrait::KeyItem1
-        && scene.deck.front().traits & CardTrait::KeyTarget1)
+        card.traits & CardTrait::KeyItem
+        && deckCard.traits & CardTrait::KeyTarget && card.link == deckCard.link)
     {
-        scene.inventory[e.inventorySlotIdx].reset();
-        SceneBuilder::spawnCardsAfterFirstKeyTarget(scene);
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::TrashMainCard,
-        };
+        if (card.link == SPECIAL_SHIELD_KEYDOOR)
+        {
+            scene.inventory[e.inventorySlotIdx].reset();
+            SceneBuilder::spawnCardsAfterFirstKeyTarget(scene);
+            scene.activeAnimation = Animation {
+                .kind = AnimationKind::TrashMainCard,
+            };
+        }
+        else if (card.link == SPECIAL_CREST_DOOR)
+        {
+            scene.won = true;
+        }
     }
-    else if (
-        card.traits & CardTrait::KeyItem2
-        && scene.deck.front().traits & CardTrait::KeyTarget2)
+    else if (deckCard.special == CardSpecial::Deposit)
     {
-        scene.won = true;
+        scene.deck.push_front(*scene.inventory[e.inventorySlotIdx]);
+        scene.inventory[e.inventorySlotIdx].reset();
+        gameEventQueue.pushEvent<PlayerTryingToSkipGameEvent>();
     }
     else
     {
@@ -188,6 +218,13 @@ void GameRulesEngine::operator()(
     scene.inventory[e.sourceCardInventoryIdx].reset();
 }
 
+void GameRulesEngine::operator()(const ZombieDiedGameEvent&)
+{
+    if (!rollForSuccess(0.25f)) return;
+
+    scene.deck.push_back(CardBuilder::createCard(CardType::CrimsonHead));
+}
+
 void GameRulesEngine::update(const dgm::Time& time)
 {
     updateActiveAnimation(time);
@@ -206,15 +243,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else if (input.isSkipButtonPressed())
     {
-        if (scene.deck.front().traits & CardTrait::Enemy)
-            gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
-                "skipCardAfterReaction"_true);
-        else
-        {
-            scene.activeAnimation = Animation {
-                .kind = AnimationKind::SkipCard,
-            };
-        }
+        gameEventQueue.pushEvent<PlayerTryingToSkipGameEvent>();
     }
     else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
     { // drag'n'drop started/moved
@@ -335,17 +364,12 @@ GameRulesEngine::getUsableInventorySlot(const Card& card) const
 bool GameRulesEngine::canInventoryCardCombineWithIncoming(
     const Card& inventoryCard, const Card& incomingCard)
 {
-    return std::max(inventoryCard.image, incomingCard.image)
-                   == CardImage::GreenHerb
-               && std::min(inventoryCard.image, incomingCard.image)
-                      == CardImage::RedHerb
-           || inventoryCard.traits & CardTrait::Weapon
-                  && incomingCard.traits & CardTrait::Ammo
-                  && inventoryCard.quantity < MAX_AMMO
-           || std::min(inventoryCard.image, incomingCard.image)
-                      == CardImage::MoonCrestLeft
-                  && std::max(inventoryCard.image, incomingCard.image)
-                         == CardImage::MoonCrestRight;
+    return inventoryCard.traits & CardTrait::Weapon
+               && incomingCard.traits & CardTrait::Ammo
+               && inventoryCard.quantity < MAX_AMMO
+           || inventoryCard.special == CardSpecial::Combines
+                  && incomingCard.special == CardSpecial::Combines
+                  && inventoryCard.link == incomingCard.link;
 }
 
 bool GameRulesEngine::canCardInteractWithDeck(
@@ -353,10 +377,9 @@ bool GameRulesEngine::canCardInteractWithDeck(
 {
     const auto deckTraits = deck.front().traits;
     return deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
-           || deckTraits & CardTrait::KeyTarget1
-                  && a.traits & CardTrait::KeyItem1
-           || deckTraits & CardTrait::KeyTarget2
-                  && a.traits & CardTrait::KeyItem2;
+           || deckTraits & CardTrait::KeyTarget && a.traits & CardTrait::KeyItem
+                  && deck.front().link == a.link
+           || deck.front().special == CardSpecial::Deposit;
 }
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)
@@ -399,10 +422,11 @@ void GameRulesEngine::reloadWeapon(Card& weapon, int quantity)
 void GameRulesEngine::popTopDeckCard()
 {
     scene.deck.pop_front();
+}
 
-    if (scene.deck.front().image == CardImage::Cerberus)
-    {
-        gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
-            "skipCardAfterReaction"_false);
-    }
+bool GameRulesEngine::rollForSuccess(float chance)
+{
+    const auto DICE_SIDES = 6;
+    auto roll = std::random_device {}();
+    return chance >= (roll % DICE_SIDES + 1) / static_cast<float>(DICE_SIDES);
 }

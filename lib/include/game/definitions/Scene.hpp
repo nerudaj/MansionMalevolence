@@ -11,6 +11,9 @@ const static inline auto INTERNAL_GAME_RESOLUTION =
     sf::Vector2f { 128.f, 228.f };
 constexpr const int MAX_HEARTS = 5;
 constexpr const int MAX_AMMO = 3;
+constexpr const float EVADE_CHANCE_REGULAR = 0.5f;
+constexpr const float EVADE_CHANCE_BLIND = 0.8f;
+constexpr const float EVADE_CHANCE_VIGILANT = 0.2f;
 
 struct [[nodiscard]] Animation final
 {

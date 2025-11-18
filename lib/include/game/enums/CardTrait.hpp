@@ -8,10 +8,8 @@ enum class [[nodiscard]] CardTrait
     Weapon = 4,
     Healing = 8,
     Ammo = 16,
-    KeyItem1 = 32,
-    KeyTarget1 = 64,
-    KeyItem2 = 128,
-    KeyTarget2 = 256,
+    KeyItem = 32,
+    KeyTarget = 64,
 };
 
 constexpr CardTrait operator|(CardTrait a, CardTrait b)

@@ -17,6 +17,10 @@ struct [[nodiscard]] CardSkippedGameEvent final
     CardSkippedGameEvent() = default;
 };
 
+struct [[nodiscard]] PlayerTryingToSkipGameEvent final
+{
+};
+
 struct [[nodiscard]] InventoryCardTrashedGameEvent final
 {
     size_t inventorySlotIdx;
@@ -81,13 +85,19 @@ struct [[nodiscard]] CardUsedOnAnotherInventoryCardGameEvent final
     }
 };
 
+struct [[nodiscard]] ZombieDiedGameEvent final
+{
+};
+
 using GameEvent = std::variant<
     CardTakenGameEvent,
     CardSkippedGameEvent,
+    PlayerTryingToSkipGameEvent,
     InventoryCardTrashedGameEvent,
     InventoryCardUsedForHealingGameEvent,
     InventoryCardUsedOnMainCardGameEvent,
     MonsterReactionTriggeredGameEvent,
     MonsterReactionFinishedGameEvent,
     MainCardTrashedGameEvent,
-    CardUsedOnAnotherInventoryCardGameEvent>;
+    CardUsedOnAnotherInventoryCardGameEvent,
+    ZombieDiedGameEvent>;
