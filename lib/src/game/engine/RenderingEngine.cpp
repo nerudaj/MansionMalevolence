@@ -136,15 +136,13 @@ void RenderingEngine::renderHud(dgm::Window& window)
 
     // Take button
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
-        scene.deck.front().traits & CardTrait::Pickable ? Icon::GreenTake
-                                                        : Icon::RedTake)));
+        scene.canTakeCard ? Icon::GreenTake : Icon::RedTake)));
     sprite.setPosition({ 96.f, 48.f });
     window.draw(sprite);
 
     // Skip button
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
-        scene.deck.front().traits & CardTrait::Enemy ? Icon::RedSkip
-                                                     : Icon::GreenSkip)));
+        scene.canSafelySkipCard ? Icon::RedSkip : Icon::GreenSkip)));
     sprite.setPosition({ 96.f, 110.f });
     window.draw(sprite);
 

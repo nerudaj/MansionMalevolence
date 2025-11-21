@@ -250,16 +250,17 @@ void GameRulesEngine::update(const dgm::Time& time)
     updateActiveAnimation(time);
     if (scene.activeAnimation.has_value()) return;
 
-    if (input.isTakeButtonPressed()
-        && scene.deck.front().traits & CardTrait::Pickable)
+    scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());
+    scene.canTakeCard = scene.deck.front().traits & CardTrait::Pickable
+                        && scene.usableInventorySlot;
+    scene.canSafelySkipCard = !(scene.deck.front().traits & CardTrait::Enemy);
+
+    if (input.isTakeButtonPressed() && scene.canTakeCard)
     {
-        if (auto&& slotIdx = getUsableInventorySlot(scene.deck.front()))
-        {
-            scene.activeAnimation = Animation {
-                .kind = AnimationKind::TakeCard,
-                .data = *slotIdx,
-            };
-        }
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::TakeCard,
+            .data = *scene.usableInventorySlot,
+        };
     }
     else if (input.isSkipButtonPressed())
     {

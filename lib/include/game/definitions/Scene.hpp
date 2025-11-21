@@ -44,4 +44,10 @@ struct [[nodiscard]] Scene final
     dgm::Rect healthbarBody;
     dgm::Rect trashBody;
     std::array<dgm::Rect, 3u> inventoryBodies;
+
+    // These are precomputed in each update()
+    // and are used both by game and rendering logic.
+    std::optional<size_t> usableInventorySlot;
+    bool canTakeCard = false;
+    bool canSafelySkipCard = false;
 };
