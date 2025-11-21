@@ -26,6 +26,7 @@ struct [[nodiscard]] Animation final
 struct [[nodiscard]] DragDrop final
 {
     std::optional<size_t> inventoryIdx;
+    bool canTrashCard;
     sf::Vector2f position;
 };
 

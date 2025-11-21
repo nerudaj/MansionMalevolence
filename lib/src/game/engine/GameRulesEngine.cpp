@@ -266,77 +266,86 @@ void GameRulesEngine::update(const dgm::Time& time)
         gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
     }
     else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
-    { // drag'n'drop started/moved
-        const auto worldPos = screenToWorld(pos);
-        if (!scene.dragDrop.has_value())
-        { // started
-            scene.dragDrop = DragDrop {
-                .inventoryIdx = findCollidingInventoryIdx(worldPos),
-                .position = worldPos,
-            };
-        }
-        else
-        { // moved
-            scene.dragDrop->position = worldPos;
-        }
+    {
+        handleDragStartedOrMoved(pos);
     }
     else if (scene.dragDrop.has_value())
-    { // drag'n'drop ended, evaluate
-        if (scene.dragDrop->inventoryIdx.has_value())
-        {
-            if (dgm::Collision::basic(
-                    scene.mainCardBody, scene.dragDrop->position))
-            {
-                gameEventQueue.pushEvent<InventoryCardUsedOnMainCardGameEvent>(
-                    scene.dragDrop->inventoryIdx.value());
-            }
-            else if (dgm::Collision::basic(
-                         scene.healthbarBody, scene.dragDrop->position))
-            {
-                gameEventQueue.pushEvent<InventoryCardUsedForHealingGameEvent>(
-                    scene.dragDrop->inventoryIdx.value());
-            }
-            else if (dgm::Collision::basic(
-                         scene.trashBody, scene.dragDrop->position))
-            {
-                const bool isKeyItem =
-                    scene.inventory[scene.dragDrop->inventoryIdx.value()]
-                        .value()
-                        .traits
-                    & CardTrait::KeyItem;
-                if (!isKeyItem)
-                {
-                    gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
-                        scene.dragDrop->inventoryIdx.value());
-                }
-            }
-            else
-            {
-                for (auto&& [idx, inventoryBody] :
-                     std::views::enumerate(scene.inventoryBodies))
-                {
-                    if (!scene.inventory[idx].has_value()
-                        || static_cast<size_t>(idx)
-                               == scene.dragDrop->inventoryIdx.value())
-                        continue;
+    {
+        handleDragEnded();
+    }
+}
 
-                    if (dgm::Collision::basic(
-                            inventoryBody, scene.dragDrop->position)
-                        && canInventoryCardCombineWithIncoming(
-                            *scene.inventory[idx],
-                            *scene.inventory[*scene.dragDrop->inventoryIdx]))
-                    {
-                        gameEventQueue
-                            .pushEvent<CardUsedOnAnotherInventoryCardGameEvent>(
-                                *scene.dragDrop->inventoryIdx,
-                                static_cast<size_t>(idx));
-                    }
-                }
+void GameRulesEngine::handleDragStartedOrMoved(sf::Vector2f& pos)
+{
+    const auto worldPos = screenToWorld(pos);
+    if (!scene.dragDrop.has_value())
+    { // started
+        auto&& inventoryIdx = findCollidingInventoryIdx(worldPos);
+        auto&& traits = inventoryIdx
+                            ? scene.inventory[*inventoryIdx].value().traits
+                            : CardTrait::None;
+        scene.dragDrop = DragDrop {
+            .inventoryIdx = std::move(inventoryIdx),
+            .canTrashCard = !(
+                traits & CardTrait::KeyItem || traits & CardTrait::KeyItemPart),
+            .position = worldPos,
+        };
+    }
+    else
+    { // moved
+        scene.dragDrop->position = worldPos;
+    }
+}
+
+void GameRulesEngine::handleDragEnded()
+{
+    if (!scene.dragDrop->inventoryIdx.has_value())
+    {
+        scene.dragDrop.reset();
+        return;
+    }
+
+    auto inventoryIdx = *scene.dragDrop->inventoryIdx;
+    const auto& dragPos = scene.dragDrop->position;
+    if (dgm::Collision::basic(scene.mainCardBody, dragPos))
+    {
+        gameEventQueue.pushEvent<InventoryCardUsedOnMainCardGameEvent>(
+            inventoryIdx);
+    }
+    else if (dgm::Collision::basic(scene.healthbarBody, dragPos))
+    {
+        gameEventQueue.pushEvent<InventoryCardUsedForHealingGameEvent>(
+            inventoryIdx);
+    }
+    else if (dgm::Collision::basic(scene.trashBody, dragPos))
+    {
+        if (scene.dragDrop->canTrashCard)
+        {
+            gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
+                inventoryIdx);
+        }
+    }
+    else
+    {
+        for (auto&& [idx, inventoryBody] :
+             std::views::enumerate(scene.inventoryBodies))
+        {
+            if (!scene.inventory[idx].has_value()
+                || static_cast<size_t>(idx) == inventoryIdx)
+                continue;
+
+            if (dgm::Collision::basic(inventoryBody, dragPos)
+                && canInventoryCardCombineWithIncoming(
+                    *scene.inventory[idx], *scene.inventory[inventoryIdx]))
+            {
+                gameEventQueue
+                    .pushEvent<CardUsedOnAnotherInventoryCardGameEvent>(
+                        inventoryIdx, static_cast<size_t>(idx));
             }
         }
-
-        scene.dragDrop.reset();
     }
+
+    scene.dragDrop.reset();
 }
 
 void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)

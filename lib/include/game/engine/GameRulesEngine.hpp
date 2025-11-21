@@ -58,7 +58,7 @@ public:
 public:
     void update(const dgm::Time& time);
 
-    void updateActiveAnimation(const dgm::Time& time);
+    void handleDragEnded();
 
     std::optional<size_t> getUsableInventorySlot(const Card& card) const;
 
@@ -70,6 +70,10 @@ public:
 
 private:
     sf::Vector2f screenToWorld(const sf::Vector2f& pos);
+
+    void handleDragStartedOrMoved(sf::Vector2f& pos);
+
+    void updateActiveAnimation(const dgm::Time& time);
 
     std::optional<size_t>
     findCollidingInventoryIdx(const sf::Vector2f& pointerPos);
