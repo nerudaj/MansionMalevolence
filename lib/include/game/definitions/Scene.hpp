@@ -54,4 +54,5 @@ struct [[nodiscard]] Scene final
     std::optional<size_t> usableInventorySlot;
     bool canTakeCard = false;
     bool canSafelySkipCard = false;
+    bool preventInteractions = false;
 };

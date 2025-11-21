@@ -272,8 +272,11 @@ void GameRulesEngine::update(const dgm::Time& time)
                         && scene.usableInventorySlot;
     scene.canSafelySkipCard = !(scene.deck.front().traits & CardTrait::Enemy);
 
+    if (scene.preventInteractions) return;
+
     if (input.isTakeButtonPressed() && scene.canTakeCard)
     {
+        scene.preventInteractions = true;
         scene.activeAnimation = Animation {
             .kind = AnimationKind::TakeCard,
             .data = *scene.usableInventorySlot,
@@ -281,6 +284,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else if (input.isSkipButtonPressed())
     {
+        scene.preventInteractions = true;
         gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
     }
     else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
@@ -482,6 +486,7 @@ void GameRulesEngine::reloadWeapon(Card& weapon, int quantity)
 void GameRulesEngine::popTopDeckCard()
 {
     scene.deck.pop_front();
+    scene.preventInteractions = false;
 }
 
 bool GameRulesEngine::rollForSuccess(float chance)
