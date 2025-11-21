@@ -355,6 +355,16 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
             renderCard(
                 window, scene.deck.front(), deckOffset + animationOffset);
         }
+        else if (
+            scene.activeAnimation->kind == AnimationKind::EnemyDodgedAttack)
+        {
+            const auto animationOffset =
+                (sf::Vector2f { deckOffset.x - 15.f, deckOffset.y }
+                 - deckOffset)
+                * easeOutThenBack(f);
+            renderCard(
+                window, scene.deck.front(), deckOffset + animationOffset);
+        }
         else
         {
             renderCard(window, scene.deck.front(), deckOffset);

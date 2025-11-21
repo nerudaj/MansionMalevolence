@@ -59,9 +59,9 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
     const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
     const auto special = scene.deck.front().special;
     const bool managedToEvade = rollForSuccess(
-        special == CardSpecial::Blind      ? EVADE_CHANCE_BLIND
-        : special == CardSpecial::Vigilant ? EVADE_CHANCE_VIGILANT
-                                           : EVADE_CHANCE_REGULAR);
+        special & CardSpecial::Blind      ? EVADE_CHANCE_BLIND
+        : special & CardSpecial::Vigilant ? EVADE_CHANCE_VIGILANT
+                                          : EVADE_CHANCE_REGULAR);
 
     if (isEnemy && !managedToEvade)
     {
@@ -128,7 +128,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
 
         gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
     }
-    else if (deckCard.special == CardSpecial::Deposit)
+    else if (deckCard.special & CardSpecial::Deposit)
     {
         scene.deck.push_front(*scene.inventory[e.inventorySlotIdx]);
         scene.inventory[e.inventorySlotIdx].reset();
@@ -170,11 +170,22 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
     // TODO: play sound
     --weapon.quantity;
 
-    scene.activeAnimation = Animation {
-        .kind = AnimationKind::EnemyDamaged,
-        .duration = sf::seconds(0.25f),
-        .data = static_cast<size_t>(weapon.power),
-    };
+    if (scene.deck.front().special & CardSpecial::Evasive
+        && rollForSuccess(EVADE_CHANCE_EVASIVE))
+    {
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::EnemyDodgedAttack,
+            .duration = sf::seconds(0.3f),
+        };
+    }
+    else
+    {
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::EnemyDamaged,
+            .duration = sf::seconds(0.25f),
+            .data = static_cast<size_t>(weapon.power),
+        };
+    }
 }
 
 void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
@@ -185,7 +196,7 @@ void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
     {
         gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
     }
-    else if (deckCard.special == CardSpecial::Retaliate)
+    else if (deckCard.special & CardSpecial::Retaliate)
     {
         gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
             "skipCardAfterReaction"_false);
@@ -234,14 +245,14 @@ void GameRulesEngine::operator()(
 
 void GameRulesEngine::operator()(const ZombieDiedGameEvent&)
 {
-    if (!rollForSuccess(0.36f)) return;
+    if (!rollForSuccess(CRIMSON_HEAD_SPAWN_CHANCE)) return;
 
     scene.deck.push_back(CardBuilder::createCard(CardType::CrimsonHead));
 }
 
 void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
 {
-    if (scene.deck.front().special == CardSpecial::SpawnCrimsonHead)
+    if (scene.deck.front().special & CardSpecial::SpawnCrimsonHead)
     {
         gameEventQueue.pushEvent<ZombieDiedGameEvent>();
     }
@@ -416,8 +427,8 @@ bool GameRulesEngine::canInventoryCardCombineWithIncoming(
     return inventoryCard.traits & CardTrait::Weapon
                && incomingCard.traits & CardTrait::Ammo
                && inventoryCard.quantity < MAX_AMMO
-           || inventoryCard.special == CardSpecial::Combines
-                  && incomingCard.special == CardSpecial::Combines
+           || inventoryCard.special & CardSpecial::Combines
+                  && incomingCard.special & CardSpecial::Combines
                   && inventoryCard.link == incomingCard.link;
 }
 
@@ -428,7 +439,7 @@ bool GameRulesEngine::canCardInteractWithDeck(
     return deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
            || deckTraits & CardTrait::KeyTarget && a.traits & CardTrait::KeyItem
                   && deck.front().link == a.link
-           || deck.front().special == CardSpecial::Deposit;
+           || deck.front().special & CardSpecial::Deposit;
 }
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)

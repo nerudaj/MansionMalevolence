@@ -215,13 +215,14 @@ const std::map<CardType, Card> CARD_DEFS = {
     { CardType::Cerberus,
       Card { .image = CardImage::Cerberus,
              .traits = CardTrait::Enemy,
-             .special = CardSpecial::Vigilant,
+             .special = CardSpecial::Evasive | CardSpecial::Vigilant,
              .quantity = 0,
              .power = 1,
              .name = "cerberus",
-             .text1 = "vigilant:",
+             .text1 = "evasive,vigilant",
              .text2 = "decreases your",
-             .text3 = "chance to evade." } },
+             .text3 = "chance to hit",
+             .text4 = "and evade." } },
 
     // Misc
     { CardType::Crate,

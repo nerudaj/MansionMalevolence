@@ -1,5 +1,7 @@
 #pragma once
 
+#include <utility>
+
 enum class [[nodiscard]] CardTrait
 {
     None = 0,
