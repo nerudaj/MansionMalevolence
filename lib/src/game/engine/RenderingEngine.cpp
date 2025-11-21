@@ -48,12 +48,11 @@ void RenderingEngine::update(const dgm::Time& time)
 
 void RenderingEngine::draw(dgm::Window& window)
 {
-    // Render the game world
     window.setViewFromCamera(worldCamera);
-    renderWorld(window);
 
-    // Render everything hud-related
+    renderBackground(window);
     renderHud(window);
+    renderWorld(window);
 
     // Restore camera view for menus, etc
     window.setViewFromCamera(hudCamera);
@@ -101,7 +100,6 @@ dgm::Camera RenderingEngine::createFullscreenCamera(
 
 void RenderingEngine::renderWorld(dgm::Window& window)
 {
-    renderBackground(window);
     renderTopDeckCard(window);
 
     for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
