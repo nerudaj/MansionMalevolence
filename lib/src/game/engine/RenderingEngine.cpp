@@ -260,7 +260,7 @@ void RenderingEngine::renderCard(
 
 static float easeInOut(float x)
 {
-    return x < 0.5f ? 4 * std::pow(x, 3.f) : 1 - std::pow(-2 * x + 2, 3) / 2;
+    return x < 0.5f ? 4 * std::pow(x, 3.f) : 1 - std::pow(-2 * x + 2, 3.f) / 2;
 }
 
 static float easeOutThenBack(float x)

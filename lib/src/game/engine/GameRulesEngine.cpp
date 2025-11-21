@@ -41,7 +41,7 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
     popTopDeckCard();
 }
 
-void GameRulesEngine::operator()(const CardSkipStartedGameEvent& e)
+void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
     scene.activeAnimation = Animation {
         .kind = AnimationKind::SkipCard,
@@ -54,7 +54,7 @@ void GameRulesEngine::operator()(const CardSkipEndedGameEvent&)
     popTopDeckCard();
 }
 
-void GameRulesEngine::operator()(const BeforeCardSkipGameEvent& e)
+void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 {
     const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
     const auto special = scene.deck.front().special;
@@ -113,22 +113,15 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     {
         scene.inventory[e.inventorySlotIdx].reset();
 
-        if (card.link == SPECIAL_SHIELD_KEYDOOR
-            || card.link == SPECIAL_DIAMOND_KEYDOOR)
-        {
-            SceneBuilder::spawnCardsAfterFirstKeyTarget(scene);
-        }
-        else if (
-            card.link == SPECIAL_CREST_DOOR
+        if (card.link == SPECIAL_CREST_DOOR
             && deckCard.image == CardImage::CrestDoorEmpty)
         {
             scene.deck.front() =
                 CardBuilder::createCard(CardType::CrestDoorWithOneCrest);
-            return;
+            return; // prevent trashing of the card
         }
         else if (
-            card.link == SPECIAL_CREST_DOOR
-            && deckCard.image == CardImage::CrestDoorWithOneCrest)
+            SceneBuilder::updateScene(scene, card.link) == GameState::Finished)
         {
             scene.won = true;
         }
@@ -241,7 +234,7 @@ void GameRulesEngine::operator()(
 
 void GameRulesEngine::operator()(const ZombieDiedGameEvent&)
 {
-    if (!rollForSuccess(0.25f)) return;
+    if (!rollForSuccess(0.36f)) return;
 
     scene.deck.push_back(CardBuilder::createCard(CardType::CrimsonHead));
 }
@@ -482,7 +475,6 @@ void GameRulesEngine::popTopDeckCard()
 
 bool GameRulesEngine::rollForSuccess(float chance)
 {
-    const auto DICE_SIDES = 6;
     const auto roll = std::random_device {}();
-    return chance >= (roll % DICE_SIDES + 1) / static_cast<float>(DICE_SIDES);
+    return chance >= (roll % 100) / static_cast<float>(100);
 }

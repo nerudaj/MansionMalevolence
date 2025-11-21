@@ -2,6 +2,7 @@
 
 #include "game/builders/CardBuilder.hpp"
 #include "game/enums/AnimationKind.hpp"
+#include "game/enums/GameScenario.hpp"
 #include <DGM/dgm.hpp>
 #include <array>
 #include <list>
@@ -32,6 +33,7 @@ struct [[nodiscard]] DragDrop final
 
 struct [[nodiscard]] Scene final
 {
+    GameScenario scenario = {};
     bool won = false;
     bool lost = false;
     std::list<Card> deck;

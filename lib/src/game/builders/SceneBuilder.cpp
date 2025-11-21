@@ -3,38 +3,81 @@
 #include "misc/Compatibility.hpp"
 #include <random>
 
-[[nodiscard]] static std::list<Card> generateDeck()
+[[nodiscard]] static std::list<Card> generateTutorialDeck()
 {
-    // Note always fill the deck with two useless cards so the rendering never
-    // breaks
-    auto&& deck =
-        std::vector<Card> { CardBuilder::createCard(CardType::BookCase),
-                            CardBuilder::createCard(CardType::DiamondDoor),
-                            CardBuilder::createCard(CardType::DiamondKey),
-                            CardBuilder::createCard(CardType::Zombie),
-                            CardBuilder::createCard(CardType::Zombie),
-                            CardBuilder::createCard(CardType::Zombie),
-                            CardBuilder::createCard(CardType::Zombie),
-                            CardBuilder::createCard(CardType::Zombie),
-                            CardBuilder::createCard(CardType::GreenHerb),
-                            CardBuilder::createCard(CardType::Crate),
-                            CardBuilder::createCard(CardType::MoonCrest),
-                            CardBuilder::createCard(CardType::Ammo),
-                            CardBuilder::createCard(CardType::CrestDoorEmpty) };
-
-    auto&& mt = std::mt19937 { std::random_device {}() };
-    std::ranges::shuffle(deck, mt);
-
-    return deck | uniranges::to<std::list>();
+    return { CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::ShieldDoor),
+             CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::GreenHerb),
+             CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::Ammo),
+             CardBuilder::createCard(CardType::ShieldKey) };
 }
 
-Scene SceneBuilder::createScene()
+[[nodiscard]] static std::list<Card> generateNormalDeck()
 {
+    auto&& deckPart1 = std::vector<Card> {
+        CardBuilder::createCard(CardType::DiamondDoor),
+        CardBuilder::createCard(CardType::CrestDoorEmpty),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::Crate),
+    };
 
+    auto&& deckPart2 = std::vector<Card> {
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::DiamondKey),
+        CardBuilder::createCard(CardType::RedHerb),
+        CardBuilder::createCard(CardType::MoonCrest),
+    };
+
+    auto&& mt = std::mt19937 { std::random_device {}() };
+    std::ranges::shuffle(deckPart1, mt);
+    std::ranges::shuffle(deckPart2, mt);
+
+    return std::views::join(std::vector { deckPart1, deckPart2 })
+           | uniranges::to<std::list>();
+}
+
+[[nodiscard]] static std::list<Card> generateHardDeck()
+{
+    // TODO: placeholder
+    return {
+        CardBuilder::createCard(CardType::DiamondDoor),
+        CardBuilder::createCard(CardType::CrestDoorEmpty),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::CrimsonHead),
+        CardBuilder::createCard(CardType::Crate),
+    };
+}
+
+[[nodiscard]] static std::list<Card>
+generateInitialDeck(const GameScenario scenario)
+{
+    switch (scenario)
+    {
+    case GameScenario::Tutorial_1:
+        return generateTutorialDeck();
+    case GameScenario::Normal:
+        return generateNormalDeck();
+    case GameScenario::Hard:
+        return generateHardDeck();
+    }
+}
+
+Scene SceneBuilder::createScene(const GameScenario scenario)
+{
     const sf::Vector2f CARD_SIZE = { 76.f, 114.f };
 
     return Scene {
-        .deck = generateDeck(),
+        .scenario = scenario,
+        .deck = generateInitialDeck(scenario),
         .inventory = { CardBuilder::createCard(CardType::Pistol), std::nullopt, std::nullopt },
         .mainCardBody =
             dgm::Rect(RenderingEngine::getDeckCardOffset(), CARD_SIZE),
@@ -52,20 +95,34 @@ Scene SceneBuilder::createScene()
     };
 }
 
-void SceneBuilder::spawnCardsAfterFirstKeyTarget(Scene& scene)
+GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
 {
-    auto&& incoming =
-        std::vector<Card> { CardBuilder::createCard(CardType::Shotgun),
-                            CardBuilder::createCard(CardType::Ammo),
-                            CardBuilder::createCard(CardType::GreenHerb),
-                            CardBuilder::createCard(CardType::RedHerb),
-                            CardBuilder::createCard(CardType::Licker),
-                            CardBuilder::createCard(CardType::Licker),
-                            CardBuilder::createCard(CardType::Cerberus),
-                            CardBuilder::createCard(CardType::SunCrest) };
+    if (scene.scenario == GameScenario::Tutorial_1
+        && completedLinkID == SPECIAL_SHIELD_KEYDOOR)
+        return GameState::Finished;
 
-    auto&& mt = std::mt19937 { std::random_device {}() };
-    std::ranges::shuffle(incoming, mt);
+    if (scene.scenario == GameScenario::Normal
+        && completedLinkID == SPECIAL_CREST_DOOR)
+        return GameState::Finished;
 
-    scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+    if (scene.scenario == GameScenario::Normal
+        && completedLinkID == SPECIAL_DIAMOND_KEYDOOR)
+    {
+        auto&& incoming = std::vector<Card> {
+            CardBuilder::createCard(CardType::Shotgun),
+            CardBuilder::createCard(CardType::SunCrest),
+            CardBuilder::createCard(CardType::GreenHerb),
+            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Ammo),
+        };
+
+        auto&& mt = std::mt19937 { std::random_device {}() };
+        std::ranges::shuffle(incoming, mt);
+
+        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+    }
+
+    return GameState::Continue;
 }

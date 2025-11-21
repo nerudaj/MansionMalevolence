@@ -18,7 +18,7 @@ public:
         : dgm::AppState(app)
         , dic(dic)
         , settings(settings)
-        , scene(SceneBuilder::createScene())
+        , scene(SceneBuilder::createScene(GameScenario::Normal))
         , gameRulesEngine(gameEvents, scene, dic.input, settings.video)
         , renderingEngine(dic.resmgr, scene, settings, dic.touchController)
         , sound(dic.resmgr.get<sf::SoundBuffer>("land.wav"))
