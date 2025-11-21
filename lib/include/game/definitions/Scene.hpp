@@ -30,7 +30,9 @@ struct [[nodiscard]] DragDrop final
 {
     std::optional<size_t> inventoryIdx;
     bool canTrashCard;
+    bool draggingMainCard;
     sf::Vector2f position;
+    sf::Vector2f initialPosition;
 };
 
 struct [[nodiscard]] Scene final

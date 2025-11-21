@@ -58,6 +58,10 @@ public:
 public:
     void update(const dgm::Time& time);
 
+    void handleSkip();
+
+    void handleTake();
+
     void handleDragEnded();
 
     std::optional<size_t> getUsableInventorySlot(const Card& card) const;

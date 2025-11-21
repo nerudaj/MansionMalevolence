@@ -274,18 +274,13 @@ void GameRulesEngine::update(const dgm::Time& time)
 
     if (scene.preventInteractions) return;
 
-    if (input.isTakeButtonPressed() && scene.canTakeCard)
+    if (input.isTakeButtonPressed())
     {
-        scene.preventInteractions = true;
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::TakeCard,
-            .data = *scene.usableInventorySlot,
-        };
+        handleTake();
     }
     else if (input.isSkipButtonPressed())
     {
-        scene.preventInteractions = true;
-        gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
+        handleSkip();
     }
     else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
     {
@@ -295,6 +290,32 @@ void GameRulesEngine::update(const dgm::Time& time)
     {
         handleDragEnded();
     }
+}
+
+void GameRulesEngine::handleTake()
+{
+    scene.preventInteractions = true;
+    if (scene.canTakeCard)
+    {
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::TakeCard,
+            .data = *scene.usableInventorySlot,
+        };
+    }
+    else
+    {
+        scene.activeAnimation = Animation {
+            .kind = AnimationKind::InvalidOperation,
+            .duration = sf::seconds(0.25f),
+            .data = *scene.usableInventorySlot,
+        };
+    }
+}
+
+void GameRulesEngine::handleSkip()
+{
+    scene.preventInteractions = true;
+    gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
 }
 
 void GameRulesEngine::handleDragStartedOrMoved(sf::Vector2f& pos)
@@ -310,7 +331,10 @@ void GameRulesEngine::handleDragStartedOrMoved(sf::Vector2f& pos)
             .inventoryIdx = std::move(inventoryIdx),
             .canTrashCard = !(
                 traits & CardTrait::KeyItem || traits & CardTrait::KeyItemPart),
+            .draggingMainCard =
+                dgm::Collision::basic(scene.mainCardBody, worldPos),
             .position = worldPos,
+            .initialPosition = worldPos,
         };
     }
     else
@@ -319,11 +343,44 @@ void GameRulesEngine::handleDragStartedOrMoved(sf::Vector2f& pos)
     }
 }
 
+template<class Callable>
+class ScopeGuard
+{
+public:
+    ScopeGuard(Callable&& callable) : callable(std::forward<Callable>(callable))
+    {
+    }
+
+    ~ScopeGuard()
+    {
+        callable();
+    }
+
+private:
+    Callable&& callable;
+};
+
 void GameRulesEngine::handleDragEnded()
 {
+    auto&& guard = ScopeGuard([this] { scene.dragDrop.reset(); });
+
+    if (scene.dragDrop->draggingMainCard)
+    {
+        const auto dir =
+            scene.dragDrop->position - scene.dragDrop->initialPosition;
+
+        const bool swipedDown = dir.y > 0.f && dir.y > std::abs(dir.x);
+        const bool swipedRight = dir.x > 0.f && dir.x > std::abs(dir.y);
+        if (swipedDown)
+            handleTake();
+        else if (swipedRight)
+            handleSkip();
+
+        return;
+    }
+
     if (!scene.dragDrop->inventoryIdx.has_value())
     {
-        scene.dragDrop.reset();
         return;
     }
 
@@ -366,8 +423,6 @@ void GameRulesEngine::handleDragEnded()
             }
         }
     }
-
-    scene.dragDrop.reset();
 }
 
 void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
@@ -400,6 +455,10 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
         {
             gameEventQueue.pushEvent<MonsterStaggerEndedGameEvent>(
                 static_cast<int>(scene.activeAnimation->data));
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::InvalidOperation)
+        {
+            scene.preventInteractions = false;
         }
 
         scene.activeAnimation.reset();

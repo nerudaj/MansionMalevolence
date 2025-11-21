@@ -142,7 +142,7 @@ void RenderingEngine::renderHud(dgm::Window& window)
 
     // Skip button
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
-        scene.canSafelySkipCard ? Icon::RedSkip : Icon::GreenSkip)));
+        scene.canSafelySkipCard ? Icon::GreenSkip : Icon::RedSkip)));
     sprite.setPosition({ 96.f, 110.f });
     window.draw(sprite);
 
@@ -362,6 +362,15 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
                 (sf::Vector2f { deckOffset.x - 15.f, deckOffset.y }
                  - deckOffset)
                 * easeOutThenBack(f);
+            renderCard(
+                window, scene.deck.front(), deckOffset + animationOffset);
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::InvalidOperation)
+        {
+            const auto animationOffset =
+                (sf::Vector2f { deckOffset.x + 76.f * 0.1f, deckOffset.y }
+                 - deckOffset)
+                * easeDamage(f);
             renderCard(
                 window, scene.deck.front(), deckOffset + animationOffset);
         }

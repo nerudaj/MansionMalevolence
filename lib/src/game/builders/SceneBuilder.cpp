@@ -69,6 +69,8 @@ generateInitialDeck(const GameScenario scenario)
     case GameScenario::Hard:
         return generateHardDeck();
     }
+
+    return {};
 }
 
 Scene SceneBuilder::createScene(const GameScenario scenario)
