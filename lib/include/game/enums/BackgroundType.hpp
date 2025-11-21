@@ -6,6 +6,7 @@ enum class [[nodiscard]] BackgroundType
     MainCard,
     MainCardGreyed,
     Trash,
+    TrashGreyed,
     HealthBar,
     HealthBarGreyed,
     Inventory1,
