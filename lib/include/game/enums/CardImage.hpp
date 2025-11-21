@@ -12,6 +12,7 @@ enum class [[nodiscard]] CardImage
     RocketLauncher,
     Crate,
     Zombie,
+    CrimsonHead,
     Licker,
     Cerberus,
     Hunter,
@@ -19,9 +20,13 @@ enum class [[nodiscard]] CardImage
     MoonCrestLeft,
     MoonCrestRight,
     MoonCrest,
-    MoonCrestDoor,
+    SunCrest,
+    CrestDoorEmpty,
+    CrestDoorWithOneCrest,
     ShieldKey,
     ShieldDoor,
+    DiamondKey,
+    DiamondDoor,
 
     Max
 };

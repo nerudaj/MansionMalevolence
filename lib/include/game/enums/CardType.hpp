@@ -19,9 +19,13 @@ enum class [[nodiscard]] CardType
     MoonCrestLeft,
     MoonCrestRight,
     MoonCrest,
-    MoonCrestDoor,
+    SunCrest,
+    CrestDoorEmpty,
+    CrestDoorWithOneCrest,
     ShieldKey,
     ShieldDoor,
+    DiamondKey,
+    DiamondDoor,
 
     // Enemies
     Zombie,

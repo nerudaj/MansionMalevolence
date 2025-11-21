@@ -9,8 +9,8 @@
     // breaks
     auto&& deck =
         std::vector<Card> { CardBuilder::createCard(CardType::BookCase),
-                            CardBuilder::createCard(CardType::ShieldDoor),
-                            CardBuilder::createCard(CardType::ShieldKey),
+                            CardBuilder::createCard(CardType::DiamondDoor),
+                            CardBuilder::createCard(CardType::DiamondKey),
                             CardBuilder::createCard(CardType::Zombie),
                             CardBuilder::createCard(CardType::Zombie),
                             CardBuilder::createCard(CardType::Zombie),
@@ -18,23 +18,9 @@
                             CardBuilder::createCard(CardType::Zombie),
                             CardBuilder::createCard(CardType::GreenHerb),
                             CardBuilder::createCard(CardType::Crate),
-                            CardBuilder::createCard(CardType::MoonCrestLeft),
+                            CardBuilder::createCard(CardType::MoonCrest),
                             CardBuilder::createCard(CardType::Ammo),
-                            CardBuilder::createCard(CardType::MoonCrestDoor) };
-
-    /*auto randomCardType = []
-    {
-        return static_cast<CardType>(
-            rand() % std::to_underlying(CardType::BookCase));
-    };
-
-    for (auto&& type :
-         std::views::iota(0u, 20u)
-             | std::views::transform(
-                 [&](size_t) -> CardType { return randomCardType(); }))
-    {
-        deck.push_back(CardBuilder::createCard(type));
-    }*/
+                            CardBuilder::createCard(CardType::CrestDoorEmpty) };
 
     auto&& mt = std::mt19937 { std::random_device {}() };
     std::ranges::shuffle(deck, mt);
@@ -53,7 +39,7 @@ Scene SceneBuilder::createScene()
         .mainCardBody =
             dgm::Rect(RenderingEngine::getDeckCardOffset(), CARD_SIZE),
         .healthbarBody = dgm::Rect({ 35.f, 7.f }, { 85.f, 16.f }),
-        .trashBody = dgm::Rect({ 7.f, 211.f }, { 114.f, 10.f }),
+        .trashBody = dgm::Rect({ 5.f, 207.f }, { 116.f, 18.f }),
         .inventoryBodies = { dgm::Rect(
                                  RenderingEngine::getNthInventoryCardOffset(0),
                                  CARD_SIZE / 3.f),
@@ -76,7 +62,7 @@ void SceneBuilder::spawnCardsAfterFirstKeyTarget(Scene& scene)
                             CardBuilder::createCard(CardType::Licker),
                             CardBuilder::createCard(CardType::Licker),
                             CardBuilder::createCard(CardType::Cerberus),
-                            CardBuilder::createCard(CardType::MoonCrestRight) };
+                            CardBuilder::createCard(CardType::SunCrest) };
 
     auto&& mt = std::mt19937 { std::random_device {}() };
     std::ranges::shuffle(incoming, mt);

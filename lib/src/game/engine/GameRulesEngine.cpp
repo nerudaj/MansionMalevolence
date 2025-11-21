@@ -76,6 +76,7 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent& e)
 
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
+    // TODO: play sound
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
@@ -111,16 +112,28 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         && deckCard.traits & CardTrait::KeyTarget && card.link == deckCard.link)
     {
         scene.inventory[e.inventorySlotIdx].reset();
-        gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
 
-        if (card.link == SPECIAL_SHIELD_KEYDOOR)
+        if (card.link == SPECIAL_SHIELD_KEYDOOR
+            || card.link == SPECIAL_DIAMOND_KEYDOOR)
         {
             SceneBuilder::spawnCardsAfterFirstKeyTarget(scene);
         }
-        else if (card.link == SPECIAL_CREST_DOOR)
+        else if (
+            card.link == SPECIAL_CREST_DOOR
+            && deckCard.image == CardImage::CrestDoorEmpty)
+        {
+            scene.deck.front() =
+                CardBuilder::createCard(CardType::CrestDoorWithOneCrest);
+            return;
+        }
+        else if (
+            card.link == SPECIAL_CREST_DOOR
+            && deckCard.image == CardImage::CrestDoorWithOneCrest)
         {
             scene.won = true;
         }
+
+        gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
     }
     else if (deckCard.special == CardSpecial::Deposit)
     {
