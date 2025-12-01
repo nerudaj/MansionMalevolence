@@ -116,6 +116,11 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         if (card.link == SPECIAL_CREST_DOOR
             && deckCard.image == CardImage::CrestDoorEmpty)
         {
+            scene.activeAnimation = Animation {
+                .kind = AnimationKind::CardTransform,
+                .data = static_cast<size_t>(CardType::CrestDoorEmpty),
+            };
+
             scene.deck.front() =
                 CardBuilder::createCard(CardType::CrestDoorWithOneCrest);
             return; // prevent trashing of the card

@@ -71,7 +71,16 @@ private:
         dgm::Window& window,
         const Card& card,
         const sf::Vector2f& offset,
-        float scale = 1.f);
+        float scale = 1.f)
+    {
+        renderCard(window, card, offset, { scale, scale });
+    }
+
+    void renderCard(
+        dgm::Window& window,
+        const Card& card,
+        const sf::Vector2f& offset,
+        const sf::Vector2f& scale);
 
     void renderTopDeckCard(dgm::Window& window);
 

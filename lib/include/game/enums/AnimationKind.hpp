@@ -9,4 +9,5 @@ enum class [[nodiscard]] AnimationKind
     EnemyDamaged,
     EnemyDodgedAttack,
     InvalidOperation,
+    CardTransform,
 };

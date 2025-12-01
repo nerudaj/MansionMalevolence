@@ -187,77 +187,6 @@ void RenderingEngine::renderTouchControls(dgm::Window& window)
     }
 }
 
-void RenderingEngine::renderCard(
-    dgm::Window& window,
-    const Card& card,
-    const sf::Vector2f& offset,
-    float scale)
-{
-    text.setScale({ scale, scale });
-    sprite.setScale({ scale, scale });
-
-    sprite.setTextureRect(atlas.getClip(cardbgrLocation).getFrame(0));
-    sprite.setPosition(offset);
-    window.draw(sprite);
-
-    sprite.setTextureRect(
-        atlas.getClip(imagesLocation).getFrame(std::to_underlying(card.image)));
-    sprite.setPosition(offset + sf::Vector2f { 10.f, 9.f } * scale);
-    window.draw(sprite);
-
-    auto& iconsClip = atlas.getClip(iconsLocation);
-    if (card.quantity > 0 && card.traits & CardTrait::Weapon)
-    {
-        sprite.setTextureRect(
-            iconsClip.getFrame(std::to_underlying(Icon::Bullet)));
-
-        for (auto i = 0; i < card.quantity; ++i)
-        {
-            sprite.setPosition(
-                offset + sf::Vector2f { 0.f, 13.f + i * 6.f } * scale);
-            window.draw(sprite);
-        }
-    }
-
-    if (card.power > 0)
-    {
-        sprite.setTextureRect(
-            iconsClip.getFrame(std::to_underlying(Icon::Diamond)));
-
-        for (auto i = 0; i < card.power; ++i)
-        {
-            sprite.setPosition(
-                offset + sf::Vector2f { 2.f + i * 12.f, 102.f } * scale);
-            window.draw(sprite);
-        }
-    }
-
-    text.setCharacterSize(5);
-    text.setPosition(offset + sf::Vector2f { 10.f, 2.f } * scale);
-    text.setString(card.name.data());
-    window.draw(text);
-
-    // Text description
-    text.setPosition(offset + sf::Vector2f { 4.f, 77.f } * scale);
-    text.setString(card.text1.data());
-    window.draw(text);
-
-    text.setPosition(offset + sf::Vector2f { 4.f, 83.f } * scale);
-    text.setString(card.text2.data());
-    window.draw(text);
-
-    text.setPosition(offset + sf::Vector2f { 4.f, 89.f } * scale);
-    text.setString(card.text3.data());
-    window.draw(text);
-
-    text.setPosition(offset + sf::Vector2f { 4.f, 95.f } * scale);
-    text.setString(card.text4.data());
-    window.draw(text);
-
-    text.setScale({ 1.f, 1.f });
-    sprite.setScale({ 1.f, 1.f });
-}
-
 static float easeInOut(float x)
 {
     return x < 0.5f ? 4 * std::pow(x, 3.f) : 1 - std::pow(-2 * x + 2, 3.f) / 2;
@@ -284,6 +213,90 @@ static float easeAttack(float x)
 static float easeDamage(float x)
 {
     return std::sin(x * 10.f);
+}
+
+static float easeValley(float x)
+{
+    return 4 * x * x - 4 * x + 1;
+}
+
+void RenderingEngine::renderCard(
+    dgm::Window& window,
+    const Card& card,
+    const sf::Vector2f& offset,
+    const sf::Vector2f& scale)
+{
+    text.setScale(scale);
+    sprite.setScale(scale);
+
+    sprite.setTextureRect(atlas.getClip(cardbgrLocation).getFrame(0));
+    sprite.setPosition(offset);
+    window.draw(sprite);
+
+    sprite.setTextureRect(
+        atlas.getClip(imagesLocation).getFrame(std::to_underlying(card.image)));
+    sprite.setPosition(
+        offset + sf::Vector2f { 10.f, 9.f }.componentWiseMul(scale));
+    window.draw(sprite);
+
+    auto& iconsClip = atlas.getClip(iconsLocation);
+    if (card.quantity > 0 && card.traits & CardTrait::Weapon)
+    {
+        sprite.setTextureRect(
+            iconsClip.getFrame(std::to_underlying(Icon::Bullet)));
+
+        for (auto i = 0; i < card.quantity; ++i)
+        {
+            sprite.setPosition(
+                offset + sf::Vector2f { 0.f, 13.f + i * 6.f } * scale.y);
+            window.draw(sprite);
+        }
+    }
+
+    if (card.power > 0)
+    {
+        sprite.setTextureRect(
+            iconsClip.getFrame(std::to_underlying(Icon::Diamond)));
+
+        for (auto i = 0; i < card.power; ++i)
+        {
+            sprite.setPosition(
+                offset
+                + sf::Vector2f { 2.f + i * 12.f, 102.f }.componentWiseMul(
+                    scale));
+            window.draw(sprite);
+        }
+    }
+
+    text.setCharacterSize(5);
+    text.setPosition(
+        offset + sf::Vector2f { 10.f, 2.f }.componentWiseMul(scale));
+    text.setString(card.name.data());
+    window.draw(text);
+
+    // Text description
+    text.setPosition(
+        offset + sf::Vector2f { 4.f, 77.f }.componentWiseMul(scale));
+    text.setString(card.text1.data());
+    window.draw(text);
+
+    text.setPosition(
+        offset + sf::Vector2f { 4.f, 83.f }.componentWiseMul(scale));
+    text.setString(card.text2.data());
+    window.draw(text);
+
+    text.setPosition(
+        offset + sf::Vector2f { 4.f, 89.f }.componentWiseMul(scale));
+    text.setString(card.text3.data());
+    window.draw(text);
+
+    text.setPosition(
+        offset + sf::Vector2f { 4.f, 95.f }.componentWiseMul(scale));
+    text.setString(card.text4.data());
+    window.draw(text);
+
+    text.setScale({ 1.f, 1.f });
+    sprite.setScale({ 1.f, 1.f });
 }
 
 void RenderingEngine::renderTopDeckCard(dgm::Window& window)
@@ -373,6 +386,21 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
                 * easeDamage(f);
             renderCard(
                 window, scene.deck.front(), deckOffset + animationOffset);
+        }
+        else if (scene.activeAnimation->kind == AnimationKind::CardTransform)
+        {
+            const auto preTransformCard = CardBuilder::createCard(
+                static_cast<CardType>(scene.activeAnimation->data));
+            const auto animationOffset =
+                (sf::Vector2f { deckOffset.x + 76.f * 0.5f, deckOffset.y - 3.f }
+                 - deckOffset)
+                * (1.f - easeValley(f));
+
+            renderCard(
+                window,
+                f <= 0.f ? preTransformCard : scene.deck.front(),
+                deckOffset + animationOffset,
+                { easeValley(f), 1.f });
         }
         else
         {
