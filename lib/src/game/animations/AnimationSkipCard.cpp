@@ -19,17 +19,22 @@ void AnimationSkipCard::render(
     const auto animationOffset =
         (sf::Vector2f { baseOffset.x + 76.f * 1.5f, baseOffset.y } - baseOffset)
         * Easing::easeOutThenBack(getPercFactor());
+    const auto scaleFactor = std::lerp(1.f, 0.8f, getPercFactor());
 
     if (getPercFactor() < 0.5f)
     {
         renderSecondTopDeckCard();
         renderCard(
-            scene.deck.front(), Position(baseOffset + animationOffset), scale);
+            scene.deck.front(),
+            Position(baseOffset + animationOffset),
+            Scale({ scaleFactor, scaleFactor }));
     }
     else
     {
         renderCard(
-            scene.deck.front(), Position(baseOffset + animationOffset), scale);
+            scene.deck.front(),
+            Position(baseOffset + animationOffset),
+            Scale({ scaleFactor, scaleFactor }));
         renderSecondTopDeckCard();
     }
 };

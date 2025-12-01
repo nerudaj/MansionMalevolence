@@ -12,9 +12,7 @@ void AnimationNewCardsShufflingIntoDeck::render(
     {
         if (count == 1 && scene.deck.size() > 1)
             renderCard(
-                *(++scene.deck.begin()),
-                Position(baseOffset),
-                Scale({ 1.f, 1.f }));
+                scene.deck.front(), Position(baseOffset), Scale({ 1.f, 1.f }));
         else if (count > 1)
             renderCardBack(Position(baseOffset), Scale({ 1.f, 1.f }));
     };
