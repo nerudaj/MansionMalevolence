@@ -48,7 +48,7 @@ addColoredBackground(tgui::Container::Ptr& container, const tgui::Color& color)
     container->add(panel);
 }
 
-tgui::Widget::Ptr priv::TableBuilder::build()
+tgui::Container::Ptr priv::TableBuilder::build()
 {
     auto&& panel = tgui::GrowVerticalLayout::create();
 

@@ -1,4 +1,5 @@
 #include "appstate/AppStateGame.hpp"
+#include "appstate/AppStateEndGameScreen.hpp"
 #include "appstate/AppStatePause.hpp"
 #include "appstate/Messaging.hpp"
 
@@ -57,8 +58,9 @@ void AppStateGame::update()
 
     gameEvents.processEvents(gameRulesEngine);
 
-    // TODO: victory or losing screens
-    if (scene.won || scene.lost) app.popState();
+    if (scene.won || scene.lost)
+        app.pushState<AppStateEndGameScreen>(
+            dic, settings, scene.stats, scene.won);
 }
 
 void AppStateGame::draw()

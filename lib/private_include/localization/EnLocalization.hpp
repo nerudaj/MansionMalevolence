@@ -54,4 +54,12 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     // Pause
     { Resume, "Resume game" },
     { BackToMenu, "Back to main menu" },
+
+    // EndGameScreen
+    { YouSurvived, "you survived" },
+    { YouDied, "you died" },
+    { Retry, "retry" },
+    { TurnsTaken, "turns taken" },
+    { ShotsFired, "shots fired" },
+    { EnemiesRouted, "enemies routed" },
 };

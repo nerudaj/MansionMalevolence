@@ -2,6 +2,7 @@
 
 #include "game/animations/AnimationInterface.hpp"
 #include "game/builders/CardBuilder.hpp"
+#include "game/definitions/GameStats.hpp"
 #include "game/enums/GameScenario.hpp"
 #include <DGM/dgm.hpp>
 #include <array>
@@ -28,6 +29,12 @@ struct [[nodiscard]] DragDrop final
     sf::Vector2f initialPosition;
 };
 
+struct [[nodiscard]] Chance final
+{
+    int evasiveChance = 0;
+    int crimsonHeadChance = 0;
+};
+
 struct [[nodiscard]] Scene final
 {
     GameScenario scenario = {};
@@ -50,4 +57,7 @@ struct [[nodiscard]] Scene final
     bool canTakeCard = false;
     bool canSafelySkipCard = false;
     bool preventInteractions = false;
+
+    GameStats stats;
+    Chance chance;
 };

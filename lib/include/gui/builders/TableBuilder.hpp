@@ -28,7 +28,7 @@ namespace priv
 
         void addSeparator();
 
-        [[nodiscard]] tgui::Widget::Ptr build();
+        [[nodiscard]] tgui::Container::Ptr build();
 
     private:
         const Sizer& sizer;

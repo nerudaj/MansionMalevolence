@@ -1,0 +1,72 @@
+#include "appstate/AppStateEndGameScreen.hpp"
+#include "appstate/CommonHandler.hpp"
+#include "appstate/Messaging.hpp"
+#include "gui/Builders.hpp"
+
+AppStateEndGameScreen::AppStateEndGameScreen(
+    dgm::App& app,
+    DependencyContainer& dic,
+    const AppSettings& settings,
+    const GameStats& stats,
+    bool won) noexcept
+    : dgm::AppState(app), dic(dic), settings(settings), stats(stats), won(won)
+{
+    buildLayout();
+}
+
+void AppStateEndGameScreen::input()
+{
+    CommonHandler::handleInput(
+        app,
+        dic,
+        settings.input,
+        CommonHandlerOptions {
+            .disableGoBack = true,
+        });
+}
+
+void AppStateEndGameScreen::update() {}
+
+void AppStateEndGameScreen::draw()
+{
+    dic.gui.draw();
+    dic.virtualCursor.draw();
+}
+
+void AppStateEndGameScreen::buildLayout()
+{
+    auto createLabel = [&](StringId id)
+    {
+        return WidgetBuilder::createTextLabel(
+            dic.strings.getString(id), dic.sizer);
+    };
+
+    auto table = TableBuilder(dic.sizer).withNoHeading();
+    table.addRow({ createLabel(StringId::TurnsTaken),
+                   WidgetBuilder::createTextLabel(
+                       std::to_string(stats.turnsTaken), dic.sizer) });
+    table.addRow({ createLabel(StringId::ShotsFired),
+                   WidgetBuilder::createTextLabel(
+                       std::to_string(stats.shotsFired), dic.sizer) });
+    table.addRow({ createLabel(StringId::EnemiesRouted),
+                   WidgetBuilder::createTextLabel(
+                       std::to_string(stats.enemiesKilled), dic.sizer) });
+
+    dic.gui.rebuildWith(
+        DefaultLayoutBuilder(dic.sizer)
+            .withBackgroundImage(
+                dic.resmgr.get<sf::Texture>("placeholder-background.png"))
+            .withTitle(
+                dic.strings.getString(
+                    won ? StringId::YouSurvived : StringId::YouDied),
+                HeadingLevel::H2)
+            .withContent(table.build())
+            .withNoTopLeftButton()
+            .withNoTopRightButton()
+            .withNoBottomLeftButton()
+            .withBottomRightButton(WidgetBuilder::createButton(
+                dic.strings.getString(StringId::BackToMenu),
+                [this] { app.popState(Messaging::serialize<PopIfNotMenu>()); },
+                dic.sizer))
+            .build());
+}

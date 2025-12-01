@@ -48,5 +48,13 @@ enum class [[nodiscard]] StringId
     Resume,
     BackToMenu,
 
+    // EndGameScreen
+    YouSurvived,
+    YouDied,
+    Retry,
+    TurnsTaken,
+    ShotsFired,
+    EnemiesRouted,
+
     MaxId, // Make sure this one is always the last!
 };

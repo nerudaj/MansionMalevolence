@@ -40,10 +40,12 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
     }
 
     popTopDeckCard();
+    scene.stats.turnsTaken++;
 }
 
 void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
+    scene.stats.turnsTaken++;
     scene.activeAnimation = std::make_unique<AnimationSkipCard>();
     audioEngine.playSound(SoundId::CardShuffle);
 }
@@ -138,7 +140,10 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     {
         // TODO: trigger return animation
         // TODO: play sound
+        return; // skip stats increment
     }
+
+    scene.stats.turnsTaken++;
 }
 
 void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
@@ -168,6 +173,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
 
     audioEngine.playSound(weapon.specialSound);
     --weapon.quantity;
+    scene.stats.shotsFired++;
 
     if (scene.deck.front().special & CardSpecial::Evasive
         && rollForSuccess(EVADE_CHANCE_EVASIVE))
@@ -189,6 +195,7 @@ void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
     {
         // TODO: play die sound
         gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
+        scene.stats.enemiesKilled++;
     }
     else if (deckCard.special & CardSpecial::Retaliate)
     {
