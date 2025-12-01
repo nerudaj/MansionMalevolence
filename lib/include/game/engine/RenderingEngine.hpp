@@ -82,9 +82,12 @@ private:
         const sf::Vector2f& offset,
         const sf::Vector2f& scale);
 
-    void renderTopDeckCard(dgm::Window& window);
+    void renderCardBack(
+        dgm::Window& window,
+        const sf::Vector2f& offset,
+        const sf::Vector2f& scale);
 
-    void renderSecondTopDeckCard(dgm::Window& window);
+    void renderTopDeckCard(dgm::Window& window);
 
     BackgroundType getAppropriateBackgroundType() const;
 

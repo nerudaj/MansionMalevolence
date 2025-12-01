@@ -55,6 +55,10 @@ public:
 
     void operator()(const MainCardResolvedGameEvent& e);
 
+    void operator()(const DoorOpenedGameEvent& e);
+
+    void operator()(const ShuffleNewCardsIntoDeck& e);
+
 public:
     void update(const dgm::Time& time);
 

@@ -5,6 +5,7 @@
 
 using Direction = BrandedType<sf::Vector2f, struct DirectionTypeTag>;
 using Position = BrandedType<sf::Vector2f, struct PositionTypeTag>;
+using Scale = BrandedType<sf::Vector2f, struct ScaleTypeTag>;
 using GamepadButton = BrandedType<unsigned, struct GamepadButtonTag>;
 
 consteval float operator""_px_per_second(unsigned long long value)

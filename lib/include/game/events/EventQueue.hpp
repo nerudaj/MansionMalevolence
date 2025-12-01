@@ -6,6 +6,11 @@ template<class T>
 class [[nodiscard]] EventQueue final
 {
 public:
+    void pushEvent(T&& event)
+    {
+        events.emplace_back(std::move(event));
+    }
+
     template<class EventType, class... Args>
     void pushEvent(Args&&... args)
     {

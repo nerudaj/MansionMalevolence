@@ -23,8 +23,11 @@ RenderingEngine::RenderingEngine(
                               resmgr.get<sf::Texture>("playbgr.png"),
                               resmgr.get<dgm::Clip>("playbgr.png.clip"))
                           .value())
-    , cardbgrLocation(
-          atlas.addImage(resmgr.get<sf::Texture>("cardbgr.png")).value())
+    , cardbgrLocation(atlas
+                          .addTileset(
+                              resmgr.get<sf::Texture>("cardbgr.png"),
+                              resmgr.get<dgm::Clip>("cardbgr.png.clip"))
+                          .value())
     , iconsLocation(atlas
                         .addTileset(
                             resmgr.get<sf::Texture>("icons.png"),
@@ -187,39 +190,6 @@ void RenderingEngine::renderTouchControls(dgm::Window& window)
     }
 }
 
-static float easeInOut(float x)
-{
-    return x < 0.5f ? 4 * std::pow(x, 3.f) : 1 - std::pow(-2 * x + 2, 3.f) / 2;
-}
-
-static float easeOutThenBack(float x)
-{
-    return -4.f * std::pow(x - 0.5f, 2.f) + 1;
-}
-
-static float easeAttack(float x)
-{
-    // note: wolframalpha.com
-    // prompt: interpolating polynomial | {point1} ... {pointN}
-    if (x < 0.4f)
-        return 12.5f * x * x - 5.f * x;
-    else if (x < 0.6f)
-        return 5.f * (x - 0.4f);
-    else if (x < 0.7f)
-        return 1.f;
-    return 193.333f * std::pow(x, 3.f) - 491.f * x * x + 407.967f * x - 110.3f;
-}
-
-static float easeDamage(float x)
-{
-    return std::sin(x * 10.f);
-}
-
-static float easeValley(float x)
-{
-    return 4 * x * x - 4 * x + 1;
-}
-
 void RenderingEngine::renderCard(
     dgm::Window& window,
     const Card& card,
@@ -229,7 +199,7 @@ void RenderingEngine::renderCard(
     text.setScale(scale);
     sprite.setScale(scale);
 
-    sprite.setTextureRect(atlas.getClip(cardbgrLocation).getFrame(0));
+    sprite.setTextureRect(atlas.getClip(cardbgrLocation).getFrame(1));
     sprite.setPosition(offset);
     window.draw(sprite);
 
@@ -299,124 +269,34 @@ void RenderingEngine::renderCard(
     sprite.setScale({ 1.f, 1.f });
 }
 
+void RenderingEngine::renderCardBack(
+    dgm::Window& window, const sf::Vector2f& offset, const sf::Vector2f& scale)
+{
+    sprite.setScale(scale);
+    sprite.setTextureRect(atlas.getClip(cardbgrLocation).getFrame(2));
+    sprite.setPosition(offset);
+    window.draw(sprite);
+    sprite.setScale({ 1.f, 1.f });
+}
+
 void RenderingEngine::renderTopDeckCard(dgm::Window& window)
 {
     const auto deckOffset = getDeckCardOffset();
 
     if (scene.activeAnimation)
     {
-        const float f =
-            scene.activeAnimation->elapsed / scene.activeAnimation->duration;
-
-        if (scene.activeAnimation->kind == AnimationKind::TakeCard)
-        {
-            const auto animationOffset =
-                (getNthInventoryCardOffset(scene.activeAnimation->data)
-                 - deckOffset)
-                * easeInOut(f);
-
-            renderCard(
-                window,
-                scene.deck.front(),
-                deckOffset + animationOffset,
-                std::lerp(1.f, 1.f / 3.f, f));
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::SkipCard)
-        {
-            const auto animationOffset =
-                (sf::Vector2f { deckOffset.x + 76.f * 1.5f, deckOffset.y }
-                 - deckOffset)
-                * easeOutThenBack(f);
-
-            if (f < 0.5f)
-            {
-                renderSecondTopDeckCard(window);
-                renderCard(
-                    window, scene.deck.front(), deckOffset + animationOffset);
-            }
-            else
-            {
-                renderCard(
-                    window, scene.deck.front(), deckOffset + animationOffset);
-                renderSecondTopDeckCard(window);
-            }
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::TrashMainCard)
-        {
-            const auto animationOffset =
-                (getTrashIconOffset() - deckOffset) * easeInOut(f);
-            renderCard(
-                window,
-                scene.deck.front(),
-                deckOffset + animationOffset,
-                std::lerp(1.f, 1.f / 10.f, f));
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::EnemyAttack)
-        {
-            const auto animationOffset =
-                (getNthHeartOffset(0) - deckOffset) * easeAttack(f);
-            renderCard(
-                window, scene.deck.front(), deckOffset + animationOffset);
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::EnemyDamaged)
-        {
-            const auto animationOffset =
-                (sf::Vector2f { deckOffset.x + 76.f * 0.1f,
-                                deckOffset.y + 76.f * 0.1f }
-                 - deckOffset)
-                * easeDamage(f);
-            renderCard(
-                window, scene.deck.front(), deckOffset + animationOffset);
-        }
-        else if (
-            scene.activeAnimation->kind == AnimationKind::EnemyDodgedAttack)
-        {
-            const auto animationOffset =
-                (sf::Vector2f { deckOffset.x - 15.f, deckOffset.y }
-                 - deckOffset)
-                * easeOutThenBack(f);
-            renderCard(
-                window, scene.deck.front(), deckOffset + animationOffset);
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::InvalidOperation)
-        {
-            const auto animationOffset =
-                (sf::Vector2f { deckOffset.x + 76.f * 0.1f, deckOffset.y }
-                 - deckOffset)
-                * easeDamage(f);
-            renderCard(
-                window, scene.deck.front(), deckOffset + animationOffset);
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::CardTransform)
-        {
-            const auto preTransformCard = CardBuilder::createCard(
-                static_cast<CardType>(scene.activeAnimation->data));
-            const auto animationOffset =
-                (sf::Vector2f { deckOffset.x + 76.f * 0.5f, deckOffset.y - 3.f }
-                 - deckOffset)
-                * (1.f - easeValley(f));
-
-            renderCard(
-                window,
-                f <= 0.f ? preTransformCard : scene.deck.front(),
-                deckOffset + animationOffset,
-                { easeValley(f), 1.f });
-        }
-        else
-        {
-            renderCard(window, scene.deck.front(), deckOffset);
-        }
+        scene.activeAnimation->render(
+            scene,
+            deckOffset,
+            [&](const Card& card, const Position& position, const Scale& scale)
+            { renderCard(window, card, position.get(), scale.get()); },
+            [&](const Position& position, const Scale& scale)
+            { renderCardBack(window, position.get(), scale.get()); });
     }
     else
     {
         renderCard(window, scene.deck.front(), deckOffset);
     }
-}
-
-void RenderingEngine::renderSecondTopDeckCard(dgm::Window& window)
-{
-    if (scene.deck.size() > 1)
-        renderCard(window, *(++scene.deck.begin()), getDeckCardOffset());
 }
 
 BackgroundType RenderingEngine::getAppropriateBackgroundType() const

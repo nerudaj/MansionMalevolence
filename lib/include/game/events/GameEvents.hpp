@@ -116,6 +116,23 @@ struct [[nodiscard]] MainCardResolvedGameEvent final
 {
 };
 
+struct [[nodiscard]] DoorOpenedGameEvent final
+{
+    int link;
+
+    explicit DoorOpenedGameEvent(int link) noexcept : link(link) {}
+};
+
+struct [[nodiscard]] ShuffleNewCardsIntoDeck final
+{
+    int cardCount;
+
+    explicit ShuffleNewCardsIntoDeck(int cardCount) noexcept
+        : cardCount(cardCount)
+    {
+    }
+};
+
 using GameEvent = std::variant<
     CardTakenGameEvent,
     BeforeCardSkipGameEvent,
@@ -131,4 +148,6 @@ using GameEvent = std::variant<
     MainCardTrashedGameEvent,
     CardUsedOnAnotherInventoryCardGameEvent,
     ZombieDiedGameEvent,
-    MainCardResolvedGameEvent>;
+    MainCardResolvedGameEvent,
+    DoorOpenedGameEvent,
+    ShuffleNewCardsIntoDeck>;

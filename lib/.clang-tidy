@@ -6,6 +6,7 @@ Checks: >
   bugprone-assignment-in-if-condition,
   bugprone-optional-value-conversion,
   bugprone-use-after-move
+  modernize-use-override
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
 ExcludeHeaderFilterRegex: 'catch_amalgamated.*'

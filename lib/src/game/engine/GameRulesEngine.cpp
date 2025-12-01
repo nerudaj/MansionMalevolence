@@ -1,4 +1,5 @@
 #include "game/engine/GameRulesEngine.hpp"
+#include "game/animations/Animations.hpp"
 #include "game/builders/SceneBuilder.hpp"
 #include <algorithm>
 #include <limits>
@@ -43,9 +44,7 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 
 void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
-    scene.activeAnimation = Animation {
-        .kind = AnimationKind::SkipCard,
-    };
+    scene.activeAnimation = std::make_unique<AnimationSkipCard>();
 }
 
 void GameRulesEngine::operator()(const CardSkipEndedGameEvent&)
@@ -116,22 +115,17 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         if (card.link == SPECIAL_CREST_DOOR
             && deckCard.image == CardImage::CrestDoorEmpty)
         {
-            scene.activeAnimation = Animation {
-                .kind = AnimationKind::CardTransform,
-                .data = static_cast<size_t>(CardType::CrestDoorEmpty),
-            };
+            scene.activeAnimation = std::make_unique<AnimationCardTransform>(
+                CardType::CrestDoorEmpty);
 
             scene.deck.front() =
                 CardBuilder::createCard(CardType::CrestDoorWithOneCrest);
-            return; // prevent trashing of the card
         }
-        else if (
-            SceneBuilder::updateScene(scene, card.link) == GameState::Finished)
+        else
         {
-            scene.won = true;
+            scene.activeAnimation =
+                std::make_unique<AnimationDoorOpen>(card.link);
         }
-
-        gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
     }
     else if (deckCard.special & CardSpecial::Deposit)
     {
@@ -148,10 +142,8 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
 
 void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 {
-    scene.activeAnimation = Animation {
-        .kind = AnimationKind::EnemyAttack,
-        .data = static_cast<size_t>(e.skipCardAfterReaction),
-    };
+    scene.activeAnimation =
+        std::make_unique<AnimationEnemyAttack>(e.skipCardAfterReaction);
 }
 
 void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
@@ -178,18 +170,12 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
     if (scene.deck.front().special & CardSpecial::Evasive
         && rollForSuccess(EVADE_CHANCE_EVASIVE))
     {
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::EnemyDodgedAttack,
-            .duration = sf::seconds(0.3f),
-        };
+        scene.activeAnimation = std::make_unique<AnimationEnemyDodgedAttack>();
     }
     else
     {
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::EnemyDamaged,
-            .duration = sf::seconds(0.25f),
-            .data = static_cast<size_t>(weapon.power),
-        };
+        scene.activeAnimation =
+            std::make_unique<AnimationEnemyDamaged>(weapon.power);
     }
 }
 
@@ -262,15 +248,34 @@ void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
         gameEventQueue.pushEvent<ZombieDiedGameEvent>();
     }
 
-    scene.activeAnimation = Animation {
-        .kind = AnimationKind::TrashMainCard,
-    };
+    scene.activeAnimation = std::make_unique<AnimationTrashMainCard>();
+}
+
+void GameRulesEngine::operator()(const DoorOpenedGameEvent& e)
+{
+    auto preDeckCount = scene.deck.size();
+    if (SceneBuilder::updateScene(scene, e.link) == GameState::Finished)
+    {
+        scene.won = true;
+        return;
+    }
+
+    auto postDeckCount = scene.deck.size();
+    scene.deck.pop_front();
+    gameEventQueue.pushEvent<ShuffleNewCardsIntoDeck>(
+        static_cast<int>(postDeckCount - preDeckCount));
+}
+
+void GameRulesEngine::operator()(const ShuffleNewCardsIntoDeck& e)
+{
+    scene.activeAnimation =
+        std::make_unique<AnimationNewCardsShufflingIntoDeck>(e.cardCount);
 }
 
 void GameRulesEngine::update(const dgm::Time& time)
 {
     updateActiveAnimation(time);
-    if (scene.activeAnimation.has_value()) return;
+    if (scene.activeAnimation) return;
 
     scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());
     scene.canTakeCard = scene.deck.front().traits & CardTrait::Pickable
@@ -302,18 +307,12 @@ void GameRulesEngine::handleTake()
     scene.preventInteractions = true;
     if (scene.canTakeCard)
     {
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::TakeCard,
-            .data = *scene.usableInventorySlot,
-        };
+        scene.activeAnimation =
+            std::make_unique<AnimationTakeCard>(*scene.usableInventorySlot);
     }
     else
     {
-        scene.activeAnimation = Animation {
-            .kind = AnimationKind::InvalidOperation,
-            .duration = sf::seconds(0.25f),
-            .data = *scene.usableInventorySlot,
-        };
+        scene.activeAnimation = std::make_unique<AnimationInvalidOperation>();
     }
 }
 
@@ -432,39 +431,18 @@ void GameRulesEngine::handleDragEnded()
 
 void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 {
-    if (!scene.activeAnimation.has_value()) return;
+    if (!scene.activeAnimation) return;
 
-    scene.activeAnimation->elapsed += time.getElapsed();
-
-    if (scene.activeAnimation->elapsed > scene.activeAnimation->duration)
+    if (scene.activeAnimation->update(time)
+        == dgm::Animation::PlaybackStatus::Finished)
     {
-        if (scene.activeAnimation->kind == AnimationKind::SkipCard)
-        {
-            gameEventQueue.pushEvent<CardSkipEndedGameEvent>();
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::TakeCard)
-        {
-            gameEventQueue.pushEvent<CardTakenGameEvent>(
-                scene.activeAnimation->data);
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::TrashMainCard)
-        {
-            gameEventQueue.pushEvent<MainCardTrashedGameEvent>();
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::EnemyAttack)
-        {
-            gameEventQueue.pushEvent<MonsterReactionFinishedGameEvent>(
-                static_cast<bool>(scene.activeAnimation->data));
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::EnemyDamaged)
-        {
-            gameEventQueue.pushEvent<MonsterStaggerEndedGameEvent>(
-                static_cast<int>(scene.activeAnimation->data));
-        }
-        else if (scene.activeAnimation->kind == AnimationKind::InvalidOperation)
-        {
-            scene.preventInteractions = false;
-        }
+        auto event = scene.activeAnimation->finalize();
+        if (event) gameEventQueue.pushEvent(std::move(*event));
+
+        // Clean inputs pressed during animation
+        std::ignore = input.isSkipButtonPressed();
+        std::ignore = input.isTakeButtonPressed();
+        scene.preventInteractions = false;
 
         scene.activeAnimation.reset();
     }
