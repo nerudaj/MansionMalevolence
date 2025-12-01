@@ -19,11 +19,11 @@ public:
         , dic(dic)
         , settings(settings)
         , scene(SceneBuilder::createScene(GameScenario::Normal))
-        , gameRulesEngine(gameEvents, scene, dic.input, settings.video)
+        , audioEngine(dic.resmgr)
+        , gameRulesEngine(
+              gameEvents, audioEngine, scene, dic.input, settings.video)
         , renderingEngine(dic.resmgr, scene, settings, dic.touchController)
-        , sound(dic.resmgr.get<sf::SoundBuffer>("land.wav"))
     {
-        sound.setVolume(100.f);
     }
 
 public:
@@ -41,7 +41,7 @@ private:
     AppSettings& settings;
     Scene scene;
     EventQueue<GameEvent> gameEvents;
+    AudioEngine audioEngine;
     GameRulesEngine gameRulesEngine;
     RenderingEngine renderingEngine;
-    sf::Sound sound;
 };

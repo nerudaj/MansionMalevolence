@@ -45,6 +45,7 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
     scene.activeAnimation = std::make_unique<AnimationSkipCard>();
+    audioEngine.playSound(SoundId::CardShuffle);
 }
 
 void GameRulesEngine::operator()(const CardSkipEndedGameEvent&)
@@ -75,7 +76,7 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
-    // TODO: play sound
+    audioEngine.playSound(SoundId::CardDestroy);
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
@@ -144,6 +145,7 @@ void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 {
     scene.activeAnimation =
         std::make_unique<AnimationEnemyAttack>(e.skipCardAfterReaction);
+    audioEngine.playSound(scene.deck.front().specialSound);
 }
 
 void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
@@ -164,7 +166,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
 {
     auto& weapon = scene.inventory[e.inventoryWeaponIdx].value();
 
-    // TODO: play sound
+    audioEngine.playSound(weapon.specialSound);
     --weapon.quantity;
 
     if (scene.deck.front().special & CardSpecial::Evasive
@@ -185,6 +187,7 @@ void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
     deckCard.power -= e.damage;
     if (deckCard.power <= 0)
     {
+        // TODO: play die sound
         gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
     }
     else if (deckCard.special & CardSpecial::Retaliate)
@@ -249,6 +252,7 @@ void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
     }
 
     scene.activeAnimation = std::make_unique<AnimationTrashMainCard>();
+    audioEngine.playSound(SoundId::CardDestroy);
 }
 
 void GameRulesEngine::operator()(const DoorOpenedGameEvent& e)
@@ -268,6 +272,7 @@ void GameRulesEngine::operator()(const DoorOpenedGameEvent& e)
 
 void GameRulesEngine::operator()(const ShuffleNewCardsIntoDeck& e)
 {
+    audioEngine.playSound(SoundId::CardShuffle);
     scene.activeAnimation =
         std::make_unique<AnimationNewCardsShufflingIntoDeck>(e.cardCount);
 }
@@ -521,7 +526,7 @@ GameRulesEngine::findCollidingInventoryIdx(const sf::Vector2f& pointerPos)
 
 void GameRulesEngine::reloadWeapon(Card& weapon, int quantity)
 {
-    // TODO: play sound
+    audioEngine.playSound(SoundId::WeaponReload);
     weapon.quantity = std::clamp(weapon.quantity + quantity, 0, MAX_AMMO);
 }
 

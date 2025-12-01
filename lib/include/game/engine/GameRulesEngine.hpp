@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/definitions/Scene.hpp"
+#include "game/engine/AudioEngine.hpp"
 #include "game/events/EventQueue.hpp"
 #include "game/events/GameEvents.hpp"
 #include "input/Input.hpp"
@@ -11,10 +12,12 @@ class [[nodiscard]] GameRulesEngine final
 public:
     GameRulesEngine(
         EventQueue<GameEvent>& gameEventQueue,
+        AudioEngine& audioEngine,
         Scene& scene,
         Input& input,
         const VideoSettings& settings) noexcept
         : gameEventQueue(gameEventQueue)
+        , audioEngine(audioEngine)
         , scene(scene)
         , input(input)
         , settings(settings)
@@ -94,6 +97,7 @@ private:
 
 private:
     EventQueue<GameEvent>& gameEventQueue;
+    AudioEngine& audioEngine;
     Scene& scene;
     Input& input;
     const VideoSettings& settings;
