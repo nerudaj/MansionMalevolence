@@ -88,9 +88,12 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
-    scene.deck.push_front(*scene.inventory[e.inventorySlotIdx]);
+    auto card = *scene.inventory[e.inventorySlotIdx];
+    scene.deck.push_back(card);
     scene.inventory[e.inventorySlotIdx].reset();
-    gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
+
+    scene.activeAnimation =
+        std::make_unique<AnimationReturnInventoryToDeck>(card);
 }
 
 void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)

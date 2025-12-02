@@ -8,6 +8,7 @@
 #include "game/animations/AnimationEnemyDodgedAttack.hpp"
 #include "game/animations/AnimationInvalidOperation.hpp"
 #include "game/animations/AnimationNewCardsShufflingIntoDeck.hpp"
+#include "game/animations/AnimationReturnInventoryToDeck.hpp"
 #include "game/animations/AnimationSkipCard.hpp"
 #include "game/animations/AnimationTakeCard.hpp"
 #include "game/animations/AnimationTrashMainCard.hpp"
