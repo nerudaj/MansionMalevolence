@@ -2,6 +2,8 @@
 
 #include "game/animations/AnimationInterface.hpp"
 #include "game/builders/CardBuilder.hpp"
+#include "game/definitions/Chance.hpp"
+#include "game/definitions/DragDrop.hpp"
 #include "game/definitions/GameStats.hpp"
 #include "game/enums/GameScenario.hpp"
 #include <DGM/dgm.hpp>
@@ -19,56 +21,6 @@ constexpr const float EVADE_CHANCE_REGULAR = 0.65f;
 constexpr const float EVADE_CHANCE_BLIND = 0.7f;
 constexpr const float EVADE_CHANCE_VIGILANT = 0.15f;
 constexpr const float EVADE_CHANCE_EVASIVE = 0.3f;
-
-struct [[nodiscard]] DragDrop final
-{
-    std::optional<size_t> inventoryIdx;
-    bool canTrashCard;
-    bool draggingMainCard;
-    sf::Vector2f position;
-    sf::Vector2f initialPosition;
-};
-
-struct [[nodiscard]] Chance final
-{
-    int evasiveChanceSkew = 0;
-    int crimsonHeadChanceSkew = 0;
-    int dodgeChanceSkew = 0;
-    int blindDodgeChanceSkew = 0;
-    int vigilantDodgeChanceSkew = 0;
-
-    bool rollForEvasion()
-    {
-        return rollForChanceSkewed(2, 1, evasiveChanceSkew);
-    }
-
-    bool rollForCrimsonHead()
-    {
-        return rollForChanceSkewed(3, 1, crimsonHeadChanceSkew);
-    }
-
-    bool rollForDodge()
-    {
-        return rollForChanceSkewed(2, 1, dodgeChanceSkew);
-    }
-
-    bool rollForBlindDodge()
-    {
-        return rollForChanceSkewed(3, 2, blindDodgeChanceSkew);
-    }
-
-    bool rollForVigilantDodge()
-    {
-        return rollForChanceSkewed(3, 1, vigilantDodgeChanceSkew);
-    }
-
-    static int rollForChanceSkewed(int diceSize, int failThreshold, int& skew)
-    {
-        const bool success = skew + rand() % diceSize < failThreshold;
-        skew += success ? 1 : -1;
-        return success;
-    }
-};
 
 struct [[nodiscard]] Scene final
 {
