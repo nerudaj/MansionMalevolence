@@ -5,11 +5,14 @@
 
 TEST_CASE("[GameRulesEngine]")
 {
-    auto&& scene = SceneBuilder::createScene();
+    auto&& scene = SceneBuilder::createScene(GameScenario::Tutorial_1);
     auto&& events = EventQueue<GameEvent>();
     auto&& touch = TouchController(sf::Vector2u(INTERNAL_GAME_RESOLUTION));
+    auto&& resmgr = dgm::ResourceManager();
+    auto&& audioEngine = AudioEngine(resmgr);
     auto&& input = Input({}, touch);
-    auto&& engine = GameRulesEngine(events, scene, input, VideoSettings {});
+    auto&& engine =
+        GameRulesEngine(events, audioEngine, scene, input, VideoSettings {});
 
     SECTION("getUsableInventorySlot")
     {
