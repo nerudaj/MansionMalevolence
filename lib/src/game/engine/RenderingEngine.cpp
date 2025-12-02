@@ -150,7 +150,7 @@ void RenderingEngine::renderHud(dgm::Window& window)
     window.draw(sprite);
 
     // Trash button
-    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Trash)));
+    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Drop)));
     sprite.setPosition(getTrashIconOffset());
     window.draw(sprite);
 

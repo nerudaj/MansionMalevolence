@@ -3,7 +3,7 @@
 enum class [[nodiscard]] Icon
 {
     Pause,
-    Trash,
+    Drop,
     Bullet,
     Heart,
     Diamond,
@@ -11,4 +11,5 @@ enum class [[nodiscard]] Icon
     RedSkip,
     GreenTake,
     RedTake,
+    Trash,
 };
