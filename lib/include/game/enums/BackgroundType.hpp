@@ -14,5 +14,6 @@ enum class [[nodiscard]] BackgroundType
     Inventory2,
     Inventory2Greyed,
     Inventory3,
-    Inventory3Greyed
+    Inventory3Greyed,
+    PickOne,
 };

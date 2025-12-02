@@ -35,6 +35,12 @@ public:
         return sf::Vector2f { 8.f + idx * 43.5f, 161.f };
     }
 
+    [[nodiscard]] static sf::Vector2f
+    getNthBoosterChoiceOffset(size_t idx) noexcept
+    {
+        return sf::Vector2f { 8.f + idx * 43.5f, 109.f };
+    }
+
     [[nodiscard]] static sf::Vector2f getTrashIconOffset() noexcept
     {
         return sf::Vector2f { 54.f, 204.f };
@@ -88,6 +94,8 @@ private:
         const sf::Vector2f& scale);
 
     void renderTopDeckCard(dgm::Window& window);
+
+    void renderBoosterChoice(dgm::Window& window);
 
     BackgroundType getAppropriateBackgroundType() const;
 

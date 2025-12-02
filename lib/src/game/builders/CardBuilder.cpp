@@ -233,7 +233,7 @@ const std::map<CardType, Card> CARD_DEFS = {
     // Misc
     { CardType::Crate,
       Card { .image = CardImage::Crate,
-             .special = CardSpecial::Deposit,
+             .special = CardSpecial::BoosterPack,
              .quantity = 0,
              .power = 0,
              .name = "crate",

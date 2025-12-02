@@ -15,4 +15,6 @@ public:
     static Scene createScene(const GameScenario scenario);
 
     static GameState updateScene(Scene& scene, const int completedLinkID);
+
+    static std::array<CardType, 3u> generateBooster();
 };

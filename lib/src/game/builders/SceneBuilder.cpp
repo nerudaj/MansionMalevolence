@@ -3,6 +3,13 @@
 #include "misc/Compatibility.hpp"
 #include <random>
 
+template<class T>
+void shuffleVec(std::vector<T>& vec)
+{
+    auto&& mt = std::mt19937 { std::random_device {}() };
+    std::ranges::shuffle(vec, mt);
+}
+
 [[nodiscard]] static std::list<Card> generateTutorialDeck()
 {
     return { CardBuilder::createCard(CardType::Zombie),
@@ -35,9 +42,8 @@
         CardBuilder::createCard(CardType::MoonCrest),
     };
 
-    auto&& mt = std::mt19937 { std::random_device {}() };
-    std::ranges::shuffle(deckPart1, mt);
-    std::ranges::shuffle(deckPart2, mt);
+    shuffleVec(deckPart1);
+    shuffleVec(deckPart2);
 
     return std::views::join(std::vector { deckPart1, deckPart2 })
            | uniranges::to<std::list>();
@@ -85,15 +91,30 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
             dgm::Rect(RenderingEngine::getDeckCardOffset(), CARD_SIZE),
         .healthbarBody = dgm::Rect({ 35.f, 7.f }, { 85.f, 16.f }),
         .trashBody = dgm::Rect({ 5.f, 207.f }, { 116.f, 18.f }),
-        .inventoryBodies = { dgm::Rect(
-                                 RenderingEngine::getNthInventoryCardOffset(0),
-                                 CARD_SIZE / 3.f),
-                             dgm::Rect(
-                                 RenderingEngine::getNthInventoryCardOffset(1),
-                                 CARD_SIZE / 3.f),
-                             dgm::Rect(
-                                 RenderingEngine::getNthInventoryCardOffset(2),
-                                 CARD_SIZE / 3.f), },
+// clang-format off
+        .inventoryBodies = {
+            dgm::Rect(
+                RenderingEngine::getNthInventoryCardOffset(0),
+                CARD_SIZE / 3.f),
+            dgm::Rect(
+                RenderingEngine::getNthInventoryCardOffset(1),
+                CARD_SIZE / 3.f),
+            dgm::Rect(
+                RenderingEngine::getNthInventoryCardOffset(2),
+                CARD_SIZE / 3.f),
+        },
+        .choiceBodies = {
+            dgm::Rect(
+                RenderingEngine::getNthBoosterChoiceOffset(0),
+                CARD_SIZE / 3.f),
+            dgm::Rect(
+                RenderingEngine::getNthBoosterChoiceOffset(1),
+                CARD_SIZE / 3.f),
+            dgm::Rect(
+                RenderingEngine::getNthBoosterChoiceOffset(2),
+                CARD_SIZE / 3.f),
+        },
+// clang-format on
     };
 }
 
@@ -120,11 +141,25 @@ GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
             CardBuilder::createCard(CardType::Ammo),
         };
 
-        auto&& mt = std::mt19937 { std::random_device {}() };
-        std::ranges::shuffle(incoming, mt);
+        shuffleVec(incoming);
 
         scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
     }
 
     return GameState::Continue;
+}
+
+std::array<CardType, 3u> SceneBuilder::generateBooster()
+{
+    auto possibleCards = std::vector {
+        CardType::Ammo,    CardType::Ammo,     CardType::RedHerb,
+        CardType::RedHerb, CardType::FirstAid, CardType::GreenHerb,
+    };
+
+    shuffleVec(possibleCards);
+
+    auto result = std::array<CardType, 3u> {};
+    for (unsigned idx = 0; idx < result.size(); ++idx)
+        result[idx] = possibleCards[idx];
+    return result;
 }

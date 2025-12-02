@@ -118,6 +118,8 @@ void RenderingEngine::renderWorld(dgm::Window& window)
                 : getNthInventoryCardOffset(idx),
             1.f / 3.f);
     }
+
+    renderBoosterChoice(window);
 }
 
 void RenderingEngine::renderBackground(dgm::Window& window)
@@ -296,6 +298,27 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
     else
     {
         renderCard(window, scene.deck.front(), deckOffset);
+    }
+}
+
+void RenderingEngine::renderBoosterChoice(dgm::Window& window)
+{
+    if (!scene.boosterChoice) return;
+
+    sprite.setTextureRect(
+        atlas.getClip(playbgrLocation)
+            .getFrame(std::to_underlying(BackgroundType::PickOne)));
+    sprite.setPosition({ 0.f, 0.f });
+    window.draw(sprite);
+
+    for (auto&& [idx, cardType] :
+         std::ranges::views::enumerate(scene.boosterChoice.value()))
+    {
+        renderCard(
+            window,
+            CardBuilder::createCard(cardType),
+            getNthBoosterChoiceOffset(idx),
+            1.f / 3.f);
     }
 }
 

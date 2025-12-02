@@ -9,7 +9,7 @@ enum class [[nodiscard]] CardSpecial
     Blind = 16,
     SpawnCrimsonHead = 32,
     Combines = 64,
-    Deposit = 128,
+    BoosterPack = 128,
 };
 
 constexpr const int SPECIAL_HERBS = 1;

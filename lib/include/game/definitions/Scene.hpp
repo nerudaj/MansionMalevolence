@@ -32,11 +32,13 @@ struct [[nodiscard]] Scene final
     int hearts = MAX_HEARTS;
     std::unique_ptr<AnimationInterface> activeAnimation = nullptr;
     std::optional<DragDrop> dragDrop;
+    std::optional<std::array<CardType, 3u>> boosterChoice = std::nullopt;
 
     dgm::Rect mainCardBody;
     dgm::Rect healthbarBody;
     dgm::Rect trashBody;
     std::array<dgm::Rect, 3u> inventoryBodies;
+    std::array<dgm::Rect, 3u> choiceBodies;
 
     // These are precomputed in each update()
     // and are used both by game and rendering logic.

@@ -7,6 +7,14 @@
 
 void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 {
+    scene.stats.turnsTaken++;
+
+    if (scene.deck.front().special == CardSpecial::BoosterPack)
+    {
+        scene.boosterChoice = SceneBuilder::generateBooster();
+        return;
+    }
+
     if (scene.inventory[e.inventorySlotIdx].has_value())
     {
         const auto& inventoryCard = scene.inventory[e.inventorySlotIdx].value();
@@ -40,7 +48,6 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
     }
 
     popTopDeckCard();
-    scene.stats.turnsTaken++;
 }
 
 void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
@@ -81,8 +88,9 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
-    audioEngine.playSound(SoundId::CardDestroy);
+    scene.deck.push_front(*scene.inventory[e.inventorySlotIdx]);
     scene.inventory[e.inventorySlotIdx].reset();
+    gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
 }
 
 void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
@@ -121,23 +129,14 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         if (card.link == SPECIAL_CREST_DOOR
             && deckCard.image == CardImage::CrestDoorEmpty)
         {
-            scene.activeAnimation = std::make_unique<AnimationCardTransform>(
-                CardType::CrestDoorEmpty);
-
-            scene.deck.front() =
-                CardBuilder::createCard(CardType::CrestDoorWithOneCrest);
+            transformTopCard(
+                CardType::CrestDoorEmpty, CardType::CrestDoorWithOneCrest);
         }
         else
         {
             scene.activeAnimation =
                 std::make_unique<AnimationDoorOpen>(card.link);
         }
-    }
-    else if (deckCard.special & CardSpecial::Deposit)
-    {
-        scene.deck.push_front(*scene.inventory[e.inventorySlotIdx]);
-        scene.inventory[e.inventorySlotIdx].reset();
-        gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
     }
     else
     {
@@ -293,27 +292,46 @@ void GameRulesEngine::update(const dgm::Time& time)
     if (scene.activeAnimation) return;
 
     scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());
-    scene.canTakeCard = scene.deck.front().traits & CardTrait::Pickable
-                        && scene.usableInventorySlot;
+    scene.canTakeCard =
+        (scene.deck.front().traits & CardTrait::Pickable
+         && scene.usableInventorySlot)
+        || scene.deck.front().special & CardSpecial::BoosterPack;
     scene.canSafelySkipCard = !(scene.deck.front().traits & CardTrait::Enemy);
 
     if (scene.preventInteractions) return;
 
-    if (input.isTakeButtonPressed())
+    if (scene.boosterChoice)
     {
-        handleTake();
+        const auto clickPos = screenToWorld(input.getDragPosition());
+        for (auto&& [idx, body] :
+             std::ranges::views::enumerate(scene.choiceBodies))
+        {
+            if (dgm::Collision::basic(body, clickPos))
+            {
+                transformTopCard(
+                    CardType::Crate, scene.boosterChoice.value()[idx]);
+                scene.boosterChoice.reset();
+            }
+        }
     }
-    else if (input.isSkipButtonPressed())
+    else
     {
-        handleSkip();
-    }
-    else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
-    {
-        handleDragStartedOrMoved(pos);
-    }
-    else if (scene.dragDrop.has_value())
-    {
-        handleDragEnded();
+        if (input.isTakeButtonPressed())
+        {
+            handleTake();
+        }
+        else if (input.isSkipButtonPressed())
+        {
+            handleSkip();
+        }
+        else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
+        {
+            handleDragStartedOrMoved(pos);
+        }
+        else if (scene.dragDrop.has_value())
+        {
+            handleDragEnded();
+        }
     }
 }
 
@@ -499,8 +517,7 @@ bool GameRulesEngine::canCardInteractWithDeck(
     const auto deckTraits = deck.front().traits;
     return deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
            || deckTraits & CardTrait::KeyTarget && a.traits & CardTrait::KeyItem
-                  && deck.front().link == a.link
-           || deck.front().special & CardSpecial::Deposit;
+                  && deck.front().link == a.link;
 }
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)
@@ -544,4 +561,11 @@ void GameRulesEngine::popTopDeckCard()
 {
     scene.deck.pop_front();
     scene.preventInteractions = false;
+}
+
+void GameRulesEngine::transformTopCard(CardType from, CardType to)
+{
+    scene.activeAnimation = std::make_unique<AnimationCardTransform>(from);
+
+    scene.deck.front() = CardBuilder::createCard(to);
 }

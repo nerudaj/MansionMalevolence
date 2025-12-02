@@ -18,7 +18,7 @@ void AnimationCardTransform::render(
         * (1.f - easedF);
 
     renderCard(
-        getPercFactor() <= 0.f ? preTransformCard : scene.deck.front(),
+        getPercFactor() <= 0.5f ? preTransformCard : scene.deck.front(),
         Position(baseOffset + animationOffset),
         Scale({ easedF, 1.f }));
 };

@@ -93,6 +93,8 @@ private:
 
     void popTopDeckCard();
 
+    void transformTopCard(CardType from, CardType to);
+
 private:
     EventQueue<GameEvent>& gameEventQueue;
     AudioEngine& audioEngine;
