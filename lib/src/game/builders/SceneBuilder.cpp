@@ -51,15 +51,18 @@ void shuffleVec(std::vector<T>& vec)
 
 [[nodiscard]] static std::list<Card> generateHardDeck()
 {
-    // TODO: placeholder
     return {
         CardBuilder::createCard(CardType::DiamondDoor),
-        CardBuilder::createCard(CardType::CrestDoorEmpty),
+        CardBuilder::createCard(CardType::DiamondKey),
+        CardBuilder::createCard(CardType::Zombie),
         CardBuilder::createCard(CardType::Zombie),
         CardBuilder::createCard(CardType::Zombie),
         CardBuilder::createCard(CardType::Cerberus),
-        CardBuilder::createCard(CardType::CrimsonHead),
-        CardBuilder::createCard(CardType::Crate),
+        CardBuilder::createCard(CardType::RedJewel),
+        CardBuilder::createCard(CardType::YellowJewelBox),
+        CardBuilder::createCard(CardType::SunCrest),
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::RedHerb),
     };
 }
 
@@ -142,6 +145,58 @@ GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
         };
 
         shuffleVec(incoming);
+
+        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+    }
+
+    if (scene.scenario == GameScenario::Hard
+        && completedLinkID == SPECIAL_DIAMOND_KEYDOOR)
+    {
+        auto&& incoming = std::vector<Card> {
+            CardBuilder::createCard(CardType::MoonCrestLeft),
+            CardBuilder::createCard(CardType::CrestDoorEmpty),
+            CardBuilder::createCard(CardType::ShieldKey),
+            CardBuilder::createCard(CardType::ShieldDoor),
+            CardBuilder::createCard(CardType::GreenHerb),
+            CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::Shotgun),
+            CardBuilder::createCard(CardType::Cerberus),
+            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Zombie),
+        };
+
+        shuffleVec(incoming);
+
+        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+    }
+
+    if (scene.scenario == GameScenario::Hard
+        && completedLinkID == SPECIAL_SHIELD_KEYDOOR)
+    {
+        auto&& incoming = std::vector<Card> {
+            CardBuilder::createCard(CardType::YellowJewel),
+            CardBuilder::createCard(CardType::RedJewelBox),
+            CardBuilder::createCard(CardType::Ammo),
+            CardBuilder::createCard(CardType::Cerberus),
+            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Zombie),
+            CardBuilder::createCard(CardType::Crate),
+        };
+
+        shuffleVec(incoming);
+
+        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+    }
+
+    if (scene.scenario == GameScenario::Hard
+        && completedLinkID == SPECIAL_CREST_DOOR)
+    {
+        auto&& incoming = std::vector<Card> {
+            CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::Tyrant),
+            CardBuilder::createCard(CardType::Vaccine),
+        };
 
         scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
     }

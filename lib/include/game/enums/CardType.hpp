@@ -7,6 +7,7 @@ enum class [[nodiscard]] CardType
     // Weapons
     Pistol,
     Shotgun,
+    RocketLauncher,
     Ammo,
 
     // Healing
@@ -26,6 +27,11 @@ enum class [[nodiscard]] CardType
     ShieldDoor,
     DiamondKey,
     DiamondDoor,
+    RedJewel,
+    RedJewelBox,
+    YellowJewel,
+    YellowJewelBox,
+    Vaccine,
 
     // Enemies
     Zombie,

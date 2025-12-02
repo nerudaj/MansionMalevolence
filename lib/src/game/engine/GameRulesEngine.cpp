@@ -9,12 +9,6 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 {
     scene.stats.turnsTaken++;
 
-    if (scene.deck.front().special == CardSpecial::BoosterPack)
-    {
-        scene.boosterChoice = SceneBuilder::generateBooster();
-        return;
-    }
-
     if (scene.inventory[e.inventorySlotIdx].has_value())
     {
         const auto& inventoryCard = scene.inventory[e.inventorySlotIdx].value();
@@ -134,6 +128,15 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         {
             transformTopCard(
                 CardType::CrestDoorEmpty, CardType::CrestDoorWithOneCrest);
+        }
+        else if (card.link == SPECIAL_RED_JEWEL)
+        {
+            transformTopCard(CardType::RedJewelBox, CardType::RocketLauncher);
+        }
+        else if (card.link == SPECIAL_YELLOW_JEWEL)
+        {
+            transformTopCard(
+                CardType::YellowJewelBox, CardType::MoonCrestRight);
         }
         else
         {
@@ -340,6 +343,12 @@ void GameRulesEngine::update(const dgm::Time& time)
 
 void GameRulesEngine::handleTake()
 {
+    if (scene.deck.front().special & CardSpecial::BoosterPack)
+    {
+        scene.boosterChoice = SceneBuilder::generateBooster();
+        return;
+    }
+
     scene.preventInteractions = true;
     if (scene.canTakeCard)
     {

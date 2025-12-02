@@ -36,6 +36,7 @@ enum class [[nodiscard]] StringId
     LevelTutorial1,
     LevelNormal,
     LevelHard,
+    LevelKillshow,
 
     // InputKind
     InputKind_BackButton,

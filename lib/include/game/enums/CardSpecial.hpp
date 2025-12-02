@@ -17,6 +17,8 @@ constexpr const int SPECIAL_MOON_CREST_PART = 2;
 constexpr const int SPECIAL_SHIELD_KEYDOOR = 3;
 constexpr const int SPECIAL_CREST_DOOR = 4;
 constexpr const int SPECIAL_DIAMOND_KEYDOOR = 5;
+constexpr const int SPECIAL_YELLOW_JEWEL = 6;
+constexpr const int SPECIAL_RED_JEWEL = 7;
 
 constexpr CardSpecial operator|(CardSpecial a, CardSpecial b)
 {

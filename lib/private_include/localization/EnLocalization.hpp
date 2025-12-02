@@ -43,6 +43,7 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { LevelTutorial1, "tutorial" },
     { LevelNormal, "normal" },
     { LevelHard, "hard" },
+    { LevelKillshow, "kill 15" },
 
     // InputKind
     { InputKind_BackButton, "back" },
