@@ -60,10 +60,13 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 {
     const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
     const auto special = scene.deck.front().special;
-    const bool managedToEvade = rollForSuccess(
-        special & CardSpecial::Blind      ? EVADE_CHANCE_BLIND
-        : special & CardSpecial::Vigilant ? EVADE_CHANCE_VIGILANT
-                                          : EVADE_CHANCE_REGULAR);
+    // clang-format off
+    const bool managedToEvade = special & CardSpecial::Blind
+        ? scene.chance.rollForBlindDodge()
+        : special & CardSpecial::Vigilant
+            ? scene.chance.rollForVigilantDodge()
+            : scene.chance.rollForDodge();
+    // clang-format on
 
     if (isEnemy && !managedToEvade)
     {
@@ -176,7 +179,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
     scene.stats.shotsFired++;
 
     if (scene.deck.front().special & CardSpecial::Evasive
-        && rollForSuccess(EVADE_CHANCE_EVASIVE))
+        && scene.chance.rollForEvasion())
     {
         scene.activeAnimation = std::make_unique<AnimationEnemyDodgedAttack>();
     }
@@ -246,7 +249,7 @@ void GameRulesEngine::operator()(
 
 void GameRulesEngine::operator()(const ZombieDiedGameEvent&)
 {
-    if (!rollForSuccess(CRIMSON_HEAD_SPAWN_CHANCE)) return;
+    if (!scene.chance.rollForCrimsonHead()) return;
 
     scene.deck.push_back(CardBuilder::createCard(CardType::CrimsonHead));
 }
@@ -541,10 +544,4 @@ void GameRulesEngine::popTopDeckCard()
 {
     scene.deck.pop_front();
     scene.preventInteractions = false;
-}
-
-bool GameRulesEngine::rollForSuccess(float chance)
-{
-    const auto roll = std::random_device {}();
-    return chance >= (roll % 100) / static_cast<float>(100);
 }

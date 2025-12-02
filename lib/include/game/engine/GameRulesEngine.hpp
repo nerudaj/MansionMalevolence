@@ -93,8 +93,6 @@ private:
 
     void popTopDeckCard();
 
-    bool rollForSuccess(float chance);
-
 private:
     EventQueue<GameEvent>& gameEventQueue;
     AudioEngine& audioEngine;
