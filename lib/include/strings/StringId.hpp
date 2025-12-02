@@ -31,6 +31,12 @@ enum class [[nodiscard]] StringId
     BindingHeadingKMB,
     BindingsHeadingGamepad,
 
+    // Level select
+    LevelSelect,
+    LevelTutorial1,
+    LevelNormal,
+    LevelHard,
+
     // InputKind
     InputKind_BackButton,
     InputKind_ConfirmButton,

@@ -63,7 +63,10 @@ void AppStateEndGameScreen::buildLayout()
             .withContent(table.build())
             .withNoTopLeftButton()
             .withNoTopRightButton()
-            .withNoBottomLeftButton()
+            .withBottomLeftButton(WidgetBuilder::createButton(
+                dic.strings.getString(StringId::Retry),
+                [this] { app.popState(Messaging::serialize<RestartGame>()); },
+                dic.sizer))
             .withBottomRightButton(WidgetBuilder::createButton(
                 dic.strings.getString(StringId::BackToMenu),
                 [this] { app.popState(Messaging::serialize<PopIfNotMenu>()); },

@@ -73,6 +73,6 @@ void AppStateGame::restoreFocusImpl(const std::string& msg)
 {
     if (auto message = Messaging::deserialize(msg))
     {
-        std::visit([&](PopIfNotMenu&) { app.popState(msg); }, *message);
+        std::visit([&](auto) { app.popState(msg); }, *message);
     }
 }

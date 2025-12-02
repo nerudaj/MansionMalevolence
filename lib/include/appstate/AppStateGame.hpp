@@ -4,6 +4,7 @@
 #include "game/definitions/Scene.hpp"
 #include "game/engine/GameRulesEngine.hpp"
 #include "game/engine/RenderingEngine.hpp"
+#include "game/enums/GameScenario.hpp"
 #include "game/events/EventQueue.hpp"
 #include "misc/DependencyContainer.hpp"
 #include "settings/AppSettings.hpp"
@@ -14,11 +15,15 @@
 class [[nodiscard]] AppStateGame : public dgm::AppState
 {
 public:
-    AppStateGame(dgm::App& app, DependencyContainer& dic, AppSettings& settings)
+    AppStateGame(
+        dgm::App& app,
+        DependencyContainer& dic,
+        AppSettings& settings,
+        GameScenario scenario)
         : dgm::AppState(app)
         , dic(dic)
         , settings(settings)
-        , scene(SceneBuilder::createScene(GameScenario::Normal))
+        , scene(SceneBuilder::createScene(scenario))
         , audioEngine(dic.resmgr)
         , gameRulesEngine(
               gameEvents, audioEngine, scene, dic.input, settings.video)
