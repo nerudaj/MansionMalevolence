@@ -348,8 +348,7 @@ BackgroundType RenderingEngine::getAppropriateBackgroundType() const
     else if (dgm::Collision::basic(scene.trashBody, dragPosition))
     {
 
-        return scene.dragDrop->canTrashCard ? BackgroundType::Trash
-                                            : BackgroundType::TrashGreyed;
+        return BackgroundType::Trash;
     }
 
     for (auto&& [idx, inventoryBody] :

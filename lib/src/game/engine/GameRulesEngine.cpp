@@ -373,13 +373,8 @@ void GameRulesEngine::handleDragStartedOrMoved(sf::Vector2f& pos)
     if (!scene.dragDrop.has_value())
     { // started
         auto&& inventoryIdx = findCollidingInventoryIdx(worldPos);
-        auto&& traits = inventoryIdx
-                            ? scene.inventory[*inventoryIdx].value().traits
-                            : CardTrait::None;
         scene.dragDrop = DragDrop {
             .inventoryIdx = std::move(inventoryIdx),
-            .canTrashCard = !(
-                traits & CardTrait::KeyItem || traits & CardTrait::KeyItemPart),
             .draggingMainCard =
                 dgm::Collision::basic(scene.mainCardBody, worldPos),
             .position = worldPos,
@@ -447,11 +442,7 @@ void GameRulesEngine::handleDragEnded()
     }
     else if (dgm::Collision::basic(scene.trashBody, dragPos))
     {
-        if (scene.dragDrop->canTrashCard)
-        {
-            gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
-                inventoryIdx);
-        }
+        gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(inventoryIdx);
     }
     else
     {
