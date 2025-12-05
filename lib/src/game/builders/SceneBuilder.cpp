@@ -32,7 +32,7 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
         .builder = std::move(builder),
         .inventory = { CardBuilder::createCard(CardType::Pistol), std::nullopt, std::nullopt },
         .mainCardBody =
-            dgm::Rect(sf::Vector2f { 6.f, 28.f }, CARD_SIZE),
+            dgm::Rect(sf::Vector2f { 6.f, 27.f }, CARD_SIZE),
         .healthbarBody = dgm::Rect({ 3.f, 150.f }, { 80.f, 24.f }),
         .trashBody = dgm::Rect({ 94.f, 102.f }, CARD_SIZE / 3.f),
 // clang-format off
