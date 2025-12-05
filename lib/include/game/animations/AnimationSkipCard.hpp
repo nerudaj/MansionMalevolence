@@ -16,6 +16,7 @@ public:
 
     std::optional<GameEvent> finalize() const override
     {
-        return CardSkipEndedGameEvent();
+        return std::nullopt;
+        // return CardSkipEndedGameEvent();
     }
 };

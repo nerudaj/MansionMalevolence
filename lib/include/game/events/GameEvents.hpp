@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/definitions/Card.hpp"
 #include <variant>
 
 struct [[nodiscard]] CardTakenGameEvent final
@@ -22,6 +23,9 @@ struct [[nodiscard]] CardSkipStartedGameEvent final
 
 struct [[nodiscard]] CardSkipEndedGameEvent final
 {
+    Card card;
+
+    explicit CardSkipEndedGameEvent(Card card) : card(card) {}
 };
 
 struct [[nodiscard]] InventoryCardTrashedGameEvent final

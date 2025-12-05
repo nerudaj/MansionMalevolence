@@ -7,13 +7,8 @@ class [[nodiscard]] AnimationCardToDiscard final : public AnimationInterface
 {
 public:
     AnimationCardToDiscard(
-        Card card,
-        const sf::Vector2f& origin,
-        bool emitGameEvent = false) noexcept
-        : AnimationInterface(sf::seconds(0.75f))
-        , card(card)
-        , origin(origin)
-        , skippingMainDeckCard(emitGameEvent)
+        const Card& card, const sf::Vector2f& origin) noexcept
+        : AnimationInterface(sf::seconds(0.75f)), card(card), origin(origin)
     {
     }
 
@@ -27,12 +22,10 @@ public:
 
     std::optional<GameEvent> finalize() const override
     {
-        if (skippingMainDeckCard) return CardSkipEndedGameEvent();
-        return std::nullopt;
+        return CardSkipEndedGameEvent(card);
     }
 
 private:
     const Card card;
     const sf::Vector2f origin;
-    const bool skippingMainDeckCard;
 };

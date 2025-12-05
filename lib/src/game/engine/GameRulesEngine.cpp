@@ -48,16 +48,14 @@ void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
     scene.stats.turnsTaken++;
     scene.activeAnimation = std::make_unique<AnimationCardToDiscard>(
-        scene.deck.front(),
-        scene.mainCardBody.getPosition(),
-        "emitGameEvent"_true);
+        scene.deck.front(), scene.mainCardBody.getPosition());
+    popTopDeckCard();
     audioEngine.playSound(SoundId::CardShuffle);
 }
 
-void GameRulesEngine::operator()(const CardSkipEndedGameEvent&)
+void GameRulesEngine::operator()(const CardSkipEndedGameEvent& e)
 {
-    scene.discard.push_back(scene.deck.front());
-    popTopDeckCard();
+    scene.discard.push_back(e.card);
 }
 
 void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
@@ -86,7 +84,6 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
     auto card = *scene.inventory[e.inventorySlotIdx];
-    scene.discard.push_back(card);
     scene.inventory[e.inventorySlotIdx].reset();
 
     scene.activeAnimation = std::make_unique<AnimationCardToDiscard>(
@@ -291,8 +288,11 @@ void GameRulesEngine::operator()(const NewCardShuffledToDiscard&)
 
 void GameRulesEngine::update(const dgm::Time& time)
 {
-    updateActiveAnimation(time);
-    if (scene.activeAnimation) return;
+    if (scene.activeAnimation)
+    {
+        updateActiveAnimation(time);
+        return;
+    }
 
     if (scene.deck.empty())
     {
@@ -483,7 +483,6 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 
         scene.preventInteractions = false;
         scene.activeAnimation.reset();
-        assert(!scene.deck.empty());
     }
 }
 

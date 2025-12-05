@@ -4,7 +4,7 @@
 
 void AnimationCardToDiscard::render(
     const Scene& scene,
-    const sf::Vector2f&,
+    const sf::Vector2f& baseOffset,
     std::function<void(const Card&, const Position&, const Scale&)> renderCard,
     std::function<void(const Position&, const Scale&)> renderCardBack) const
 {
@@ -18,6 +18,10 @@ void AnimationCardToDiscard::render(
     const auto scale = Scale(
         sf::Vector2f { easedF, 1.f }
         * std::lerp(1.f, 1.f / 3.f, getPercFactor()));
+
+    if (!scene.deck.empty())
+        renderCard(
+            scene.deck.front(), Position(baseOffset), Scale({ 1.f, 1.f }));
 
     if (getPercFactor() <= 0.25f)
         renderCard(card, position, scale);
