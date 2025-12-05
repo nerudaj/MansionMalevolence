@@ -42,15 +42,19 @@ void AppStateEndGameScreen::buildLayout()
     };
 
     auto table = TableBuilder(dic.sizer).withNoHeading();
-    table.addRow({ createLabel(StringId::TurnsTaken),
-                   WidgetBuilder::createTextLabel(
-                       std::to_string(stats.turnsTaken), dic.sizer) });
-    table.addRow({ createLabel(StringId::ShotsFired),
-                   WidgetBuilder::createTextLabel(
-                       std::to_string(stats.shotsFired), dic.sizer) });
+    table.addRow(
+        { createLabel(StringId::TurnsTaken),
+          WidgetBuilder::createTextLabel(
+              std::to_string(stats.turnsTaken), dic.sizer, "justify"_true) });
+    table.addRow(
+        { createLabel(StringId::ShotsFired),
+          WidgetBuilder::createTextLabel(
+              std::to_string(stats.shotsFired), dic.sizer, "justify"_true) });
     table.addRow({ createLabel(StringId::EnemiesRouted),
                    WidgetBuilder::createTextLabel(
-                       std::to_string(stats.enemiesKilled), dic.sizer) });
+                       std::to_string(stats.enemiesKilled),
+                       dic.sizer,
+                       "justify"_true) });
 
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
