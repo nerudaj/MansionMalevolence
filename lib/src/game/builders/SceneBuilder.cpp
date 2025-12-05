@@ -91,9 +91,9 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
         .deck = generateInitialDeck(scenario),
         .inventory = { CardBuilder::createCard(CardType::Pistol), std::nullopt, std::nullopt },
         .mainCardBody =
-            dgm::Rect(sf::Vector2f { 7.f, 35.f }, CARD_SIZE),
-        .healthbarBody = dgm::Rect({ 35.f, 7.f }, { 85.f, 16.f }),
-        .trashBody = dgm::Rect({ 95.f, 95.f }, { 25.f, 53.f }),
+            dgm::Rect(sf::Vector2f { 6.f, 28.f }, CARD_SIZE),
+        .healthbarBody = dgm::Rect({ 3.f, 150.f }, { 80.f, 24.f }),
+        .trashBody = dgm::Rect({ 94.f, 102.f }, { 25.f, 38.f }),
 // clang-format off
         .inventoryBodies = {
             dgm::Rect(
@@ -121,17 +121,10 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
     };
 }
 
-GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
+std::list<Card> SceneBuilder::getCardsForRoom(
+    const GameScenario scenario, const int completedLinkID)
 {
-    if (scene.scenario == GameScenario::Tutorial_1
-        && completedLinkID == SPECIAL_SHIELD_KEYDOOR)
-        return GameState::Finished;
-
-    if (scene.scenario == GameScenario::Normal
-        && completedLinkID == SPECIAL_CREST_DOOR)
-        return GameState::Finished;
-
-    if (scene.scenario == GameScenario::Normal
+    if (scenario == GameScenario::Normal
         && completedLinkID == SPECIAL_DIAMOND_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
@@ -146,10 +139,10 @@ GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
 
         shuffleVec(incoming);
 
-        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+        return std::list(incoming.begin(), incoming.end());
     }
 
-    if (scene.scenario == GameScenario::Hard
+    if (scenario == GameScenario::Hard
         && completedLinkID == SPECIAL_DIAMOND_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
@@ -167,10 +160,10 @@ GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
 
         shuffleVec(incoming);
 
-        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+        return std::list(incoming.begin(), incoming.end());
     }
 
-    if (scene.scenario == GameScenario::Hard
+    if (scenario == GameScenario::Hard
         && completedLinkID == SPECIAL_SHIELD_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
@@ -186,11 +179,10 @@ GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
 
         shuffleVec(incoming);
 
-        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+        return std::list(incoming.begin(), incoming.end());
     }
 
-    if (scene.scenario == GameScenario::Hard
-        && completedLinkID == SPECIAL_CREST_DOOR)
+    if (scenario == GameScenario::Hard && completedLinkID == SPECIAL_CREST_DOOR)
     {
         auto&& incoming = std::vector<Card> {
             CardBuilder::createCard(CardType::Crate),
@@ -198,10 +190,10 @@ GameState SceneBuilder::updateScene(Scene& scene, const int completedLinkID)
             CardBuilder::createCard(CardType::Vaccine),
         };
 
-        scene.deck.insert(scene.deck.end(), incoming.begin(), incoming.end());
+        return std::list(incoming.begin(), incoming.end());
     }
 
-    return GameState::Continue;
+    return {};
 }
 
 std::array<CardType, 3u> SceneBuilder::generateBooster()

@@ -9,7 +9,7 @@ void AnimationEnemyAttack::render(
     std::function<void(const Position&, const Scale&)>) const
 {
     const auto animationOffset =
-        (RenderingEngine::getNthHeartOffset(0) - baseOffset)
+        (RenderingEngine::getInfectionTextOffset() - baseOffset)
         * Easing::easeAttack(getPercFactor());
     renderCard(
         scene.deck.front(),

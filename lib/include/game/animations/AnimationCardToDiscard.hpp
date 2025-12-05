@@ -10,7 +10,10 @@ public:
         Card card,
         const sf::Vector2f& origin,
         bool emitGameEvent = false) noexcept
-        : card(card), origin(origin), emitGameEvent(emitGameEvent)
+        : AnimationInterface(sf::seconds(0.75f))
+        , card(card)
+        , origin(origin)
+        , skippingMainDeckCard(emitGameEvent)
     {
     }
 
@@ -24,12 +27,12 @@ public:
 
     std::optional<GameEvent> finalize() const override
     {
-        if (emitGameEvent) return CardSkipEndedGameEvent();
+        if (skippingMainDeckCard) return CardSkipEndedGameEvent();
         return std::nullopt;
     }
 
 private:
     const Card card;
     const sf::Vector2f origin;
-    const bool emitGameEvent;
+    const bool skippingMainDeckCard;
 };

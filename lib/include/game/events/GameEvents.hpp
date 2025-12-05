@@ -123,14 +123,8 @@ struct [[nodiscard]] DoorOpenedGameEvent final
     explicit DoorOpenedGameEvent(int link) noexcept : link(link) {}
 };
 
-struct [[nodiscard]] ShuffleNewCardsIntoDeck final
+struct [[nodiscard]] NewCardShuffledToDiscard final
 {
-    int cardCount;
-
-    explicit ShuffleNewCardsIntoDeck(int cardCount) noexcept
-        : cardCount(cardCount)
-    {
-    }
 };
 
 using GameEvent = std::variant<
@@ -150,4 +144,4 @@ using GameEvent = std::variant<
     ZombieDiedGameEvent,
     MainCardResolvedGameEvent,
     DoorOpenedGameEvent,
-    ShuffleNewCardsIntoDeck>;
+    NewCardShuffledToDiscard>;

@@ -29,7 +29,7 @@ public:
     [[nodiscard]] static sf::Vector2f
     getNthInventoryCardOffset(size_t idx) noexcept
     {
-        return sf::Vector2f { 8.f + idx * 43.5f, 161.f };
+        return sf::Vector2f { 8.f + idx * 43.5f, 182.f };
     }
 
     [[nodiscard]] static sf::Vector2f
@@ -45,7 +45,12 @@ public:
 
     [[nodiscard]] static sf::Vector2f getNthHeartOffset(size_t idx) noexcept
     {
-        return { 31.f + idx * 18.f, 3.f };
+        return { 3.f + idx * 14.f, 150.f };
+    }
+
+    [[nodiscard]] static sf::Vector2f getInfectionTextOffset() noexcept
+    {
+        return { 95.f, 160.f };
     }
 
 private:

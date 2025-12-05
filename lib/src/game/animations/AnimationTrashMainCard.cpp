@@ -10,8 +10,7 @@ void AnimationTrashMainCard::render(
 {
     const auto scale = std::lerp(1.f, 1.f / 10.f, getPercFactor());
     const auto animationOffset =
-        (sf::Vector2f { baseOffset.x, -100.f } - baseOffset)
-        * Easing::easeInOut(getPercFactor());
+        sf::Vector2f { 0.f, -100.f } * Easing::easeInOut(getPercFactor());
     renderCard(
         scene.deck.front(),
         Position(baseOffset + animationOffset),

@@ -60,7 +60,7 @@ public:
 
     void operator()(const DoorOpenedGameEvent& e);
 
-    void operator()(const ShuffleNewCardsIntoDeck& e);
+    void operator()(const NewCardShuffledToDiscard& e);
 
 public:
     void update(const dgm::Time& time);
@@ -94,6 +94,8 @@ private:
     void popTopDeckCard();
 
     void transformTopCard(CardType from, CardType to);
+
+    void shuffleNewCardIntoDeck();
 
 private:
     EventQueue<GameEvent>& gameEventQueue;

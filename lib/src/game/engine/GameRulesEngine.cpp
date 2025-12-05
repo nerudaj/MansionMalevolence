@@ -275,30 +275,30 @@ void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
 
 void GameRulesEngine::operator()(const DoorOpenedGameEvent& e)
 {
-    auto preDeckCount = scene.deck.size();
-    if (SceneBuilder::updateScene(scene, e.link) == GameState::Finished)
-    {
-        scene.won = true;
-        return;
-    }
+    scene.cardsToAdd = SceneBuilder::getCardsForRoom(scene.scenario, e.link);
 
-    auto postDeckCount = scene.deck.size();
     popTopDeckCard();
-    gameEventQueue.pushEvent<ShuffleNewCardsIntoDeck>(
-        static_cast<int>(postDeckCount - preDeckCount));
+    shuffleNewCardIntoDeck();
 }
 
-void GameRulesEngine::operator()(const ShuffleNewCardsIntoDeck& e)
+void GameRulesEngine::operator()(const NewCardShuffledToDiscard&)
 {
-    audioEngine.playSound(SoundId::CardShuffle);
-    scene.activeAnimation =
-        std::make_unique<AnimationNewCardsShufflingIntoDeck>(e.cardCount);
+    scene.discard.push_back(scene.cardsToAdd.front());
+    scene.cardsToAdd.pop_front();
+    shuffleNewCardIntoDeck();
 }
 
 void GameRulesEngine::update(const dgm::Time& time)
 {
     updateActiveAnimation(time);
     if (scene.activeAnimation) return;
+
+    if (scene.deck.empty())
+    {
+        // TODO: play animation
+        scene.deck = scene.discard;
+        scene.discard.clear();
+    }
 
     scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());
     scene.canTakeCard =
@@ -482,6 +482,7 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 
         scene.preventInteractions = false;
         scene.activeAnimation.reset();
+        assert(!scene.deck.empty());
     }
 }
 
@@ -565,13 +566,6 @@ void GameRulesEngine::popTopDeckCard()
 {
     scene.deck.pop_front();
     scene.preventInteractions = false;
-
-    if (scene.deck.empty())
-    {
-        // TODO: play animation
-        scene.deck = scene.discard;
-        scene.discard.clear();
-    }
 }
 
 void GameRulesEngine::transformTopCard(CardType from, CardType to)
@@ -579,4 +573,13 @@ void GameRulesEngine::transformTopCard(CardType from, CardType to)
     scene.activeAnimation = std::make_unique<AnimationCardTransform>(from);
 
     scene.deck.front() = CardBuilder::createCard(to);
+}
+
+void GameRulesEngine::shuffleNewCardIntoDeck()
+{
+    if (scene.cardsToAdd.empty()) return;
+
+    audioEngine.playSound(SoundId::CardShuffle);
+    scene.activeAnimation =
+        std::make_unique<AnimationNewCardsShufflingIntoDeck>();
 }

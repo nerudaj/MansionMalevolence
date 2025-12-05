@@ -6,8 +6,8 @@ class [[nodiscard]] AnimationNewCardsShufflingIntoDeck final
     : public AnimationInterface
 {
 public:
-    AnimationNewCardsShufflingIntoDeck(int count) noexcept
-        : AnimationInterface(sf::seconds(0.3f)), count(count)
+    AnimationNewCardsShufflingIntoDeck() noexcept
+        : AnimationInterface(sf::seconds(0.3f))
     {
     }
 
@@ -22,12 +22,6 @@ public:
 
     std::optional<GameEvent> finalize() const override
     {
-        if (count > 1)
-            return ShuffleNewCardsIntoDeck(count - 1);
-        else
-            return std::nullopt;
+        return NewCardShuffledToDiscard();
     }
-
-private:
-    int count;
 };

@@ -39,4 +39,10 @@ public:
     {
         return 4 * x * x - 4 * x + 1;
     }
+
+    static float easeValley2(float x)
+    {
+        if (x < 0.5f) return 16.f * x * x - 8.f * x + 1.f;
+        return 1.f;
+    }
 };

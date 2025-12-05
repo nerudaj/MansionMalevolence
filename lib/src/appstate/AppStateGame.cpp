@@ -54,6 +54,7 @@ void AppStateGame::input()
 void AppStateGame::update()
 {
     gameRulesEngine.update(app.time);
+    assert(!scene.deck.empty());
     renderingEngine.update(app.time);
 
     gameEvents.processEvents(gameRulesEngine);

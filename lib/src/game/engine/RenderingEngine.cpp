@@ -1,6 +1,9 @@
 #include "game/engine/RenderingEngine.hpp"
 #include "game/engine/GameRulesEngine.hpp"
 
+const auto WHITE_COLOR = sf::Color { 0xff, 0xf1, 0xe8 };
+const auto RED_COLOR = sf::Color { 0xff, 0x00, 0x4d };
+
 RenderingEngine::RenderingEngine(
     dgm::ResourceManager& resmgr,
     const Scene& scene,
@@ -39,7 +42,7 @@ RenderingEngine::RenderingEngine(
     , sprite(atlas.getTexture())
 {
     resmgr.getMutable<sf::Font>("pico-8.ttf").setSmooth(false);
-    text.setFillColor(sf::Color { 0xff, 0xf1, 0xe8 });
+    text.setFillColor(WHITE_COLOR);
 }
 
 void RenderingEngine::update(const dgm::Time& time)
@@ -109,6 +112,10 @@ void RenderingEngine::renderWorld(dgm::Window& window)
             sf::Vector2f { 1.f, 1.f } / 3.f);
     }
 
+    if (scene.deck.size() > 1)
+        renderCard(
+            window, *(++scene.deck.begin()), scene.mainCardBody.getPosition());
+
     renderTopDeckCard(window);
 
     for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
@@ -152,6 +159,14 @@ void RenderingEngine::renderHud(dgm::Window& window)
         sprite.setPosition(getNthHeartOffset(i));
         window.draw(sprite);
     }
+
+    text.setString(std::to_string(static_cast<int>(
+        100.f * scene.stats.turnsTaken / scene.infectionLimit)));
+    text.setFillColor(RED_COLOR);
+    text.setScale({ 2.f, 2.f });
+    text.setPosition(getInfectionTextOffset());
+    window.draw(text);
+    text.setFillColor(WHITE_COLOR);
 
     /*
     text.setPosition({ 0.f, 0.f });
@@ -271,7 +286,7 @@ void RenderingEngine::renderTopDeckCard(dgm::Window& window)
             [&](const Position& position, const Scale& scale)
             { renderCardBack(window, position.get(), scale.get()); });
     }
-    else
+    else if (!scene.deck.empty())
     {
         renderCard(window, scene.deck.front(), deckOffset);
     }

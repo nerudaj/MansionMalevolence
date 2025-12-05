@@ -29,8 +29,10 @@ struct [[nodiscard]] Scene final
     bool lost = false;
     std::list<Card> deck;
     std::list<Card> discard = {};
+    std::list<Card> cardsToAdd = {};
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = MAX_HEARTS;
+    int infectionLimit = 50;
     std::unique_ptr<AnimationInterface> activeAnimation = nullptr;
     std::optional<DragDrop> dragDrop = std::nullopt;
     std::optional<std::array<CardType, 3u>> boosterChoice = std::nullopt;

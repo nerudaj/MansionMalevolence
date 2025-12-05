@@ -8,6 +8,8 @@ void AnimationNewCardsShufflingIntoDeck::render(
     std::function<void(const Card&, const Position&, const Scale&)> renderCard,
     std::function<void(const Position&, const Scale&)> renderCardBack) const
 {
+    const auto count = scene.cardsToAdd.size();
+
     auto renderSecondTopDeckCard = [&]
     {
         if (count == 1 && scene.deck.size() > 1)

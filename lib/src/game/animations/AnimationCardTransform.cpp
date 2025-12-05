@@ -13,9 +13,7 @@ void AnimationCardTransform::render(
 
     const auto preTransformCard = CardBuilder::createCard(cardType);
     const auto animationOffset =
-        (sf::Vector2f { baseOffset.x + 76.f * 0.5f, baseOffset.y - 3.f }
-         - baseOffset)
-        * (1.f - easedF);
+        sf::Vector2f { 76.f * 0.5f, -3.f } * (1.f - easedF);
 
     renderCard(
         getPercFactor() <= 0.5f ? preTransformCard : scene.deck.front(),

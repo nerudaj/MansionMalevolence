@@ -9,8 +9,7 @@ void AnimationEnemyDodgedAttack::render(
     std::function<void(const Position&, const Scale&)>) const
 {
     const auto animationOffset =
-        (sf::Vector2f { baseOffset.x - 15.f, baseOffset.y } - baseOffset)
-        * Easing::easeOutThenBack(getPercFactor());
+        sf::Vector2f { -15.f, 0.f } * Easing::easeOutThenBack(getPercFactor());
     renderCard(
         scene.deck.front(),
         Position(baseOffset + animationOffset),
