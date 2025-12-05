@@ -64,6 +64,13 @@ const std::map<CardType, Card> CARD_DEFS = {
              .power = 5,
              .name = "first-aid spray",
              .texts = {"restores to full","health."} } },
+    { CardType::Vaccine,
+      Card {
+          .image = CardImage::Vaccine,
+          .traits = CardTrait::Pickable | CardTrait::Healing,
+          .special = CardSpecial::WinGame,
+          .link = SPECIAL_YELLOW_JEWEL,
+          .name = "vaccine",.texts = { "use this to cure", "the infection." } } },
 
     // Items
     { CardType::ShieldDoor,
@@ -177,13 +184,6 @@ const std::map<CardType, Card> CARD_DEFS = {
               "there is a slot",
               "for a big jewel.",
           } } },
-    { CardType::Vaccine,
-      Card {
-          .image = CardImage::Vaccine,
-          .traits = CardTrait::Pickable,
-          .link = SPECIAL_YELLOW_JEWEL,
-          .name = "vaccine",
-      } },
 
     // Enemies
     { CardType::Zombie,

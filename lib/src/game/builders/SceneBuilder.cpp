@@ -10,90 +10,31 @@ void shuffleVec(std::vector<T>& vec)
     std::ranges::shuffle(vec, mt);
 }
 
-[[nodiscard]] static std::list<Card> generateTutorialDeck()
+std::unique_ptr<ScenarioBuilderInterface>
+makeBuilder(const GameScenario scenario)
 {
-    return { CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::ShieldDoor),
-             CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::GreenHerb),
-             CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::Ammo),
-             CardBuilder::createCard(CardType::ShieldKey) };
-}
-
-[[nodiscard]] static std::list<Card> generateNormalDeck()
-{
-    auto&& deckPart1 = std::vector<Card> {
-        CardBuilder::createCard(CardType::DiamondDoor),
-        CardBuilder::createCard(CardType::CrestDoorEmpty),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Cerberus),
-        CardBuilder::createCard(CardType::Crate),
-    };
-
-    auto&& deckPart2 = std::vector<Card> {
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Cerberus),
-        CardBuilder::createCard(CardType::Ammo),
-        CardBuilder::createCard(CardType::DiamondKey),
-        CardBuilder::createCard(CardType::RedHerb),
-        CardBuilder::createCard(CardType::MoonCrest),
-    };
-
-    shuffleVec(deckPart1);
-    shuffleVec(deckPart2);
-
-    return std::views::join(std::vector { deckPart1, deckPart2 })
-           | uniranges::to<std::list>();
-}
-
-[[nodiscard]] static std::list<Card> generateHardDeck()
-{
-    return {
-        CardBuilder::createCard(CardType::DiamondDoor),
-        CardBuilder::createCard(CardType::DiamondKey),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Cerberus),
-        CardBuilder::createCard(CardType::RedJewel),
-        CardBuilder::createCard(CardType::YellowJewelBox),
-        CardBuilder::createCard(CardType::SunCrest),
-        CardBuilder::createCard(CardType::Ammo),
-        CardBuilder::createCard(CardType::RedHerb),
-    };
-}
-
-[[nodiscard]] static std::list<Card>
-generateInitialDeck(const GameScenario scenario)
-{
-    switch (scenario)
-    {
-    case GameScenario::Tutorial_1:
-        return generateTutorialDeck();
-    case GameScenario::Normal:
-        return generateNormalDeck();
-    case GameScenario::Hard:
-        return generateHardDeck();
-    }
-
-    return {};
+    if (scenario == GameScenario::Tutorial_1)
+        return std::make_unique<TutorialScenarioBuilder>();
+    else if (scenario == GameScenario::Normal)
+        return std::make_unique<NormalScenarioBuilder>();
+    return std::make_unique<HardScenarioBuilder>();
 }
 
 Scene SceneBuilder::createScene(const GameScenario scenario)
 {
     const sf::Vector2f CARD_SIZE = { 76.f, 114.f };
+    auto builder = makeBuilder(scenario);
 
-    return Scene {
-        .scenario = scenario,
-        .deck = generateInitialDeck(scenario),
+    return Scene
+    {
+        .deck = builder->generateStartRoom(),
+        .infectionLimit = builder->getInfectionLimit(),
+        .builder = std::move(builder),
         .inventory = { CardBuilder::createCard(CardType::Pistol), std::nullopt, std::nullopt },
         .mainCardBody =
             dgm::Rect(sf::Vector2f { 6.f, 28.f }, CARD_SIZE),
         .healthbarBody = dgm::Rect({ 3.f, 150.f }, { 80.f, 24.f }),
-        .trashBody = dgm::Rect({ 94.f, 102.f }, { 25.f, 38.f }),
+        .trashBody = dgm::Rect({ 94.f, 102.f }, CARD_SIZE / 3.f),
 // clang-format off
         .inventoryBodies = {
             dgm::Rect(
@@ -121,11 +62,78 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
     };
 }
 
-std::list<Card> SceneBuilder::getCardsForRoom(
-    const GameScenario scenario, const int completedLinkID)
+std::array<CardType, 3u> SceneBuilder::generateBooster()
 {
-    if (scenario == GameScenario::Normal
-        && completedLinkID == SPECIAL_DIAMOND_KEYDOOR)
+    auto possibleCards = std::vector {
+        CardType::Ammo,    CardType::Ammo,     CardType::RedHerb,
+        CardType::RedHerb, CardType::FirstAid, CardType::GreenHerb,
+    };
+
+    shuffleVec(possibleCards);
+
+    auto result = std::array<CardType, 3u> {};
+    for (unsigned idx = 0; idx < result.size(); ++idx)
+        result[idx] = possibleCards[idx];
+    return result;
+}
+
+int TutorialScenarioBuilder::getInfectionLimit() const noexcept
+{
+    return 20;
+}
+
+std::list<Card> TutorialScenarioBuilder::generateStartRoom()
+{
+    return { CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::ShieldDoor),
+             CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::GreenHerb),
+             CardBuilder::createCard(CardType::Zombie),
+             CardBuilder::createCard(CardType::Ammo),
+             CardBuilder::createCard(CardType::ShieldKey) };
+}
+
+std::list<Card> TutorialScenarioBuilder::generateRoomDeck(const int)
+{
+    return { CardBuilder::createCard(CardType::Vaccine) };
+}
+
+int NormalScenarioBuilder::getInfectionLimit() const noexcept
+{
+    return 50;
+}
+
+std::list<Card> NormalScenarioBuilder::generateStartRoom()
+{
+    auto&& deckPart1 = std::vector<Card> {
+        CardBuilder::createCard(CardType::DiamondDoor),
+        CardBuilder::createCard(CardType::CrestDoorEmpty),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::Crate),
+    };
+
+    auto&& deckPart2 = std::vector<Card> {
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::DiamondKey),
+        CardBuilder::createCard(CardType::RedHerb),
+        CardBuilder::createCard(CardType::MoonCrest),
+    };
+
+    shuffleVec(deckPart1);
+    shuffleVec(deckPart2);
+
+    return std::views::join(std::vector { deckPart1, deckPart2 })
+           | uniranges::to<std::list>();
+}
+
+std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
+{
+    if (linkID == SPECIAL_DIAMOND_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
             CardBuilder::createCard(CardType::Shotgun),
@@ -141,9 +149,44 @@ std::list<Card> SceneBuilder::getCardsForRoom(
 
         return std::list(incoming.begin(), incoming.end());
     }
+    else if (linkID == SPECIAL_CREST_DOOR)
+    {
+        return { CardBuilder::createCard(CardType::Vaccine) };
+    }
 
-    if (scenario == GameScenario::Hard
-        && completedLinkID == SPECIAL_DIAMOND_KEYDOOR)
+    assert(false);
+    return {};
+}
+
+int HardScenarioBuilder::getInfectionLimit() const noexcept
+{
+    return 100;
+}
+
+std::list<Card> HardScenarioBuilder::generateStartRoom()
+{
+    auto deck = std::vector {
+        CardBuilder::createCard(CardType::DiamondDoor),
+        CardBuilder::createCard(CardType::DiamondKey),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::RedJewel),
+        CardBuilder::createCard(CardType::YellowJewelBox),
+        CardBuilder::createCard(CardType::SunCrest),
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::RedHerb),
+    };
+
+    shuffleVec(deck);
+
+    return deck | uniranges::to<std::list>();
+}
+
+std::list<Card> HardScenarioBuilder::generateRoomDeck(const int linkID)
+{
+    if (linkID == SPECIAL_DIAMOND_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
             CardBuilder::createCard(CardType::MoonCrestLeft),
@@ -162,9 +205,7 @@ std::list<Card> SceneBuilder::getCardsForRoom(
 
         return std::list(incoming.begin(), incoming.end());
     }
-
-    if (scenario == GameScenario::Hard
-        && completedLinkID == SPECIAL_SHIELD_KEYDOOR)
+    else if (linkID == SPECIAL_SHIELD_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
             CardBuilder::createCard(CardType::YellowJewel),
@@ -181,8 +222,7 @@ std::list<Card> SceneBuilder::getCardsForRoom(
 
         return std::list(incoming.begin(), incoming.end());
     }
-
-    if (scenario == GameScenario::Hard && completedLinkID == SPECIAL_CREST_DOOR)
+    else if (linkID == SPECIAL_CREST_DOOR)
     {
         auto&& incoming = std::vector<Card> {
             CardBuilder::createCard(CardType::Crate),
@@ -193,20 +233,6 @@ std::list<Card> SceneBuilder::getCardsForRoom(
         return std::list(incoming.begin(), incoming.end());
     }
 
+    assert(false);
     return {};
-}
-
-std::array<CardType, 3u> SceneBuilder::generateBooster()
-{
-    auto possibleCards = std::vector {
-        CardType::Ammo,    CardType::Ammo,     CardType::RedHerb,
-        CardType::RedHerb, CardType::FirstAid, CardType::GreenHerb,
-    };
-
-    shuffleVec(possibleCards);
-
-    auto result = std::array<CardType, 3u> {};
-    for (unsigned idx = 0; idx < result.size(); ++idx)
-        result[idx] = possibleCards[idx];
-    return result;
 }

@@ -10,6 +10,7 @@ enum class [[nodiscard]] CardSpecial
     SpawnCrimsonHead = 32,
     Combines = 64,
     BoosterPack = 128,
+    WinGame = 256,
 };
 
 constexpr const int SPECIAL_HERBS = 1;

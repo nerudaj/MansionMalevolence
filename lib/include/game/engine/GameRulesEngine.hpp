@@ -79,6 +79,10 @@ public:
     static bool
     canCardInteractWithDeck(const Card& a, const std::list<Card>& deck);
 
+    [[nodiscard]] bool gameEnded() const noexcept;
+
+    [[nodiscard]] bool gameWon() const noexcept;
+
 private:
     sf::Vector2f screenToWorld(const sf::Vector2f& pos);
 

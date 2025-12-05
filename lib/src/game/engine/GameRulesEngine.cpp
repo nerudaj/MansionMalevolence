@@ -102,6 +102,10 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
         // TODO: play sound
         return;
     }
+    else if (card.special & CardSpecial::WinGame)
+    {
+        scene.infectionLimit = -1;
+    }
 
     scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
     // TODO: play healing sound
@@ -169,8 +173,6 @@ void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
     scene.hearts -= scene.deck.front().power;
     // TODO: trigger slash animation
     // TODO: play sound
-
-    scene.lost = scene.hearts <= 0;
 
     if (e.skipCardAfterReaction)
     {
@@ -275,8 +277,7 @@ void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
 
 void GameRulesEngine::operator()(const DoorOpenedGameEvent& e)
 {
-    scene.cardsToAdd = SceneBuilder::getCardsForRoom(scene.scenario, e.link);
-
+    scene.cardsToAdd = scene.builder->generateRoomDeck(e.link);
     popTopDeckCard();
     shuffleNewCardIntoDeck();
 }
@@ -523,6 +524,17 @@ bool GameRulesEngine::canCardInteractWithDeck(
     return deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
            || deckTraits & CardTrait::KeyTarget && a.traits & CardTrait::KeyItem
                   && deck.front().link == a.link;
+}
+
+bool GameRulesEngine::gameEnded() const noexcept
+{
+    return gameWon() || scene.hearts <= 0
+           || scene.stats.turnsTaken >= scene.infectionLimit;
+}
+
+bool GameRulesEngine::gameWon() const noexcept
+{
+    return scene.infectionLimit == -1;
 }
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)

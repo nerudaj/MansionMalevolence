@@ -22,17 +22,28 @@ constexpr const float EVADE_CHANCE_BLIND = 0.7f;
 constexpr const float EVADE_CHANCE_VIGILANT = 0.15f;
 constexpr const float EVADE_CHANCE_EVASIVE = 0.3f;
 
+class [[nodiscard]] ScenarioBuilderInterface
+{
+public:
+    virtual ~ScenarioBuilderInterface() = default;
+
+public:
+    virtual int getInfectionLimit() const noexcept = 0;
+
+    virtual std::list<Card> generateStartRoom() = 0;
+
+    virtual std::list<Card> generateRoomDeck(const int linkID) = 0;
+};
+
 struct [[nodiscard]] Scene final
 {
-    GameScenario scenario = {};
-    bool won = false;
-    bool lost = false;
     std::list<Card> deck;
+    int infectionLimit = -1;
+    std::unique_ptr<ScenarioBuilderInterface> builder;
     std::list<Card> discard = {};
     std::list<Card> cardsToAdd = {};
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = MAX_HEARTS;
-    int infectionLimit = 50;
     std::unique_ptr<AnimationInterface> activeAnimation = nullptr;
     std::optional<DragDrop> dragDrop = std::nullopt;
     std::optional<std::array<CardType, 3u>> boosterChoice = std::nullopt;
