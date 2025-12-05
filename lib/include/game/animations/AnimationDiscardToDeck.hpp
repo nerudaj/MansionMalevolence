@@ -4,7 +4,7 @@
 #include "game/definitions/EasingFunctions.hpp"
 #include "game/definitions/Scene.hpp"
 
-class [[nodiscard]] AnimationSkipCard final : public AnimationInterface
+class [[nodiscard]] AnimationDiscardToDeck final : public AnimationInterface
 {
 public:
     void render(
@@ -16,7 +16,6 @@ public:
 
     std::optional<GameEvent> finalize() const override
     {
-        return std::nullopt;
-        // return CardSkipEndedGameEvent();
+        return DiscardReturnedToDeckGameEvent();
     }
 };

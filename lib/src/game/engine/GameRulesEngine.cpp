@@ -286,6 +286,12 @@ void GameRulesEngine::operator()(const NewCardShuffledToDiscard&)
     shuffleNewCardIntoDeck();
 }
 
+void GameRulesEngine::operator()(const DiscardReturnedToDeckGameEvent&)
+{
+    scene.deck = scene.cardsToAdd;
+    scene.cardsToAdd.clear();
+}
+
 void GameRulesEngine::update(const dgm::Time& time)
 {
     if (scene.activeAnimation)
@@ -296,9 +302,14 @@ void GameRulesEngine::update(const dgm::Time& time)
 
     if (scene.deck.empty())
     {
-        // TODO: play animation
-        scene.deck = scene.discard;
-        scene.discard.clear();
+        if (!scene.discard.empty())
+        {
+            scene.activeAnimation = std::make_unique<AnimationDiscardToDeck>();
+            scene.cardsToAdd = scene.discard;
+            scene.discard.clear();
+        }
+
+        return;
     }
 
     scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());

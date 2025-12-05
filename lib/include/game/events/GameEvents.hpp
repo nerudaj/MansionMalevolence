@@ -131,6 +131,10 @@ struct [[nodiscard]] NewCardShuffledToDiscard final
 {
 };
 
+struct [[nodiscard]] DiscardReturnedToDeckGameEvent
+{
+};
+
 using GameEvent = std::variant<
     CardTakenGameEvent,
     BeforeCardSkipGameEvent,
@@ -148,4 +152,5 @@ using GameEvent = std::variant<
     ZombieDiedGameEvent,
     MainCardResolvedGameEvent,
     DoorOpenedGameEvent,
-    NewCardShuffledToDiscard>;
+    NewCardShuffledToDiscard,
+    DiscardReturnedToDeckGameEvent>;

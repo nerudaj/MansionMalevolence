@@ -62,6 +62,8 @@ public:
 
     void operator()(const NewCardShuffledToDiscard& e);
 
+    void operator()(const DiscardReturnedToDeckGameEvent&);
+
 public:
     void update(const dgm::Time& time);
 
