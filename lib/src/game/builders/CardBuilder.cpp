@@ -256,10 +256,10 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card { .image = CardImage::Crate,
              .special = CardSpecial::BoosterPack,
              .name = "crate",
-             .text1 = "allows you to",
-             .text2 = "return card from",
-             .text3 = "your inventory",
-             .text4 = "to the deck." } },
+             .text1 = "take this card",
+             .text2 = "so you can pick",
+             .text3 = "one of three",
+             .text4 = "support card." } },
 };
 
 Card CardBuilder::createCard(CardType type)
