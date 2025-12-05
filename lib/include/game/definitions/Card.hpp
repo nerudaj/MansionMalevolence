@@ -18,8 +18,5 @@ struct [[nodiscard]] Card final
     int power = 0;
     int link = 0; // for IDs that pair related cards together
     std::array<char, 17> name = {};
-    std::array<char, 17> text1 = {};
-    std::array<char, 17> text2 = {};
-    std::array<char, 17> text3 = {};
-    std::array<char, 17> text4 = {};
+    std::array<std::array<char, 17>, 4> texts = {};
 };

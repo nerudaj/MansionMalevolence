@@ -215,7 +215,7 @@ void RenderingEngine::renderCard(
     sprite.setTextureRect(
         iconsClip.getFrame(std::to_underlying(Icon::BulletBig)));
 
-    for (auto i = 0; i < card.quantity; ++i)
+    for (auto i = 0; i < card.quantity && card.traits & CardTrait::Weapon; ++i)
     {
         sprite.setPosition(
             offset + sf::Vector2f { 0.f, 13.f + i * 7.f } * scale.y);
@@ -239,26 +239,14 @@ void RenderingEngine::renderCard(
     text.setString(card.name.data());
     window.draw(text);
 
-    // Text description
-    text.setPosition(
-        offset + sf::Vector2f { 5.f, 76.f }.componentWiseMul(scale));
-    text.setString(card.text1.data());
-    window.draw(text);
-
-    text.setPosition(
-        offset + sf::Vector2f { 5.f, 82.f }.componentWiseMul(scale));
-    text.setString(card.text2.data());
-    window.draw(text);
-
-    text.setPosition(
-        offset + sf::Vector2f { 5.f, 88.f }.componentWiseMul(scale));
-    text.setString(card.text3.data());
-    window.draw(text);
-
-    text.setPosition(
-        offset + sf::Vector2f { 5.f, 94.f }.componentWiseMul(scale));
-    text.setString(card.text4.data());
-    window.draw(text);
+    for (auto [idx, line] : std::ranges::views::enumerate(card.texts))
+    {
+        text.setPosition(
+            offset
+            + sf::Vector2f { 5.f, 76.f + 6.f * idx }.componentWiseMul(scale));
+        text.setString(line.data());
+        window.draw(text);
+    }
 
     text.setScale({ 1.f, 1.f });
     sprite.setScale({ 1.f, 1.f });
