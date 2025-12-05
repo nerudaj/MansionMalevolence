@@ -325,6 +325,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else
     {
+        /*
         if (input.isTakeButtonPressed())
         {
             handleTake();
@@ -333,7 +334,8 @@ void GameRulesEngine::update(const dgm::Time& time)
         {
             handleSkip();
         }
-        else if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
+        */
+        if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
         {
             handleDragStartedOrMoved(pos);
         }
@@ -478,11 +480,7 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
         auto event = scene.activeAnimation->finalize();
         if (event) gameEventQueue.pushEvent(std::move(*event));
 
-        // Clean inputs pressed during animation
-        std::ignore = input.isSkipButtonPressed();
-        std::ignore = input.isTakeButtonPressed();
         scene.preventInteractions = false;
-
         scene.activeAnimation.reset();
     }
 }

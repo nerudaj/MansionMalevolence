@@ -28,10 +28,12 @@ public:
     /// </summary>
     void forceRelease(InputKind action);
 
+private: // these are deprecated but left for possible inclusion in PC version
     [[nodiscard]] bool isTakeButtonPressed() const;
 
     [[nodiscard]] bool isSkipButtonPressed() const;
 
+public:
     [[nodiscard]] sf::Vector2f getDragPosition() const;
 
     [[nodiscard]] bool isMenuCycleLeftPressed() const;
