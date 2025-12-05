@@ -17,10 +17,9 @@ void AnimationNewCardsShufflingIntoDeck::render(
             renderCardBack(Position(baseOffset), Scale({ 1.f, 1.f }));
     };
 
-    const auto animationOffset =
-        (sf::Vector2f { baseOffset.x + 76.f * 1.5f, baseOffset.y } - baseOffset)
-        * Easing::easeOutThenBack(getPercFactor());
-    const auto scaleFactor = std::lerp(1.f, 0.8f, getPercFactor());
+    const auto animationOffset = (scene.trashBody.getPosition() - baseOffset)
+                                 * Easing::easeInOut(getPercFactor());
+    const auto scaleFactor = std::lerp(1.f, 1.f / 3.f, getPercFactor());
 
     if (getPercFactor() < 0.5f)
     {
