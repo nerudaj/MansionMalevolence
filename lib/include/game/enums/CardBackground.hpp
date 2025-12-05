@@ -5,7 +5,7 @@ enum class [[nodiscard]] CardBackground
     Dummy,
     Old,
     NoAmmoNoDiamonds,
-    NoAmmoWithDiamons,
+    NoAmmoWithDiamonds,
     AmmoAndDiamonds,
     Backside,
 };

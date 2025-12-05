@@ -2,6 +2,8 @@
 
 #include "game/definitions/Scene.hpp"
 #include "game/enums/BackgroundType.hpp"
+#include "game/enums/CardBackground.hpp"
+#include "game/enums/Icon.hpp"
 #include "input/TouchController.hpp"
 #include "misc/FpsCounter.hpp"
 #include "settings/AppSettings.hpp"
@@ -98,6 +100,10 @@ private:
     void renderBoosterChoice(dgm::Window& window);
 
     BackgroundType getAppropriateBackgroundType() const;
+
+    CardBackground getAppropriateCardBackgroundType(const Card& card) const;
+
+    Icon getAppropriateDiamondType(const Card& card) const;
 
 private:
     const Scene& scene;

@@ -1,8 +1,5 @@
 #include "game/engine/RenderingEngine.hpp"
 #include "game/engine/GameRulesEngine.hpp"
-#include "game/enums/BackgroundType.hpp"
-#include "game/enums/CardBackground.hpp"
-#include "game/enums/Icon.hpp"
 
 RenderingEngine::RenderingEngine(
     dgm::ResourceManager& resmgr,
@@ -202,9 +199,9 @@ void RenderingEngine::renderCard(
     text.setScale(scale);
     sprite.setScale(scale);
 
-    sprite.setTextureRect(
-        atlas.getClip(cardbgrLocation)
-            .getFrame(std::to_underlying(CardBackground::Old)));
+    sprite.setTextureRect(atlas.getClip(cardbgrLocation)
+                              .getFrame(std::to_underlying(
+                                  getAppropriateCardBackgroundType(card))));
     sprite.setPosition(offset);
     window.draw(sprite);
 
@@ -215,32 +212,25 @@ void RenderingEngine::renderCard(
     window.draw(sprite);
 
     auto& iconsClip = atlas.getClip(iconsLocation);
-    if (card.quantity > 0 && card.traits & CardTrait::Weapon)
-    {
-        sprite.setTextureRect(
-            iconsClip.getFrame(std::to_underlying(Icon::Bullet)));
+    sprite.setTextureRect(
+        iconsClip.getFrame(std::to_underlying(Icon::BulletBig)));
 
-        for (auto i = 0; i < card.quantity; ++i)
-        {
-            sprite.setPosition(
-                offset + sf::Vector2f { 0.f, 13.f + i * 6.f } * scale.y);
-            window.draw(sprite);
-        }
+    for (auto i = 0; i < card.quantity; ++i)
+    {
+        sprite.setPosition(
+            offset + sf::Vector2f { 0.f, 13.f + i * 7.f } * scale.y);
+        window.draw(sprite);
     }
 
-    if (card.power > 0)
-    {
-        sprite.setTextureRect(
-            iconsClip.getFrame(std::to_underlying(Icon::Diamond)));
+    sprite.setTextureRect(iconsClip.getFrame(
+        std::to_underlying(getAppropriateDiamondType(card))));
 
-        for (auto i = 0; i < card.power; ++i)
-        {
-            sprite.setPosition(
-                offset
-                + sf::Vector2f { 2.f + i * 12.f, 102.f }.componentWiseMul(
-                    scale));
-            window.draw(sprite);
-        }
+    for (auto i = 0; i < card.power; ++i)
+    {
+        sprite.setPosition(
+            offset
+            + sf::Vector2f { 2.f + i * 12.f, 102.f }.componentWiseMul(scale));
+        window.draw(sprite);
     }
 
     text.setCharacterSize(5);
@@ -376,4 +366,25 @@ BackgroundType RenderingEngine::getAppropriateBackgroundType() const
     }
 
     return BackgroundType::Plain;
+}
+
+CardBackground
+RenderingEngine::getAppropriateCardBackgroundType(const Card& card) const
+{
+    if (card.power == 0)
+        return CardBackground::NoAmmoNoDiamonds;
+    else if (card.traits & CardTrait::Weapon)
+        return CardBackground::AmmoAndDiamonds;
+    return CardBackground::NoAmmoWithDiamonds;
+}
+
+Icon RenderingEngine::getAppropriateDiamondType(const Card& card) const
+{
+    if (card.traits & CardTrait::Enemy)
+        return Icon::RedDiamond;
+    else if (card.traits & CardTrait::Healing)
+        return Icon::GreenDiamond;
+    else if (card.traits & CardTrait::Weapon)
+        return Icon::YellowDiamond;
+    return Icon::Diamond;
 }
