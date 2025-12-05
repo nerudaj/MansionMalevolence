@@ -251,22 +251,22 @@ void RenderingEngine::renderCard(
 
     // Text description
     text.setPosition(
-        offset + sf::Vector2f { 4.f, 77.f }.componentWiseMul(scale));
+        offset + sf::Vector2f { 5.f, 76.f }.componentWiseMul(scale));
     text.setString(card.text1.data());
     window.draw(text);
 
     text.setPosition(
-        offset + sf::Vector2f { 4.f, 83.f }.componentWiseMul(scale));
+        offset + sf::Vector2f { 5.f, 82.f }.componentWiseMul(scale));
     text.setString(card.text2.data());
     window.draw(text);
 
     text.setPosition(
-        offset + sf::Vector2f { 4.f, 89.f }.componentWiseMul(scale));
+        offset + sf::Vector2f { 5.f, 88.f }.componentWiseMul(scale));
     text.setString(card.text3.data());
     window.draw(text);
 
     text.setPosition(
-        offset + sf::Vector2f { 4.f, 95.f }.componentWiseMul(scale));
+        offset + sf::Vector2f { 5.f, 94.f }.componentWiseMul(scale));
     text.setString(card.text4.data());
     window.draw(text);
 
