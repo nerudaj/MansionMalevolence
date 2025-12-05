@@ -28,10 +28,11 @@ struct [[nodiscard]] Scene final
     bool won = false;
     bool lost = false;
     std::list<Card> deck;
+    std::list<Card> discard = {};
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = MAX_HEARTS;
     std::unique_ptr<AnimationInterface> activeAnimation = nullptr;
-    std::optional<DragDrop> dragDrop;
+    std::optional<DragDrop> dragDrop = std::nullopt;
     std::optional<std::array<CardType, 3u>> boosterChoice = std::nullopt;
 
     dgm::Rect mainCardBody;

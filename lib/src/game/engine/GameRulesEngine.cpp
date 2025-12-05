@@ -47,13 +47,16 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
     scene.stats.turnsTaken++;
-    scene.activeAnimation = std::make_unique<AnimationSkipCard>();
+    scene.activeAnimation = std::make_unique<AnimationCardToDiscard>(
+        scene.deck.front(),
+        scene.mainCardBody.getPosition(),
+        "emitGameEvent"_true);
     audioEngine.playSound(SoundId::CardShuffle);
 }
 
 void GameRulesEngine::operator()(const CardSkipEndedGameEvent&)
 {
-    scene.deck.push_back(scene.deck.front());
+    scene.discard.push_back(scene.deck.front());
     popTopDeckCard();
 }
 
@@ -83,11 +86,11 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
     auto card = *scene.inventory[e.inventorySlotIdx];
-    scene.deck.push_back(card);
+    scene.discard.push_back(card);
     scene.inventory[e.inventorySlotIdx].reset();
 
-    scene.activeAnimation =
-        std::make_unique<AnimationReturnInventoryToDeck>(card);
+    scene.activeAnimation = std::make_unique<AnimationCardToDiscard>(
+        card, scene.inventoryBodies[e.inventorySlotIdx].getPosition());
 }
 
 void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
@@ -256,7 +259,7 @@ void GameRulesEngine::operator()(const ZombieDiedGameEvent&)
 {
     if (!scene.chance.rollForCrimsonHead()) return;
 
-    scene.deck.push_back(CardBuilder::createCard(CardType::CrimsonHead));
+    scene.discard.push_back(CardBuilder::createCard(CardType::CrimsonHead));
 }
 
 void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
@@ -280,7 +283,7 @@ void GameRulesEngine::operator()(const DoorOpenedGameEvent& e)
     }
 
     auto postDeckCount = scene.deck.size();
-    scene.deck.pop_front();
+    popTopDeckCard();
     gameEventQueue.pushEvent<ShuffleNewCardsIntoDeck>(
         static_cast<int>(postDeckCount - preDeckCount));
 }
@@ -564,6 +567,13 @@ void GameRulesEngine::popTopDeckCard()
 {
     scene.deck.pop_front();
     scene.preventInteractions = false;
+
+    if (scene.deck.empty())
+    {
+        // TODO: play animation
+        scene.deck = scene.discard;
+        scene.discard.clear();
+    }
 }
 
 void GameRulesEngine::transformTopCard(CardType from, CardType to)

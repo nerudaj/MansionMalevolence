@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/animations/AnimationCardToDiscard.hpp"
 #include "game/animations/AnimationCardTransform.hpp"
 #include "game/animations/AnimationDoorOpen.hpp"
 #include "game/animations/AnimationEnemyAttack.hpp"

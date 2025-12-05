@@ -26,11 +26,6 @@ public:
 
     void draw(dgm::Window& window);
 
-    [[nodiscard]] static sf::Vector2f getDeckCardOffset() noexcept
-    {
-        return sf::Vector2f { 7.f, 35.f };
-    }
-
     [[nodiscard]] static sf::Vector2f
     getNthInventoryCardOffset(size_t idx) noexcept
     {

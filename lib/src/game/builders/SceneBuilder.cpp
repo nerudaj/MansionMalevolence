@@ -91,9 +91,9 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
         .deck = generateInitialDeck(scenario),
         .inventory = { CardBuilder::createCard(CardType::Pistol), std::nullopt, std::nullopt },
         .mainCardBody =
-            dgm::Rect(RenderingEngine::getDeckCardOffset(), CARD_SIZE),
+            dgm::Rect(sf::Vector2f { 7.f, 35.f }, CARD_SIZE),
         .healthbarBody = dgm::Rect({ 35.f, 7.f }, { 85.f, 16.f }),
-        .trashBody = dgm::Rect({ 5.f, 207.f }, { 116.f, 18.f }),
+        .trashBody = dgm::Rect({ 95.f, 95.f }, { 25.f, 53.f }),
 // clang-format off
         .inventoryBodies = {
             dgm::Rect(

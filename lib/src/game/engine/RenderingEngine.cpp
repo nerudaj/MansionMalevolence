@@ -101,6 +101,14 @@ dgm::Camera RenderingEngine::createFullscreenCamera(
 
 void RenderingEngine::renderWorld(dgm::Window& window)
 {
+    if (!scene.discard.empty())
+    {
+        renderCardBack(
+            window,
+            scene.trashBody.getPosition(),
+            sf::Vector2f { 1.f, 1.f } / 3.f);
+    }
+
     renderTopDeckCard(window);
 
     for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
@@ -137,23 +145,6 @@ void RenderingEngine::renderHud(dgm::Window& window)
     sprite.setPosition({ 3.f, 3.f });
     window.draw(sprite);
 
-    // Take button
-    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
-        scene.canTakeCard ? Icon::GreenTake : Icon::RedTake)));
-    sprite.setPosition({ 96.f, 48.f });
-    window.draw(sprite);
-
-    // Skip button
-    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(
-        scene.canSafelySkipCard ? Icon::GreenSkip : Icon::RedSkip)));
-    sprite.setPosition({ 96.f, 110.f });
-    window.draw(sprite);
-
-    // Trash button
-    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Drop)));
-    sprite.setPosition(getTrashIconOffset());
-    window.draw(sprite);
-
     // Hearts
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Heart)));
     for (auto i = 0; i < scene.hearts; ++i)
@@ -162,9 +153,11 @@ void RenderingEngine::renderHud(dgm::Window& window)
         window.draw(sprite);
     }
 
+    /*
     text.setPosition({ 0.f, 0.f });
     text.setString(fpsCounter.getText());
     window.draw(text);
+    */
 
     /*scene.mainCardBody.debugRender(window);
     scene.healthbarBody.debugRender(window);
@@ -266,7 +259,7 @@ void RenderingEngine::renderCardBack(
 
 void RenderingEngine::renderTopDeckCard(dgm::Window& window)
 {
-    const auto deckOffset = getDeckCardOffset();
+    const auto deckOffset = scene.mainCardBody.getPosition();
 
     if (scene.activeAnimation)
     {
