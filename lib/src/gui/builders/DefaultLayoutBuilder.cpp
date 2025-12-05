@@ -92,7 +92,7 @@ namespace priv
         tgui::Container::Ptr content)
     {
         auto&& contentPanel = tgui::Group::create({
-            "70%",
+            "90%",
             uni::format(
                 "100% - {} - {} - {}",
                 props.titleHeight,
