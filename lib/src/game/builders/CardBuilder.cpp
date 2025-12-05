@@ -260,11 +260,6 @@ const std::map<CardType, Card> CARD_DEFS = {
              .text2 = "return card from",
              .text3 = "your inventory",
              .text4 = "to the deck." } },
-    { CardType::BookCase,
-      Card { .image = CardImage::Max,
-             .name = "bookcase",
-             .text1 = "books on various",
-             .text2 = "subjects." } },
 };
 
 Card CardBuilder::createCard(CardType type)

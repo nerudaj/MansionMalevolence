@@ -42,7 +42,6 @@ enum class [[nodiscard]] CardType
     Tyrant,
 
     Crate,
-    BookCase,
 
     Max,
 };
