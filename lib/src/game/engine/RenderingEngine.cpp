@@ -1,6 +1,7 @@
 #include "game/engine/RenderingEngine.hpp"
 #include "game/engine/GameRulesEngine.hpp"
 #include "game/enums/BackgroundType.hpp"
+#include "game/enums/CardBackground.hpp"
 #include "game/enums/Icon.hpp"
 
 RenderingEngine::RenderingEngine(
@@ -201,7 +202,9 @@ void RenderingEngine::renderCard(
     text.setScale(scale);
     sprite.setScale(scale);
 
-    sprite.setTextureRect(atlas.getClip(cardbgrLocation).getFrame(1));
+    sprite.setTextureRect(
+        atlas.getClip(cardbgrLocation)
+            .getFrame(std::to_underlying(CardBackground::Old)));
     sprite.setPosition(offset);
     window.draw(sprite);
 
@@ -275,7 +278,9 @@ void RenderingEngine::renderCardBack(
     dgm::Window& window, const sf::Vector2f& offset, const sf::Vector2f& scale)
 {
     sprite.setScale(scale);
-    sprite.setTextureRect(atlas.getClip(cardbgrLocation).getFrame(2));
+    sprite.setTextureRect(
+        atlas.getClip(cardbgrLocation)
+            .getFrame(std::to_underlying(CardBackground::Backside)));
     sprite.setPosition(offset);
     window.draw(sprite);
     sprite.setScale({ 1.f, 1.f });
