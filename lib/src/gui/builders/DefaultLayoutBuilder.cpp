@@ -129,7 +129,8 @@ namespace priv
         auto panel = tgui::Panel::create();
         panel->getRenderer()->setTextureBackground(ttexture);
 
-        container->add(panel);
+        panelContainer->add(panel);
+        container->add(panelContainer);
 
         return LayoutBuilderWithBackgroundAndTitle(container, props);
     }
