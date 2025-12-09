@@ -7,6 +7,7 @@ enum class [[nodiscard]] StringId
     PlayButton,
     Options,
     PauseTitle,
+    HowToPlay,
     ExitButton,
     Back,
 

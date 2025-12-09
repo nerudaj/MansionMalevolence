@@ -9,6 +9,7 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { PlayButton, "play" },
     { Options, "options" },
     { PauseTitle, "game paused" },
+    { HowToPlay, "how to play" },
     { ExitButton, "exit" },
     { Back, "back" },
 
