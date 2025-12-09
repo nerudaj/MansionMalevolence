@@ -58,8 +58,7 @@ void AppStateEndGameScreen::buildLayout()
 
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
-            .withBackgroundImage(
-                dic.resmgr.get<sf::Texture>("placeholder-background.png"))
+            .withNoBackgroundImage()
             .withTitle(
                 dic.strings.getString(
                     won ? StringId::YouSurvived : StringId::YouDied),

@@ -68,7 +68,7 @@ void AppStateOptions::buildLayout()
         DefaultLayoutBuilder(dic.sizer)
             .withNoBackgroundImage()
             .withTitle(
-                dic.strings.getString(StringId::Options), HeadingLevel::H1)
+                dic.strings.getString(StringId::Options), HeadingLevel::H2)
             .withContent(FormBuilder(dic.strings, dic.sizer)
                              .addOption(
                                  StringId::MusicVolume,
