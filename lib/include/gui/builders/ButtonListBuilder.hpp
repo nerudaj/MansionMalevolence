@@ -23,6 +23,8 @@ public:
     ~ButtonListBuilder() = default;
 
 public:
+    ButtonListBuilder& addPadding(const std::string& percent);
+
     ButtonListBuilder& addButton(
         const StringId labelId,
         std::function<void(void)> onClick,
@@ -40,7 +42,12 @@ private:
         std::string buttonId;
     };
 
+    struct Padding
+    {
+        std::string heightPercent;
+    };
+
     const StringProvider& strings;
     const Sizer& sizer;
-    std::vector<ButtonProps> buttonProps;
+    std::vector<std::variant<ButtonProps, Padding>> buttonProps;
 };

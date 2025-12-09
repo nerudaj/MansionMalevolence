@@ -105,7 +105,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
     }
 
     scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
-    // TODO: play healing sound
+    audioEngine.playSound(card.specialSound);
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
@@ -144,6 +144,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         }
         else
         {
+            audioEngine.playSound(scene.deck.front().specialSound);
             scene.activeAnimation =
                 std::make_unique<AnimationDoorOpen>(card.link);
         }
@@ -169,7 +170,6 @@ void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 {
     scene.hearts -= scene.deck.front().power;
     // TODO: trigger slash animation
-    // TODO: play sound
 
     if (e.skipCardAfterReaction)
     {
@@ -203,7 +203,6 @@ void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
     deckCard.power -= e.damage;
     if (deckCard.power <= 0)
     {
-        // TODO: play die sound
         gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
         scene.stats.enemiesKilled++;
     }
@@ -363,6 +362,7 @@ void GameRulesEngine::handleTake()
     if (scene.deck.front().special & CardSpecial::BoosterPack)
     {
         scene.boosterChoice = SceneBuilder::generateBooster();
+        audioEngine.playSound(scene.deck.front().specialSound);
         return;
     }
 
