@@ -10,7 +10,7 @@ namespace SoundId
     const IdType DogGrowl = "zombiecards_dog.wav";
     const IdType DogWhine = "zombiecards_dog_whine.wav";
     const IdType ZombieGrowl = "zombiecards_zombie_growl.wav";
-    const IdType CrimsonHeadGrowl = "zombiecards_zombie_growl";
+    const IdType CrimsonHeadGrowl = "zombiecards_zombie_growl2.wav";
     const IdType LickerGrowl = "HU_SMASH.wav";
     const IdType TyrantGrowl = "TY_SLICE.wav";
     const IdType WeaponReload = "shotgun_reload.wav";
