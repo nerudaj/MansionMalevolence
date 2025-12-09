@@ -42,5 +42,6 @@ struct [[nodiscard]] DependencyContainer final
         gui.setFont(resmgr.get<tgui::Font>("pico-8.ttf"));
         // NOTE: You can create your own theme file and use it here
         gui.setTheme(resmgr.get<tgui::Theme::Ptr>("Pico8.txt"));
+        tgui::Texture::setDefaultSmooth(false);
     }
 };

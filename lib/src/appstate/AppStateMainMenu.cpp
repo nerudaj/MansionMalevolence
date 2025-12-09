@@ -41,9 +41,9 @@ void AppStateMainMenu::buildLayout()
 {
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
-            .withBackgroundImage(
-                dic.resmgr.get<sf::Texture>("placeholder-background.png"))
-            .withTitle(CMakeVars::TITLE, HeadingLevel::H1)
+            .withNoBackgroundImage()
+            .withTexturedTitle(
+                dic.resmgr.get<sf::Texture>("zombiecards_logo.png"))
             .withContent(ButtonListBuilder(dic.strings, dic.sizer)
                              .addButton(StringId::PlayButton, [&] { onPlay(); })
                              .addButton(StringId::Options, [&] { onOptions(); })
