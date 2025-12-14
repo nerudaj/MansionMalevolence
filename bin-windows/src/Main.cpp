@@ -21,6 +21,13 @@ int main(int, char*[])
         auto&& dependencies = DependencyContainer(
             window, "../assets", Language::English, settings);
 
+        // clang-format off
+        settings.audio.registerObserver([&dependencies](const AudioSettings& settings)
+        {
+            dependencies.jukebox.setVolume(settings.musicVolume);
+        });
+        // clang-format on
+
         window.getSfmlWindowContext().setMouseCursorVisible(false);
 
         app.pushState<AppStateMainMenu>(dependencies, settings);

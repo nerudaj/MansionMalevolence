@@ -1,5 +1,6 @@
 #pragma once
 
+#include "settings/ObservableSettings.hpp"
 #include <nlohmann/json.hpp>
 
 struct [[nodiscard]] AudioSettings final
@@ -9,3 +10,5 @@ struct [[nodiscard]] AudioSettings final
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioSettings, soundVolume, musicVolume);
+
+using ObservableAudioSettings = ObservableSettings<AudioSettings>;

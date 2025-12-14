@@ -8,7 +8,7 @@
 
 struct [[nodiscard]] AppSettings final
 {
-    AudioSettings audio;
+    ObservableAudioSettings audio;
     VideoSettings video;
     InputSettings input;
     BindingsSettings bindings;

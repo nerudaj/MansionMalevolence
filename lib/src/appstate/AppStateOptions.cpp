@@ -11,20 +11,6 @@
 const tgui::Color CONTENT_BGCOLOR = tgui::Color(255, 255, 255, 64);
 constexpr const char* TABS_ID = "Options_Tabs";
 
-std::string resolutionToString(const sf::Vector2u& vec)
-{
-    return uni::format("{}x{}", vec.x, vec.y);
-}
-
-static std::vector<std::string> getResolutionStrings()
-{
-    return sf::VideoMode::getFullscreenModes()
-           | std::views::transform([](const sf::VideoMode& mode)
-                                   { return mode.size; })
-           | std::views::transform(resolutionToString)
-           | uniranges::to<std::vector>();
-}
-
 static std::string intValueFormatter(float val)
 {
     return std::to_string(static_cast<int>(val));
@@ -73,9 +59,13 @@ void AppStateOptions::buildLayout()
                              .addOption(
                                  StringId::MusicVolume,
                                  WidgetBuilder::createSlider(
-                                     settings.audio.musicVolume,
+                                     settings.audio.get().musicVolume,
                                      [&](float val)
-                                     { settings.audio.musicVolume = val; },
+                                     {
+                                         auto s = settings.audio.get();
+                                         s.musicVolume = val;
+                                         settings.audio.set(s);
+                                     },
                                      dic.gui,
                                      dic.sizer,
                                      SliderProperties { .valueFormatter =
@@ -86,9 +76,13 @@ void AppStateOptions::buildLayout()
                              .addOption(
                                  StringId::SoundVolume,
                                  WidgetBuilder::createSlider(
-                                     settings.audio.soundVolume,
+                                     settings.audio.get().soundVolume,
                                      [&](float val)
-                                     { settings.audio.soundVolume = val; },
+                                     {
+                                         auto s = settings.audio.get();
+                                         s.soundVolume = val;
+                                         settings.audio.set(s);
+                                     },
                                      dic.gui,
                                      dic.sizer,
                                      SliderProperties { .valueFormatter =

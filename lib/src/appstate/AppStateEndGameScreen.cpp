@@ -12,6 +12,7 @@ AppStateEndGameScreen::AppStateEndGameScreen(
     : dgm::AppState(app), dic(dic), settings(settings), stats(stats), won(won)
 {
     buildLayout();
+    dic.jukebox.switchMode(JukeboxMode::Menu);
 }
 
 void AppStateEndGameScreen::input()

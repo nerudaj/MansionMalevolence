@@ -2,6 +2,8 @@
 #include "filesystem/AppStorage.hpp"
 #include "filesystem/TiledLoader.hpp"
 #include "misc/Compatibility.hpp"
+#include "misc/Playlist.hpp"
+#include <SFML/Audio.hpp>
 #include <TGUI/Backend/SFML-Graphics.hpp>
 #include <TGUI/Tgui.hpp>
 #include <expected>
@@ -38,6 +40,37 @@ loadTiledMap(const std::filesystem::path& path)
     try
     {
         return TiledLoader::loadLevel(path);
+    }
+    catch (const std::exception& ex)
+    {
+        return std::unexpected { dgm::Error(ex.what()) };
+    }
+}
+
+static std::expected<sf::Music, dgm::Error>
+loadSong(const std::filesystem::path& path)
+{
+    try
+    {
+        auto music = sf::Music(path);
+        return music;
+    }
+    catch (const std::exception& ex)
+    {
+        return std::unexpected { dgm::Error(ex.what()) };
+    }
+}
+
+static std::expected<Playlist, dgm::Error>
+loadPlaylist(const std::filesystem::path& path)
+{
+    try
+    {
+        const auto assetText = dgm::Utility::loadAssetAllText(path);
+        if (!assetText) return std::unexpected { assetText.error() };
+        const auto json = nlohmann::json::parse(assetText.value());
+        const Playlist playlist = json;
+        return playlist;
     }
     catch (const std::exception& ex)
     {
@@ -107,6 +140,22 @@ ResourceLoader::loadResources(const std::filesystem::path& assetDir)
     {
         throw std::runtime_error(uni::format(
             "Could not load sound: {}", result.error().getMessage()));
+    }
+
+    if (auto result = resmgr.loadResourcesFromDirectory<sf::Music>(
+            assetDir / "music", loadSong, { ".ogg" });
+        !result)
+    {
+        throw std::runtime_error(uni::format(
+            "Could not load song: {}", result.error().getMessage()));
+    }
+
+    if (auto result = resmgr.loadResourcesFromDirectory<Playlist>(
+            assetDir / "music", loadPlaylist, { ".json" });
+        !result)
+    {
+        throw std::runtime_error(uni::format(
+            "Could not load playlist: {}", result.error().getMessage()));
     }
 
     return resmgr;

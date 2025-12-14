@@ -11,6 +11,7 @@ AppStateMainMenu::AppStateMainMenu(
     : dgm::AppState(app), dic(dic), settings(settings)
 {
     buildLayout();
+    dic.jukebox.switchMode(JukeboxMode::Menu);
 }
 
 void AppStateMainMenu::input()
@@ -35,6 +36,7 @@ void AppStateMainMenu::draw()
 void AppStateMainMenu::restoreFocusImpl(const std::string&)
 {
     buildLayout();
+    dic.jukebox.switchMode(JukeboxMode::Menu);
 }
 
 void AppStateMainMenu::buildLayout()

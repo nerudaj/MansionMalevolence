@@ -29,6 +29,7 @@ public:
               gameEvents, audioEngine, scene, dic.input, settings.video)
         , renderingEngine(dic.resmgr, scene, settings, dic.touchController)
     {
+        dic.jukebox.switchMode(JukeboxMode::Game);
     }
 
 public:

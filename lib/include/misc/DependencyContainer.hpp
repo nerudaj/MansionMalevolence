@@ -6,6 +6,7 @@
 #include "input/Input.hpp"
 #include "input/TouchController.hpp"
 #include "input/VirtualCursor.hpp"
+#include "misc/Jukebox.hpp"
 #include "settings/AppSettings.hpp"
 #include "strings/StringProvider.hpp"
 #include <DGM/dgm.hpp>
@@ -19,6 +20,7 @@ struct [[nodiscard]] DependencyContainer final
     Input input;
     VirtualCursor virtualCursor;
     Sizer sizer;
+    Jukebox jukebox;
 
     DependencyContainer(
         dgm::Window& window,
@@ -38,6 +40,7 @@ struct [[nodiscard]] DependencyContainer final
               input,
               resmgr.get<sf::Texture>("cursor.png"))
         , sizer(settings.video)
+        , jukebox(resmgr)
     {
         gui.setFont(resmgr.get<tgui::Font>("pico-8.ttf"));
         // NOTE: You can create your own theme file and use it here
