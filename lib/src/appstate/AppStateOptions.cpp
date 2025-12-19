@@ -59,13 +59,9 @@ void AppStateOptions::buildLayout()
                              .addOption(
                                  StringId::MusicVolume,
                                  WidgetBuilder::createSlider(
-                                     settings.audio.get().musicVolume,
+                                     settings.audio.musicVolume,
                                      [&](float val)
-                                     {
-                                         auto s = settings.audio.get();
-                                         s.musicVolume = val;
-                                         settings.audio.set(s);
-                                     },
+                                     { settings.audio.musicVolume = val; },
                                      dic.gui,
                                      dic.sizer,
                                      SliderProperties { .valueFormatter =
@@ -76,13 +72,9 @@ void AppStateOptions::buildLayout()
                              .addOption(
                                  StringId::SoundVolume,
                                  WidgetBuilder::createSlider(
-                                     settings.audio.get().soundVolume,
+                                     settings.audio.soundVolume,
                                      [&](float val)
-                                     {
-                                         auto s = settings.audio.get();
-                                         s.soundVolume = val;
-                                         settings.audio.set(s);
-                                     },
+                                     { settings.audio.soundVolume = val; },
                                      dic.gui,
                                      dic.sizer,
                                      SliderProperties { .valueFormatter =

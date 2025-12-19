@@ -23,5 +23,6 @@ public:
      *
      *  Any errors are converted into exceptions and thrown.
      */
-    static AppSettings loadSettings(const std::filesystem::path& file);
+    static AppSettings_StorageModel
+    loadSettings(const std::filesystem::path& file);
 };

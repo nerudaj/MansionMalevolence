@@ -16,23 +16,34 @@ struct [[nodiscard]] DependencyContainer final
     Gui gui;
     dgm::ResourceManager resmgr;
     const StringProvider strings;
+    Jukebox jukebox;
+    AppSettings settings;
     TouchController touchController;
     Input input;
     VirtualCursor virtualCursor;
     Sizer sizer;
-    Jukebox jukebox;
 
     DependencyContainer(
         dgm::Window& window,
         const std::filesystem::path& rootDir,
         Language primaryLang,
-        const AppSettings& settings)
+        const AppSettings_StorageModel& settingsSM)
         // Gui needs to be instantiated before Resource manager
         // since we need to have gui backend defined before
         // other tgui objects (like fonts) can be created.
         : gui(window)
         , resmgr(ResourceLoader::loadResources(rootDir))
         , strings(primaryLang)
+        , jukebox(resmgr)
+        , settings(AppSettings {
+            .audio = {
+                .soundVolume = Observable<float>(settingsSM.audio.soundVolume, [](float){}),
+                .musicVolume = Observable<float>(settingsSM.audio.musicVolume, [this](float v) { jukebox.setVolume(v); }),
+            },
+            .video = settingsSM.video,
+            .input = settingsSM.input,
+            .bindings = settingsSM.bindings,
+        })
         , touchController(settings.video.resolution)
         , input(settings.bindings, touchController)
         , virtualCursor(
@@ -40,7 +51,6 @@ struct [[nodiscard]] DependencyContainer final
               input,
               resmgr.get<sf::Texture>("cursor.png"))
         , sizer(settings.video)
-        , jukebox(resmgr)
     {
         gui.setFont(resmgr.get<tgui::Font>("pico-8.ttf"));
         // NOTE: You can create your own theme file and use it here

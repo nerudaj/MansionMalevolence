@@ -161,7 +161,8 @@ ResourceLoader::loadResources(const std::filesystem::path& assetDir)
     return resmgr;
 }
 
-AppSettings ResourceLoader::loadSettings(const std::filesystem::path& file)
+AppSettings_StorageModel
+ResourceLoader::loadSettings(const std::filesystem::path& file)
 {
     auto settingsJson = AppStorage::loadFile(file);
 
@@ -169,7 +170,8 @@ AppSettings ResourceLoader::loadSettings(const std::filesystem::path& file)
     {
         try
         {
-            AppSettings settings = nlohmann::json::parse(settingsJson.value());
+            AppSettings_StorageModel settings =
+                nlohmann::json::parse(settingsJson.value());
             return settings;
         }
         catch (const std::exception& ex)
@@ -182,5 +184,5 @@ AppSettings ResourceLoader::loadSettings(const std::filesystem::path& file)
         sf::err() << settingsJson.error().getMessage() << std::endl;
     }
 
-    return AppSettings {};
+    return AppSettings_StorageModel {};
 }

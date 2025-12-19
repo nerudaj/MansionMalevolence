@@ -4,14 +4,13 @@
 
 TEST_CASE("[AppStateMainMenu]")
 {
-    auto settings = AppSettings {};
     auto window = Helper::createDummyWindow();
     auto app = dgm::App(window);
     auto dic = Helper::createDummyDependencies(window);
 
     SECTION("Can exit")
     {
-        app.pushState<AppStateMainMenu>(dic, settings);
+        app.pushState<AppStateMainMenu>(dic, dic.settings);
 
         auto button = dic.gui.get<tgui::Button>("MainMenu_Button_Exit");
         GuiHelper::clickButton(button);
