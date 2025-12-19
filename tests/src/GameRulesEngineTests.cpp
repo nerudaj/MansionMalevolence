@@ -2,6 +2,7 @@
 #include "game/builders/SceneBuilder.hpp"
 #include "game/engine/GameRulesEngine.hpp"
 #include <catch_amalgamated.hpp>
+#include <thread>
 
 TEST_CASE("[GameRulesEngine]")
 {
@@ -44,6 +45,44 @@ TEST_CASE("[GameRulesEngine]")
                 CardBuilder::createCard(CardType::RedHerb));
             REQUIRE(result.has_value());
             REQUIRE(result.value() == 2u);
+        }
+
+        SECTION("When deck is empty")
+        {
+            dgm::Time time;
+            std::this_thread::sleep_for(std::chrono::seconds(1));
+            time.reset();
+
+            SECTION("Moves discard back to deck if there is any")
+            {
+                scene.deck.clear();
+                scene.discard = scene.builder->generateStartRoom();
+
+                engine.update(time);
+                events.processEvents(engine);
+                REQUIRE(scene.discard.empty());
+                REQUIRE(!scene.cardsToAdd.empty());
+                REQUIRE(scene.activeAnimation);
+
+                engine.update(time);
+                events.processEvents(engine);
+                REQUIRE(!scene.activeAnimation);
+                REQUIRE(scene.cardsToAdd.empty());
+                REQUIRE(!scene.deck.empty());
+            }
+
+            SECTION("Does nothing when there is no discard")
+            {
+                scene.deck.clear();
+                engine.update(time);
+                engine.handleTake();
+                events.processEvents(engine);
+                engine.update(time);
+                engine.handleSkip();
+                events.processEvents(engine);
+                engine.update(time);
+                events.processEvents(engine);
+            }
         }
     }
 }

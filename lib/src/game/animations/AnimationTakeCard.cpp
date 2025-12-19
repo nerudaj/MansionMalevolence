@@ -13,8 +13,10 @@ void AnimationTakeCard::render(
         (RenderingEngine::getNthInventoryCardOffset(inventorySlotIdx)
          - baseOffset)
         * Easing::easeInOut(getPercFactor());
-    renderCard(
-        scene.deck.front(),
-        Position(baseOffset + animationOffset),
-        Scale({ scale, scale }));
+
+    if (!scene.deck.empty())
+        renderCard(
+            scene.deck.front(),
+            Position(baseOffset + animationOffset),
+            Scale({ scale, scale }));
 };

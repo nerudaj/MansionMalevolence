@@ -38,6 +38,8 @@ void GameRulesEngine::operator()(const CardSkipEndedGameEvent& e)
 
 void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 {
+    if (scene.deck.empty()) return;
+
     const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
     const auto special = scene.deck.front().special;
     // clang-format off
@@ -284,19 +286,26 @@ void GameRulesEngine::update(const dgm::Time& time)
             scene.activeAnimation = std::make_unique<AnimationDiscardToDeck>();
             scene.cardsToAdd = scene.discard;
             scene.discard.clear();
+            return;
         }
-
-        return;
     }
 
-    scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());
-    scene.canTakeCard =
-        (scene.deck.front().traits & CardTrait::Pickable
-         && scene.usableInventorySlot)
-        || scene.deck.front().special & CardSpecial::BoosterPack;
-    scene.canSafelySkipCard = !(scene.deck.front().traits & CardTrait::Enemy);
-
-    if (scene.preventInteractions) return;
+    if (scene.deck.empty())
+    {
+        scene.usableInventorySlot = std::nullopt;
+        scene.canSafelySkipCard = false;
+        scene.canTakeCard = false;
+    }
+    else
+    {
+        scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());
+        scene.canTakeCard =
+            (scene.deck.front().traits & CardTrait::Pickable
+             && scene.usableInventorySlot)
+            || scene.deck.front().special & CardSpecial::BoosterPack;
+        scene.canSafelySkipCard =
+            !(scene.deck.front().traits & CardTrait::Enemy);
+    }
 
     if (scene.boosterChoice)
     {
@@ -314,16 +323,6 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else
     {
-        /*
-        if (input.isTakeButtonPressed())
-        {
-            handleTake();
-        }
-        else if (input.isSkipButtonPressed())
-        {
-            handleSkip();
-        }
-        */
         if (auto pos = input.getDragPosition(); pos != sf::Vector2f {})
         {
             handleDragStartedOrMoved(pos);
@@ -337,19 +336,20 @@ void GameRulesEngine::update(const dgm::Time& time)
 
 void GameRulesEngine::handleTake()
 {
-    if (scene.deck.front().special & CardSpecial::BoosterPack)
-    {
-        scene.boosterChoice =
-            SceneBuilder::generateBooster(scene.deck.front().image);
-        audioEngine.playSound(scene.deck.front().specialSound);
-        return;
-    }
-
-    scene.preventInteractions = true;
     if (scene.canTakeCard)
     {
-        scene.activeAnimation =
-            std::make_unique<AnimationTakeCard>(*scene.usableInventorySlot);
+        assert(!scene.deck.empty());
+        if (scene.deck.front().special & CardSpecial::BoosterPack)
+        {
+            scene.boosterChoice =
+                SceneBuilder::generateBooster(scene.deck.front().image);
+            audioEngine.playSound(scene.deck.front().specialSound);
+        }
+        else
+        {
+            scene.activeAnimation =
+                std::make_unique<AnimationTakeCard>(*scene.usableInventorySlot);
+        }
     }
     else
     {
@@ -359,7 +359,6 @@ void GameRulesEngine::handleTake()
 
 void GameRulesEngine::handleSkip()
 {
-    scene.preventInteractions = true;
     gameEventQueue.pushEvent<BeforeCardSkipGameEvent>();
 }
 
@@ -471,7 +470,6 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
         auto event = scene.activeAnimation->finalize();
         if (event) gameEventQueue.pushEvent(std::move(*event));
 
-        scene.preventInteractions = false;
         scene.activeAnimation.reset();
     }
 }
@@ -566,7 +564,6 @@ void GameRulesEngine::reloadWeapon(Card& weapon, int quantity)
 void GameRulesEngine::popTopDeckCard()
 {
     scene.deck.pop_front();
-    scene.preventInteractions = false;
 }
 
 void GameRulesEngine::transformTopCard(CardType from, CardType to)
