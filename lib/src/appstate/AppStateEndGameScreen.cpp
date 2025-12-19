@@ -57,6 +57,28 @@ void AppStateEndGameScreen::buildLayout()
                        dic.sizer,
                        "justify"_true) });
 
+    auto content = tgui::VerticalLayout::create();
+    auto tablePanel = tgui::ScrollablePanel::create();
+    tablePanel->add(table.build());
+    content->add(tablePanel);
+
+    auto buttonList =
+        ButtonListBuilder(dic.strings, dic.sizer)
+            .addButton(
+                StringId::Retry,
+                [this] { app.popState(Messaging::serialize<RestartGame>()); })
+            .addButton(
+                StringId::BackToMenu,
+                [this] { app.popState(Messaging::serialize<PopIfNotMenu>()); })
+            .build();
+
+    buttonList->setPosition({ "25%", "parent.height / 2 - height / 2" });
+
+    auto buttonPanel = tgui::Panel::create();
+    buttonPanel->add(buttonList);
+
+    content->add(buttonPanel);
+
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
             .withNoBackgroundImage()
@@ -64,16 +86,7 @@ void AppStateEndGameScreen::buildLayout()
                 dic.strings.getString(
                     won ? StringId::YouSurvived : StringId::YouDied),
                 HeadingLevel::H2)
-            .withContent(table.build())
-            .withNoTopLeftButton()
-            .withNoTopRightButton()
-            .withBottomLeftButton(WidgetBuilder::createButton(
-                dic.strings.getString(StringId::Retry),
-                [this] { app.popState(Messaging::serialize<RestartGame>()); },
-                dic.sizer))
-            .withBottomRightButton(WidgetBuilder::createButton(
-                dic.strings.getString(StringId::BackToMenu),
-                [this] { app.popState(Messaging::serialize<PopIfNotMenu>()); },
-                dic.sizer))
+            .withContent(content)
+            .withNoCornerButtons()
             .build());
 }
