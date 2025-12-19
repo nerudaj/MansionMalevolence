@@ -11,6 +11,10 @@ enum class [[nodiscard]] CardSpecial
     Combines = 64,
     BoosterPack = 128,
     WinGame = 256,
+    NegatesEvasive = 512,
+    BoostsEvasion = 1024,
+    CritChance = 2048,
+    RefillAmmoOnKill = 4096,
 };
 
 constexpr const int SPECIAL_HERBS = 1;
@@ -20,6 +24,8 @@ constexpr const int SPECIAL_CREST_DOOR = 4;
 constexpr const int SPECIAL_DIAMOND_KEYDOOR = 5;
 constexpr const int SPECIAL_YELLOW_JEWEL = 6;
 constexpr const int SPECIAL_RED_JEWEL = 7;
+constexpr const int SPECIAL_LOCKER_KEY = 8;
+constexpr const int SPECIAL_SILENCER = 9;
 
 constexpr CardSpecial operator|(CardSpecial a, CardSpecial b)
 {

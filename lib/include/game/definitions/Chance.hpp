@@ -9,6 +9,7 @@ struct [[nodiscard]] Chance final
     int dodgeChanceSkew = 0;
     int blindDodgeChanceSkew = 0;
     int vigilantDodgeChanceSkew = 0;
+    int critChanceSkew = 0;
 
     bool rollForEvasion()
     {
@@ -33,6 +34,11 @@ struct [[nodiscard]] Chance final
     bool rollForVigilantDodge()
     {
         return rollForChanceSkewed(3, 1, vigilantDodgeChanceSkew);
+    }
+
+    bool rollForCrit()
+    {
+        return rollForChanceSkewed(3, 1, critChanceSkew);
     }
 
     static int rollForChanceSkewed(int diceSize, int failThreshold, int& skew)

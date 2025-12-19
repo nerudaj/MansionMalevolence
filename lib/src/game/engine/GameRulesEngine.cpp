@@ -11,30 +11,8 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 
     if (scene.inventory[e.inventorySlotIdx].has_value())
     {
-        const auto& inventoryCard = scene.inventory[e.inventorySlotIdx].value();
-        if (inventoryCard.special == CardSpecial::Combines)
-        {
-            // TODO: play sound
-            scene.inventory[e.inventorySlotIdx] =
-                CardBuilder::combineCards(inventoryCard, scene.deck.front());
-        }
-        else if (
-            scene.inventory[e.inventorySlotIdx].value().traits
-            & CardTrait::Weapon)
-        {
-            reloadWeapon(
-                *scene.inventory[e.inventorySlotIdx],
-                scene.deck.front().quantity);
-        }
-        else
-        {
-            throw std::runtime_error(uni::format(
-                "CardTakenGameEvent: Trying to mix incoming card {} with "
-                "inventory card {} - operation not defined",
-                std::to_underlying(scene.deck.front().image),
-                std::to_underlying(
-                    scene.inventory[e.inventorySlotIdx]->image)));
-        }
+        auto& inventoryCard = scene.inventory[e.inventorySlotIdx].value();
+        combineCards(inventoryCard, scene.deck.front());
     }
     else
     {
@@ -142,6 +120,11 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
             transformTopCard(
                 CardType::YellowJewelBox, CardType::MoonCrestRight);
         }
+        else if (card.link == SPECIAL_LOCKER_KEY)
+        {
+            transformTopCard(
+                CardType::LockedWeaponLocker, CardType::UnlockedWeaponLocker);
+        }
         else
         {
             audioEngine.playSound(scene.deck.front().specialSound);
@@ -169,7 +152,6 @@ void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 {
     scene.hearts -= scene.deck.front().power;
-    // TODO: trigger slash animation
 
     if (e.skipCardAfterReaction)
     {
@@ -185,15 +167,19 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
     --weapon.quantity;
     scene.stats.shotsFired++;
 
-    if (scene.deck.front().special & CardSpecial::Evasive
-        && scene.chance.rollForEvasion())
+    const bool canEvade = scene.deck.front().special & CardSpecial::Evasive
+                          && !(weapon.special & CardSpecial::NegatesEvasive);
+    if (canEvade && scene.chance.rollForEvasion())
     {
         scene.activeAnimation = std::make_unique<AnimationEnemyDodgedAttack>();
     }
     else
     {
-        scene.activeAnimation =
-            std::make_unique<AnimationEnemyDamaged>(weapon.power);
+        int extraDamage = weapon.special & CardSpecial::CritChance
+                              ? static_cast<int>(scene.chance.rollForCrit())
+                              : 0;
+        scene.activeAnimation = std::make_unique<AnimationEnemyDamaged>(
+            weapon.power + extraDamage, e.inventoryWeaponIdx);
     }
 }
 
@@ -205,6 +191,13 @@ void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
     {
         gameEventQueue.pushEvent<MainCardResolvedGameEvent>();
         scene.stats.enemiesKilled++;
+
+        assert(scene.inventory[e.usedWeaponInventoryIdx].has_value());
+        auto& weapon = scene.inventory[e.usedWeaponInventoryIdx].value();
+        if (weapon.special & CardSpecial::RefillAmmoOnKill)
+        {
+            weapon.quantity++;
+        }
     }
     else if (deckCard.special & CardSpecial::Retaliate)
     {
@@ -232,23 +225,7 @@ void GameRulesEngine::operator()(
     const auto& src = scene.inventory[e.sourceCardInventoryIdx].value();
     auto& dst = scene.inventory[e.destinationCardInventoryIdx].value();
 
-    if (dst.traits & CardTrait::Weapon && src.traits & CardTrait::Ammo)
-    {
-        reloadWeapon(dst, src.quantity);
-    }
-    else if (
-        dst.image == CardImage::GreenHerb || src.image == CardImage::GreenHerb)
-    {
-        // TODO: play sound
-        dst = CardBuilder::createCard(CardType::MixedHerbs);
-    }
-    else if (
-        dst.image == CardImage::MoonCrestLeft
-        || src.image == CardImage::MoonCrestLeft)
-    {
-        // TODO: play sound
-        dst = CardBuilder::createCard(CardType::MoonCrest);
-    }
+    combineCards(dst, src);
 
     scene.inventory[e.sourceCardInventoryIdx].reset();
 }
@@ -361,7 +338,8 @@ void GameRulesEngine::handleTake()
 {
     if (scene.deck.front().special & CardSpecial::BoosterPack)
     {
-        scene.boosterChoice = SceneBuilder::generateBooster();
+        scene.boosterChoice =
+            SceneBuilder::generateBooster(scene.deck.front().image);
         audioEngine.playSound(scene.deck.front().specialSound);
         return;
     }
@@ -604,4 +582,28 @@ void GameRulesEngine::shuffleNewCardIntoDeck()
     audioEngine.playSound(SoundId::CardShuffle);
     scene.activeAnimation =
         std::make_unique<AnimationNewCardsShufflingIntoDeck>();
+}
+
+void GameRulesEngine::combineCards(Card& inventoryCard, const Card& incoming)
+{
+    if (inventoryCard.special & CardSpecial::Combines
+        && incoming.special & CardSpecial::Combines)
+    {
+        audioEngine.playSound(incoming.specialSound);
+        inventoryCard = CardBuilder::combineCards(inventoryCard, incoming);
+    }
+    else if (
+        inventoryCard.traits & CardTrait::Weapon
+        && incoming.traits & CardTrait::Ammo)
+    {
+        reloadWeapon(inventoryCard, incoming.quantity);
+    }
+    else
+    {
+        throw std::runtime_error(uni::format(
+            "CardTakenGameEvent: Trying to mix incoming card {} with "
+            "inventory card {} - operation not defined",
+            std::to_underlying(incoming.image),
+            std::to_underlying(inventoryCard.image)));
+    }
 }

@@ -7,17 +7,35 @@ const std::map<CardType, Card> CARD_DEFS = {
     { CardType::Pistol,
       Card { .image = CardImage::Pistol,
              .traits = CardTrait::Pickable | CardTrait::Weapon,
+             .special = CardSpecial::Combines,
              .specialSound = SoundId::PistolFire,
              .quantity = 3,
              .power = 1,
+             .link = SPECIAL_SILENCER,
              .name = "pistol" } },
+    { CardType::SilencedPistol,
+      Card { .image = CardImage::SilencedPistol,
+             .traits = CardTrait::Pickable | CardTrait::Weapon,
+             .special = CardSpecial::NegatesEvasive | CardSpecial::BoostsEvasion,
+             .quantity = 3,
+             .power = 1,
+             .name = "silenced pistol",
+             .texts = { "boosts your", "dodge chance,", "negates evasive", "monster ability." },} },
     { CardType::Shotgun,
       Card { .image = CardImage::Shotgun,
              .traits = CardTrait::Pickable | CardTrait::Weapon,
+             .special = CardSpecial::NegatesEvasive | CardSpecial::CritChance,
              .specialSound = SoundId::ShotgunFire,
              .quantity = 2,
              .power = 2,
-             .name = "shotgun" } },
+             .name = "shotgun", .texts={"chance to deal", "extra damage,", "negates evasive", "moster ability"}, } },
+    { CardType::Crossbow,
+      Card { .image = CardImage::Crossbow,
+             .traits = CardTrait::Pickable | CardTrait::Weapon,
+             .special = CardSpecial::RefillAmmoOnKill,
+             .quantity = 2,
+             .power = 2,
+             .name = "crossbow", .texts = {"refills 1 ammo", "when moster is", "killed."}, } },
     { CardType::RocketLauncher,
       Card { .image = CardImage::RocketLauncher,
              .traits = CardTrait::Pickable | CardTrait::Weapon,
@@ -34,6 +52,14 @@ const std::map<CardType, Card> CARD_DEFS = {
                 "restores ammo",
                 "for a chosen",
                 "weapon."} } },
+    { CardType::PistolParts,
+      Card { .image = CardImage::PistolParts,
+             .traits = CardTrait::Pickable,
+             .special = CardSpecial::Combines,
+             .link = SPECIAL_SILENCER,
+             .name = "ammo",
+             .texts = {
+                "upgrade your", "pistol with", "these parts"}, } },
 
     // Healing
     { CardType::GreenHerb,
@@ -192,6 +218,20 @@ const std::map<CardType, Card> CARD_DEFS = {
               "there is a slot",
               "for a big jewel.",
           } } },
+    { CardType::WeaponLockerKey,
+      Card {
+          .image = CardImage::WeaponLockerKey,
+          .traits = CardTrait::KeyItem | CardTrait::Pickable,
+          .link = SPECIAL_LOCKER_KEY,
+          .name = "weapon box key",
+      } },
+    { CardType::LockedWeaponLocker,
+      Card {
+          .image = CardImage::LockedWeaponLocker,
+          .traits = CardTrait::KeyTarget,
+          .link = SPECIAL_LOCKER_KEY,
+          .name = "locked wpn. box",
+      } },
 
     // Enemies
     { CardType::Zombie,
@@ -267,7 +307,18 @@ const std::map<CardType, Card> CARD_DEFS = {
                  "take this card",
                  "so you can pick",
                  "one out of three",
-                 "support card.",
+                 "support cards.",
+             } } },
+    { CardType::UnlockedWeaponLocker,
+      Card { .image = CardImage::WeaponLocker,
+             .special = CardSpecial::BoosterPack,
+             .specialSound = SoundId::CrateOpen,
+             .name = "weapon box",
+             .texts = {
+                 "take this card",
+                 "so you can pick",
+                 "one out of three",
+                 "weapon cards.",
              } } },
 };
 
@@ -278,8 +329,9 @@ Card CardBuilder::createCard(CardType type)
 
 Card CardBuilder::combineCards(const Card& a, const Card& b)
 {
-    const bool isValid = a.special == CardSpecial::Combines
-                         && b.special == a.special && a.link == b.link;
+    const bool isValid = a.special & CardSpecial::Combines
+                         && b.special & CardSpecial::Combines
+                         && a.link == b.link;
     if (!isValid)
     {
         throw std::runtime_error(uni::format(
@@ -292,6 +344,13 @@ Card CardBuilder::combineCards(const Card& a, const Card& b)
         return createCard(CardType::MixedHerbs);
     else if (a.link == SPECIAL_MOON_CREST_PART)
         return createCard(CardType::MoonCrest);
+    else if (a.link == SPECIAL_SILENCER)
+    {
+        assert(a.traits & CardTrait::Weapon);
+        auto card = createCard(CardType::SilencedPistol);
+        card.quantity = a.quantity;
+        return card;
+    }
 
     return createCard(CardType::Empty);
 }

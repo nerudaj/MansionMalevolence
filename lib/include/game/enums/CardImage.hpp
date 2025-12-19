@@ -7,8 +7,11 @@ enum class [[nodiscard]] CardImage
     MixedHerbs,
     FirstAid,
     Ammo,
+    PistolParts,
+    SilencedPistol,
     Pistol,
     Shotgun,
+    Crossbow,
     RocketLauncher,
     Crate,
     Vaccine,
@@ -32,6 +35,9 @@ enum class [[nodiscard]] CardImage
     ShieldDoor,
     DiamondKey,
     DiamondDoor,
+    WeaponLockerKey,
+    LockedWeaponLocker,
+    WeaponLocker,
 
     Max
 };

@@ -103,6 +103,8 @@ private:
 
     void shuffleNewCardIntoDeck();
 
+    void combineCards(Card& inventoryCard, const Card& incoming);
+
 private:
     EventQueue<GameEvent>& gameEventQueue;
     AudioEngine& audioEngine;

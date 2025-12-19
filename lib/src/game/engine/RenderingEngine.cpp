@@ -34,11 +34,12 @@ RenderingEngine::RenderingEngine(
                             resmgr.get<sf::Texture>("icons.png"),
                             resmgr.get<dgm::Clip>("icons.png.clip"))
                         .value())
-    , imagesLocation(atlas
-                         .addTileset(
-                             resmgr.get<sf::Texture>("illustrations.png"),
-                             resmgr.get<dgm::Clip>("illustrations.png.clip"))
-                         .value())
+    , imagesLocation(
+          atlas
+              .addTileset(
+                  resmgr.get<sf::Texture>("zombie_cards_illustrations.png"),
+                  resmgr.get<dgm::Clip>("zombie_cards_illustrations.png.clip"))
+              .value())
     , sprite(atlas.getTexture())
 {
     resmgr.getMutable<sf::Font>("pico-8.ttf").setSmooth(false);

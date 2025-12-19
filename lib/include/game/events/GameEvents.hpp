@@ -87,9 +87,11 @@ struct [[nodiscard]] MonsterShotAtGameEvent final
 struct [[nodiscard]] MonsterStaggerEndedGameEvent final
 {
     int damage;
+    size_t usedWeaponInventoryIdx;
 
-    constexpr explicit MonsterStaggerEndedGameEvent(int damage) noexcept
-        : damage(damage)
+    constexpr explicit MonsterStaggerEndedGameEvent(
+        int damage, size_t usedWeaponInventoryIdx) noexcept
+        : damage(damage), usedWeaponInventoryIdx(usedWeaponInventoryIdx)
     {
     }
 };

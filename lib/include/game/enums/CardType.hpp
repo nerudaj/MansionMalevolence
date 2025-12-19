@@ -6,9 +6,12 @@ enum class [[nodiscard]] CardType
 
     // Weapons
     Pistol,
+    SilencedPistol,
     Shotgun,
+    Crossbow,
     RocketLauncher,
     Ammo,
+    PistolParts,
 
     // Healing
     GreenHerb,
@@ -32,6 +35,9 @@ enum class [[nodiscard]] CardType
     YellowJewel,
     YellowJewelBox,
     Vaccine,
+    WeaponLockerKey,
+    LockedWeaponLocker,
+    UnlockedWeaponLocker,
 
     // Enemies
     Zombie,

@@ -5,8 +5,10 @@
 class [[nodiscard]] AnimationEnemyDamaged final : public AnimationInterface
 {
 public:
-    AnimationEnemyDamaged(int damage) noexcept
-        : AnimationInterface(sf::seconds(0.25f)), damage(damage)
+    AnimationEnemyDamaged(int damage, size_t usedWeaponInventoryIdx) noexcept
+        : AnimationInterface(sf::seconds(0.25f))
+        , damage(damage)
+        , usedWeaponInventoryIdx(usedWeaponInventoryIdx)
     {
     }
 
@@ -20,9 +22,10 @@ public:
 
     std::optional<GameEvent> finalize() const override
     {
-        return MonsterStaggerEndedGameEvent(damage);
+        return MonsterStaggerEndedGameEvent(damage, usedWeaponInventoryIdx);
     }
 
 private:
     int damage = 0;
+    size_t usedWeaponInventoryIdx = false;
 };

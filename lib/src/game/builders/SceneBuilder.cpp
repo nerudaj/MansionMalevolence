@@ -62,8 +62,14 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
     };
 }
 
-std::array<CardType, 3u> SceneBuilder::generateBooster()
+std::array<CardType, 3u>
+SceneBuilder::generateBooster(CardImage boosterCardImage)
 {
+    if (boosterCardImage == CardImage::WeaponLocker)
+    {
+        return { CardType::PistolParts, CardType::Shotgun, CardType::Crossbow };
+    }
+
     auto possibleCards = std::vector {
         CardType::Ammo,    CardType::Ammo,     CardType::RedHerb,
         CardType::RedHerb, CardType::FirstAid, CardType::GreenHerb,
@@ -136,7 +142,7 @@ std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
     if (linkID == SPECIAL_DIAMOND_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
-            CardBuilder::createCard(CardType::Shotgun),
+            CardBuilder::createCard(CardType::UnlockedWeaponLocker),
             CardBuilder::createCard(CardType::SunCrest),
             CardBuilder::createCard(CardType::GreenHerb),
             CardBuilder::createCard(CardType::Licker),
@@ -195,7 +201,7 @@ std::list<Card> HardScenarioBuilder::generateRoomDeck(const int linkID)
             CardBuilder::createCard(CardType::ShieldDoor),
             CardBuilder::createCard(CardType::GreenHerb),
             CardBuilder::createCard(CardType::Crate),
-            CardBuilder::createCard(CardType::Shotgun),
+            CardBuilder::createCard(CardType::UnlockedWeaponLocker),
             CardBuilder::createCard(CardType::Cerberus),
             CardBuilder::createCard(CardType::Licker),
             CardBuilder::createCard(CardType::Zombie),
