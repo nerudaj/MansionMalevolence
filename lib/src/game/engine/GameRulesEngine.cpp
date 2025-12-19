@@ -175,9 +175,10 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
     }
     else
     {
-        int extraDamage = weapon.special & CardSpecial::CritChance
-                              ? static_cast<int>(scene.chance.rollForCrit())
-                              : 0;
+        const int extraDamage =
+            weapon.special & CardSpecial::CritChance
+                ? static_cast<int>(scene.chance.rollForCrit())
+                : 0;
         scene.activeAnimation = std::make_unique<AnimationEnemyDamaged>(
             weapon.power + extraDamage, e.inventoryWeaponIdx);
     }
