@@ -346,9 +346,8 @@ Card CardBuilder::combineCards(const Card& a, const Card& b)
         return createCard(CardType::MoonCrest);
     else if (a.link == SPECIAL_SILENCER)
     {
-        assert(a.traits & CardTrait::Weapon);
         auto card = createCard(CardType::SilencedPistol);
-        card.quantity = a.quantity;
+        card.quantity = a.traits & CardTrait::Weapon ? a.quantity : b.quantity;
         return card;
     }
 
