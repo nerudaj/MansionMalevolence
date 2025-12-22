@@ -5,8 +5,8 @@
 
 struct [[nodiscard]] AudioSettings_StorageModel final
 {
-    float soundVolume;
-    float musicVolume;
+    float soundVolume = 50.f;
+    float musicVolume = 50.f;
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(

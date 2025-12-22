@@ -24,9 +24,8 @@ public:
         , dic(dic)
         , settings(settings)
         , scene(SceneBuilder::createScene(scenario))
-        , audioEngine(dic.resmgr)
         , gameRulesEngine(
-              gameEvents, audioEngine, scene, dic.input, settings.video)
+              gameEvents, dic.audioEngine, scene, dic.input, settings.video)
         , renderingEngine(dic.resmgr, scene, settings, dic.touchController)
     {
         dic.jukebox.switchMode(JukeboxMode::Game);
@@ -47,7 +46,6 @@ private:
     AppSettings& settings;
     Scene scene;
     EventQueue<GameEvent> gameEvents;
-    AudioEngine audioEngine;
     GameRulesEngine gameRulesEngine;
     RenderingEngine renderingEngine;
 };

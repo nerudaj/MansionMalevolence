@@ -20,6 +20,11 @@ public:
         sound.play();
     }
 
+    void setVolume(float volume)
+    {
+        sound.setVolume(volume);
+    }
+
 private:
     const dgm::ResourceManager& resmgr;
     sf::SoundBuffer emptySoundBuffer;

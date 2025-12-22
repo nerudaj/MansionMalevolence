@@ -1,6 +1,7 @@
 #pragma once
 
 #include "filesystem/ResourceLoader.hpp"
+#include "game/engine/AudioEngine.hpp"
 #include "gui/Gui.hpp"
 #include "gui/Sizers.hpp"
 #include "input/Input.hpp"
@@ -17,6 +18,7 @@ struct [[nodiscard]] DependencyContainer final
     dgm::ResourceManager resmgr;
     const StringProvider strings;
     Jukebox jukebox;
+    AudioEngine audioEngine;
     AppSettings settings;
     TouchController touchController;
     Input input;
@@ -35,9 +37,10 @@ struct [[nodiscard]] DependencyContainer final
         , resmgr(ResourceLoader::loadResources(rootDir))
         , strings(primaryLang)
         , jukebox(resmgr)
+        , audioEngine(resmgr)
         , settings(AppSettings {
             .audio = {
-                .soundVolume = Observable<float>(settingsSM.audio.soundVolume, [](float){}),
+                .soundVolume = Observable<float>(settingsSM.audio.soundVolume, [this](float v){ audioEngine.setVolume(v); }),
                 .musicVolume = Observable<float>(settingsSM.audio.musicVolume, [this](float v) { jukebox.setVolume(v); }),
             },
             .video = settingsSM.video,
