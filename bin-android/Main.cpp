@@ -51,10 +51,10 @@ int main(int, char*[])
 
         window.getSfmlWindowContext().setMouseCursorVisible(false);
 
-        app.pushState<AppStateMainMenu>(dependencies, settings);
+        app.pushState<AppStateMainMenu>(dependencies, dependencies.settings);
         app.run();
         
-        AppStorage::saveFile(SETTINGS_FILE_NAME, settings);
+        AppStorage::saveFile(SETTINGS_FILE_NAME, fromAppSettingsModel(dependencies.settings));
     }
     catch (const std::exception& ex)
     {
