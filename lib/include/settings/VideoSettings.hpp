@@ -9,8 +9,6 @@ struct [[nodiscard]] VideoSettings final
     sf::Vector2u resolution =
 #ifdef ANDROID
         sf::VideoMode::getDesktopMode().size;
-#elif _DEBUG
-        sf::Vector2u(405, 720);
 #else
         sf::VideoMode::getDesktopMode().size;
 #endif

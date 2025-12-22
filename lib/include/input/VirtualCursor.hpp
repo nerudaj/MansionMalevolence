@@ -20,6 +20,8 @@ public:
     }
 
 public:
+    void forceSyncPosition();
+
     void update(const dgm::Time& time, const float cursorSpeed);
 
     [[nodiscard]] const sf::Vector2f& getPosition() const noexcept

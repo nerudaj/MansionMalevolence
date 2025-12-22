@@ -34,5 +34,6 @@ public:
     std::vector<std::string> ingameSongs;
     JukeboxMode mode = JukeboxMode::None;
     std::string currentSongName = "";
+    float volume = 0.f;
     static inline size_t cnt = 0; // used for random selection of a next song
 };

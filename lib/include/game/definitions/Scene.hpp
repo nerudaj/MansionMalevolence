@@ -14,6 +14,8 @@
 
 const static inline auto INTERNAL_GAME_RESOLUTION =
     sf::Vector2f { 128.f, 228.f };
+const static inline auto INTERNAL_GAME_RESOLUTION_U =
+    sf::Vector2u(INTERNAL_GAME_RESOLUTION);
 constexpr const int MAX_HEARTS = 5;
 constexpr const int MAX_AMMO = 3;
 constexpr const float CRIMSON_HEAD_SPAWN_CHANCE = 0.5f;

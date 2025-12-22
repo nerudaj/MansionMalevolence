@@ -1,5 +1,10 @@
 #include "input/VirtualCursor.hpp"
 
+void VirtualCursor::forceSyncPosition()
+{
+    position = sf::Vector2f(sf::Mouse::getPosition(window));
+}
+
 void VirtualCursor::update(const dgm::Time& time, const float cursorSpeed)
 {
     const auto cursorDelta = input.getCursorDelta();

@@ -1,6 +1,7 @@
 #include "game/engine/GameRulesEngine.hpp"
 #include "game/animations/Animations.hpp"
 #include "game/builders/SceneBuilder.hpp"
+#include "misc/CoordConverter.hpp"
 #include <algorithm>
 #include <limits>
 #include <random>
@@ -527,20 +528,8 @@ bool GameRulesEngine::gameWon() const noexcept
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)
 {
-    // precondition check
-    if (settings.resolution.x > settings.resolution.y)
-        throw std::runtime_error(
-            "Playing on landscape resolution is unsupported");
-
-    // NOTE: I assume this game will always be played on a portrait aspect ratio
-    // therefore the viewport can be offset on Y axis, but not on X axis.
-    const float scale = settings.resolution.x / INTERNAL_GAME_RESOLUTION.x;
-    const float yoffsetRelative =
-        (1.f - (INTERNAL_GAME_RESOLUTION.y * scale / settings.resolution.y))
-        / 2.f;
-
-    return (pos - sf::Vector2f { 0.f, settings.resolution.y * yoffsetRelative })
-           / scale;
+    return CoordConverter::screenToWorld(
+        pos, INTERNAL_GAME_RESOLUTION_U, settings.resolution);
 }
 
 std::optional<size_t>
@@ -600,7 +589,8 @@ void GameRulesEngine::combineCards(Card& inventoryCard, const Card& incoming)
     else
     {
         throw std::runtime_error(uni::format(
-            "CardTakenGameEvent: Trying to mix incoming card {} with "
+            "GameRulesEngine::combineCards: Trying to mix incoming card {} "
+            "with "
             "inventory card {} - operation not defined",
             std::to_underlying(incoming.image),
             std::to_underlying(inventoryCard.image)));

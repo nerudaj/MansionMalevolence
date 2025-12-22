@@ -66,6 +66,8 @@ struct [[nodiscard]] TouchModel final
 public:
     TouchModel(const sf::Vector2u& windowSize);
 
+    void updateFromNewWindowSize(const sf::Vector2u& windowSize);
+
 public:
     mutable std::array<TouchInput, 4u> objects;
     std::map<unsigned, size_t>
@@ -86,6 +88,8 @@ public:
     TouchController(const sf::Vector2u& windowSize) : model(windowSize) {}
 
 public:
+    void updateFromNewWindowSize(const sf::Vector2u& windowSize);
+
     void processEvent(const std::optional<sf::Event>& e);
 
     [[nodiscard]] constexpr const TouchModel& getTouchModel() const noexcept

@@ -1,5 +1,6 @@
 #include "input/TouchController.hpp"
 #include "game/definitions/Scene.hpp"
+#include "misc/CoordConverter.hpp"
 #include <SFML/System/Err.hpp>
 
 void TouchInput::reset()
@@ -15,35 +16,41 @@ void TouchInput::reset()
         touchPosition = touchArea.getPosition();
 }
 
-static float yOffset(const sf::Vector2u& windowSize)
-{
-    const float scale = windowSize.x / INTERNAL_GAME_RESOLUTION.x;
-    return (windowSize.y - INTERNAL_GAME_RESOLUTION.y * scale) / 2.f;
-}
-
 TouchModel::TouchModel(const sf::Vector2u& windowSize)
     : objects(std::array {
           TouchInput(
               TouchObjectKind::Button,
-              { windowSize.x * 0.12f,
-                windowSize.x * 0.12f + yOffset(windowSize) },
-              windowSize.x * 0.08f),
-          TouchInput(
-              TouchObjectKind::Button,
-              { windowSize.x * 0.852f,
-                windowSize.x * 0.453f + yOffset(windowSize) },
-              windowSize.x * 0.123f),
-          TouchInput(
-              TouchObjectKind::Button,
-              { windowSize.x * 0.852f,
-                windowSize.x * 0.953f + yOffset(windowSize) },
-              windowSize.x * 0.123f),
+              CoordConverter::worldToScreen(
+                  { 15.f, 15.f }, INTERNAL_GAME_RESOLUTION_U, windowSize),
+              CoordConverter::worldToScreen(
+                  10.f, INTERNAL_GAME_RESOLUTION_U, windowSize)),
+          TouchInput(TouchObjectKind::Button, { -1.f, -1.f }, 0.5f),
+          TouchInput(TouchObjectKind::Button, { -1.f, -1.f }, 0.5f),
           TouchInput(
               TouchObjectKind::Joystick,
               { 0.f, 0.f },
               sf::Vector2f(windowSize).length()),
       })
 {
+}
+
+void TouchModel::updateFromNewWindowSize(const sf::Vector2u& windowSize)
+{
+    pauseButton = TouchInput(
+        TouchObjectKind::Button,
+        CoordConverter::worldToScreen(
+            { 15.f, 15.f }, INTERNAL_GAME_RESOLUTION_U, windowSize),
+        CoordConverter::worldToScreen(
+            10.f, INTERNAL_GAME_RESOLUTION_U, windowSize));
+    dragJoystick = TouchInput(
+        TouchObjectKind::Joystick,
+        { 0.f, 0.f },
+        sf::Vector2f(windowSize).length());
+}
+
+void TouchController::updateFromNewWindowSize(const sf::Vector2u& windowSize)
+{
+    model.updateFromNewWindowSize(windowSize);
 }
 
 void TouchController::processEvent(const std::optional<sf::Event>& e)

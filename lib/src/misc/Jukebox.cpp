@@ -16,11 +16,12 @@ void Jukebox::switchMode(JukeboxMode newMode)
     playNextSong();
 }
 
-void Jukebox::setVolume(float volume)
+void Jukebox::setVolume(float newVolume)
 {
-    assert(0.f <= volume && volume <= 100.f);
+    assert(0.f <= newVolume && newVolume <= 100.f);
     assert(!currentSongName.empty());
-    resmgr.getMutable<sf::Music>(currentSongName).setVolume(volume);
+    resmgr.getMutable<sf::Music>(currentSongName).setVolume(newVolume);
+    volume = newVolume;
 }
 
 void Jukebox::playNextSong()
@@ -43,7 +44,7 @@ void Jukebox::playNextSong()
     ++cnt;
 
     auto& song = resmgr.getMutable<sf::Music>(currentSongName);
-    song.setVolume(100.f);
+    song.setVolume(volume);
     song.setLooping(true);
     song.play();
 }

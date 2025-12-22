@@ -28,6 +28,8 @@ private:
 
     void onBack();
 
+    void onResolutionSelected(const sf::Vector2u& resolution);
+
 private:
     DependencyContainer& dic;
     AppSettings& settings;
