@@ -9,8 +9,7 @@ void AnimationInvalidOperation::render(
     std::function<void(const Position&, const Scale&)>) const
 {
     const auto animationOffset =
-        sf::Vector2f { 76.f * 0.1f, 0.f }
-        - baseOffset * Easing::easeDamage(getPercFactor());
+        sf::Vector2f { 4.f, 4.f } * Easing::easeDamage(getPercFactor());
     renderCard(
         scene.deck.front(),
         Position(baseOffset + animationOffset),
