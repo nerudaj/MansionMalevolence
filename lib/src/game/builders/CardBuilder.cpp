@@ -17,6 +17,7 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card { .image = CardImage::SilencedPistol,
              .traits = CardTrait::Pickable | CardTrait::Weapon,
              .special = CardSpecial::NegatesEvasive | CardSpecial::BoostsEvasion,
+             .specialSound = SoundId::SilencedPistolFire,
              .quantity = 3,
              .power = 1,
              .name = "silenced pistol",
@@ -33,6 +34,7 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card { .image = CardImage::Crossbow,
              .traits = CardTrait::Pickable | CardTrait::Weapon,
              .special = CardSpecial::RefillAmmoOnKill,
+             .specialSound = SoundId::Crossbow,
              .quantity = 2,
              .power = 2,
              .name = "crossbow", .texts = {"refills 1 ammo", "when moster is", "killed."}, } },
@@ -165,6 +167,7 @@ const std::map<CardType, Card> CARD_DEFS = {
     { CardType::CrestDoorEmpty,
       Card { .image = CardImage::CrestDoorEmpty,
              .traits = CardTrait::KeyTarget,
+             .specialSound = SoundId::DoorUnlock,
              .link = SPECIAL_CREST_DOOR,
              .name = "sun/moon door",
              .texts = {
@@ -195,6 +198,7 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card {
           .image = CardImage::RedJewelBox,
           .traits = CardTrait::KeyTarget,
+          .specialSound = SoundId::CrateOpen,
           .link = SPECIAL_RED_JEWEL,
           .name = "red jewel box",
           .texts = {
@@ -212,6 +216,7 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card {
           .image = CardImage::YellowJewelBox,
           .traits = CardTrait::KeyTarget,
+          .specialSound = SoundId::CrateOpen,
           .link = SPECIAL_YELLOW_JEWEL,
           .name = "yellow jewel box",
           .texts = {
@@ -229,6 +234,7 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card {
           .image = CardImage::LockedWeaponLocker,
           .traits = CardTrait::KeyTarget,
+          .specialSound = SoundId::DoorUnlock,
           .link = SPECIAL_LOCKER_KEY,
           .name = "locked wpn. box",
       } },

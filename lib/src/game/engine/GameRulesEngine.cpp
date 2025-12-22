@@ -353,6 +353,7 @@ void GameRulesEngine::handleTake()
     }
     else
     {
+        audioEngine.playSound(SoundId::Error);
         scene.activeAnimation = std::make_unique<AnimationInvalidOperation>();
     }
 }

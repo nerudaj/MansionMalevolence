@@ -16,8 +16,11 @@ namespace SoundId
     const IdType WeaponReload = "shotgun_reload.wav";
     const IdType ShotgunFire = "SHOT01.wav";
     const IdType PistolFire = "GUN01.wav";
+    const IdType SilencedPistolFire = "GUN01_muffled.wav";
+    const IdType Crossbow = "crossbow.wav";
     const IdType LauncherFire = "launcher_fire.wav";
     const IdType CrateOpen = "crate.wav";
     const IdType DoorUnlock = "KEY_DOOR.wav";
-    const IdType Heal = "SPRAY.wav";
+    const IdType Heal = "heal.wav";
+    const IdType Error = "error.wav";
 } // namespace SoundId
