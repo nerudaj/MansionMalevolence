@@ -26,7 +26,8 @@ ButtonListBuilder::build(tgui::HorizontalAlignment alignment)
         layout->setPosition({ "25%", "0%" });
     else
         layout->setPosition({ "50%", "0%" });
-    layout->getRenderer()->setSpaceBetweenWidgets(sizer.getBaseFontSize());
+    layout->getRenderer()->setSpaceBetweenWidgets(
+        static_cast<float>(sizer.getBaseFontSize()));
 
     for (auto&& [idx, props] : std::views::enumerate(buttonProps))
     {
