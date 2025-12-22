@@ -44,11 +44,6 @@ int main(int, char*[])
         auto&& app = dgm::App(window);
         auto&& dependencies = DependencyContainer(window, "", Language::English, settings);
 
-        settings.audio.registerObserver([&dependencies](const AudioSettings& settings)
-        {
-            dependencies.jukebox.setVolume(settings.musicVolume);
-        });
-
         window.getSfmlWindowContext().setMouseCursorVisible(false);
 
         app.pushState<AppStateMainMenu>(dependencies, dependencies.settings);
