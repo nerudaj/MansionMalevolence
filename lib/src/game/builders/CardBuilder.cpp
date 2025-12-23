@@ -58,6 +58,7 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card { .image = CardImage::PistolParts,
              .traits = CardTrait::Pickable,
              .special = CardSpecial::Combines,
+             .specialSound = SoundId::Crafting,
              .link = SPECIAL_SILENCER,
              .name = "ammo",
              .texts = {
