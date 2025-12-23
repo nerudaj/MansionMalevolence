@@ -20,7 +20,8 @@ public:
         DependencyContainer& dic,
         AppSettings& settings,
         GameScenario scenario)
-        : dgm::AppState(app)
+        : dgm::AppState(
+              app, dgm::AppStateConfig { .clearColor = sf::Color(17, 29, 53) })
         , dic(dic)
         , settings(settings)
         , scene(SceneBuilder::createScene(scenario))
