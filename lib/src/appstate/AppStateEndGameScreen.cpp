@@ -72,8 +72,6 @@ void AppStateEndGameScreen::buildLayout()
                 [this] { app.popState(Messaging::serialize<PopIfNotMenu>()); })
             .build();
 
-    buttonList->setPosition({ "25%", "parent.height / 2 - height / 2" });
-
     auto buttonPanel = tgui::Panel::create();
     buttonPanel->add(buttonList);
 
