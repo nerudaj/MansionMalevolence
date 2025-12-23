@@ -23,7 +23,7 @@ void AppStatePause::buildLayout()
         DefaultLayoutBuilder(dic.sizer)
             .withNoBackgroundImage()
             .withTitle(
-                dic.strings.getString(StringId::PauseTitle), HeadingLevel::H1)
+                dic.strings.getString(StringId::PauseTitle), HeadingLevel::H2)
             .withContent(
                 ButtonListBuilder(dic.strings, dic.sizer)
                     .addButton(StringId::Resume, [&] { onResume(); })
