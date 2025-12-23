@@ -41,14 +41,24 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 {
     if (scene.deck.empty()) return;
 
+    const bool hasSilencedPistol = [this]
+    {
+        for (auto card : scene.inventory)
+            if (card.has_value() && card->special & CardSpecial::BoostsEvasion)
+                return true;
+        return false;
+    }();
+
     const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
     const auto special = scene.deck.front().special;
     // clang-format off
-    const bool managedToEvade = special & CardSpecial::Blind
-        ? scene.chance.rollForBlindDodge()
-        : special & CardSpecial::Vigilant
-            ? scene.chance.rollForVigilantDodge()
-            : scene.chance.rollForDodge();
+    const bool managedToEvade = hasSilencedPistol
+        ? scene.chance.rollForSilencedDodge()
+        : special & CardSpecial::Blind
+            ? scene.chance.rollForBlindDodge()
+            : special & CardSpecial::Vigilant
+                ? scene.chance.rollForVigilantDodge()
+                : scene.chance.rollForDodge();
     // clang-format on
 
     if (isEnemy && !managedToEvade)
