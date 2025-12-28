@@ -96,7 +96,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
     }
 
     scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
-    audioEngine.playSound(card.specialSound);
+    audioEngine.playSound(SoundId::Heal);
     scene.activeAnimation = AnimationHeal();
     scene.inventory[e.inventorySlotIdx].reset();
 }
