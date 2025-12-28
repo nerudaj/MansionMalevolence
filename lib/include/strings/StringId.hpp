@@ -35,9 +35,10 @@ enum class [[nodiscard]] StringId
     // Level select
     LevelSelect,
     LevelTutorial1,
+    LevelEasy,
     LevelNormal,
     LevelHard,
-    LevelKillshow,
+    LevelNightmare,
 
     // InputKind
     InputKind_BackButton,

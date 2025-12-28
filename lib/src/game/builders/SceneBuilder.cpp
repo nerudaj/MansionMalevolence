@@ -15,6 +15,8 @@ makeBuilder(const GameScenario scenario)
 {
     if (scenario == GameScenario::Tutorial_1)
         return std::make_unique<TutorialScenarioBuilder>();
+    if (scenario == GameScenario::Easy)
+        return std::make_unique<EasyScenarioBuilder>();
     else if (scenario == GameScenario::Normal)
         return std::make_unique<NormalScenarioBuilder>();
     return std::make_unique<HardScenarioBuilder>();
@@ -90,14 +92,18 @@ int TutorialScenarioBuilder::getInfectionLimit() const noexcept
 
 std::list<Card> TutorialScenarioBuilder::generateStartRoom()
 {
-    return { CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::ShieldDoor),
-             CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::GreenHerb),
-             CardBuilder::createCard(CardType::Zombie),
-             CardBuilder::createCard(CardType::Ammo),
-             CardBuilder::createCard(CardType::ShieldKey) };
+    return {
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::ShieldDoor),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::GreenHerb),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::WeaponLockerKey),
+        CardBuilder::createCard(CardType::LockedWeaponLocker),
+        CardBuilder::createCard(CardType::ShieldKey),
+    };
 }
 
 std::list<Card> TutorialScenarioBuilder::generateRoomDeck(const int)
@@ -107,47 +113,62 @@ std::list<Card> TutorialScenarioBuilder::generateRoomDeck(const int)
 
 int NormalScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 50;
+    return 75;
 }
 
 std::list<Card> NormalScenarioBuilder::generateStartRoom()
 {
-    auto&& deckPart1 = std::vector<Card> {
-        CardBuilder::createCard(CardType::DiamondDoor),
-        CardBuilder::createCard(CardType::CrestDoorEmpty),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Cerberus),
-        CardBuilder::createCard(CardType::Crate),
-    };
-
-    auto&& deckPart2 = std::vector<Card> {
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Cerberus),
+    auto deck = std::vector {
         CardBuilder::createCard(CardType::Ammo),
-        CardBuilder::createCard(CardType::DiamondKey),
-        CardBuilder::createCard(CardType::RedHerb),
-        CardBuilder::createCard(CardType::MoonCrest),
+        CardBuilder::createCard(CardType::ShieldDoor),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Cerberus),
     };
 
-    shuffleVec(deckPart1);
-    shuffleVec(deckPart2);
+    shuffleVec(deck);
 
-    return std::views::join(std::vector { deckPart1, deckPart2 })
+    auto deck2 = std::vector {
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::ShieldKey),
+        CardBuilder::createCard(CardType::DiamondDoor),
+        CardBuilder::createCard(CardType::FirstAid),
+    };
+
+    shuffleVec(deck2);
+
+    return std::views::join(std::vector { deck, deck2 })
            | uniranges::to<std::list>();
 }
 
 std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
 {
-    if (linkID == SPECIAL_DIAMOND_KEYDOOR)
+    if (linkID == SPECIAL_SHIELD_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
-            CardBuilder::createCard(CardType::UnlockedWeaponLocker),
+            CardBuilder::createCard(CardType::PistolParts),
             CardBuilder::createCard(CardType::SunCrest),
+            CardBuilder::createCard(CardType::DiamondKey),
+            CardBuilder::createCard(CardType::Cerberus),
+            CardBuilder::createCard(CardType::CrimsonHead),
+            CardBuilder::createCard(CardType::Crate),
             CardBuilder::createCard(CardType::GreenHerb),
+        };
+
+        shuffleVec(incoming);
+
+        return std::list(incoming.begin(), incoming.end());
+    }
+    else if (linkID == SPECIAL_DIAMOND_KEYDOOR)
+    {
+        auto&& incoming = std::vector<Card> {
+            CardBuilder::createCard(CardType::Shotgun),
+            CardBuilder::createCard(CardType::MoonCrest),
+            CardBuilder::createCard(CardType::CrestDoorEmpty),
             CardBuilder::createCard(CardType::Licker),
-            CardBuilder::createCard(CardType::Licker),
-            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Zombie),
+            CardBuilder::createCard(CardType::Cerberus),
+            CardBuilder::createCard(CardType::Crate),
             CardBuilder::createCard(CardType::Ammo),
         };
 
@@ -157,7 +178,9 @@ std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
     }
     else if (linkID == SPECIAL_CREST_DOOR)
     {
-        return { CardBuilder::createCard(CardType::Vaccine) };
+        return { CardBuilder::createCard(CardType::CrimsonHead),
+                 CardBuilder::createCard(CardType::Licker),
+                 CardBuilder::createCard(CardType::Vaccine) };
     }
 
     assert(false);
@@ -166,28 +189,32 @@ std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
 
 int HardScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 100;
+    return 115;
 }
 
 std::list<Card> HardScenarioBuilder::generateStartRoom()
 {
     auto deck = std::vector {
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::MoonCrestLeft),
+        CardBuilder::createCard(CardType::ShieldDoor),
         CardBuilder::createCard(CardType::DiamondDoor),
-        CardBuilder::createCard(CardType::DiamondKey),
-        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::CrestDoorEmpty),
         CardBuilder::createCard(CardType::Zombie),
         CardBuilder::createCard(CardType::Zombie),
         CardBuilder::createCard(CardType::Cerberus),
-        CardBuilder::createCard(CardType::RedJewel),
-        CardBuilder::createCard(CardType::YellowJewelBox),
-        CardBuilder::createCard(CardType::SunCrest),
-        CardBuilder::createCard(CardType::Ammo),
-        CardBuilder::createCard(CardType::RedHerb),
+        CardBuilder::createCard(CardType::Cerberus),
     };
 
     shuffleVec(deck);
 
-    return deck | uniranges::to<std::list>();
+    auto deck2 = std::vector {
+        CardBuilder::createCard(CardType::DiamondKey),
+        CardBuilder::createCard(CardType::FirstAid),
+    };
+
+    return std::views::join(std::vector { deck, deck2 })
+           | uniranges::to<std::list>();
 }
 
 std::list<Card> HardScenarioBuilder::generateRoomDeck(const int linkID)
@@ -195,38 +222,37 @@ std::list<Card> HardScenarioBuilder::generateRoomDeck(const int linkID)
     if (linkID == SPECIAL_DIAMOND_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
-            CardBuilder::createCard(CardType::MoonCrestLeft),
-            CardBuilder::createCard(CardType::CrestDoorEmpty),
-            CardBuilder::createCard(CardType::ShieldKey),
-            CardBuilder::createCard(CardType::ShieldDoor),
-            CardBuilder::createCard(CardType::GreenHerb),
-            CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::RedJewel),
             CardBuilder::createCard(CardType::UnlockedWeaponLocker),
-            CardBuilder::createCard(CardType::Cerberus),
-            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::CrimsonHead),
+            CardBuilder::createCard(CardType::SunCrest),
+            CardBuilder::createCard(CardType::ShieldKey),
             CardBuilder::createCard(CardType::Zombie),
+            CardBuilder::createCard(CardType::Ammo),
+            CardBuilder::createCard(CardType::Cerberus),
         };
 
         shuffleVec(incoming);
 
-        return std::list(incoming.begin(), incoming.end());
+        return incoming | uniranges::to<std::list>();
     }
     else if (linkID == SPECIAL_SHIELD_KEYDOOR)
     {
         auto&& incoming = std::vector<Card> {
-            CardBuilder::createCard(CardType::YellowJewel),
             CardBuilder::createCard(CardType::RedJewelBox),
-            CardBuilder::createCard(CardType::Ammo),
-            CardBuilder::createCard(CardType::Cerberus),
+            CardBuilder::createCard(CardType::MoonCrestRight),
             CardBuilder::createCard(CardType::Licker),
             CardBuilder::createCard(CardType::Licker),
             CardBuilder::createCard(CardType::Zombie),
-            CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::GreenHerb),
+            CardBuilder::createCard(CardType::Ammo),
+            CardBuilder::createCard(CardType::Ammo),
         };
 
         shuffleVec(incoming);
 
-        return std::list(incoming.begin(), incoming.end());
+        return incoming | uniranges::to<std::list>();
     }
     else if (linkID == SPECIAL_CREST_DOOR)
     {
@@ -236,7 +262,67 @@ std::list<Card> HardScenarioBuilder::generateRoomDeck(const int linkID)
             CardBuilder::createCard(CardType::Vaccine),
         };
 
-        return std::list(incoming.begin(), incoming.end());
+        return incoming | uniranges::to<std::list>();
+    }
+
+    assert(false);
+    return {};
+}
+
+int EasyScenarioBuilder::getInfectionLimit() const noexcept
+{
+    return 45;
+}
+
+std::list<Card> EasyScenarioBuilder::generateStartRoom()
+{
+    auto deck = std::vector {
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::GreenHerb),
+        CardBuilder::createCard(CardType::ShieldDoor),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::DiamondDoor),
+    };
+
+    shuffleVec(deck);
+
+    auto deck2 = std::vector {
+        CardBuilder::createCard(CardType::ShieldKey),
+    };
+
+    return std::views::join(std::vector { deck, deck2 })
+           | uniranges::to<std::list>();
+}
+
+std::list<Card> EasyScenarioBuilder::generateRoomDeck(const int linkID)
+{
+    if (linkID == SPECIAL_SHIELD_KEYDOOR)
+    {
+        auto deck = std::vector {
+            CardBuilder::createCard(CardType::DiamondKey),
+            CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::Cerberus),
+            CardBuilder::createCard(CardType::Crossbow),
+            CardBuilder::createCard(CardType::Zombie),
+            CardBuilder::createCard(CardType::RedHerb),
+        };
+
+        shuffleVec(deck);
+
+        return deck | uniranges::to<std::list>();
+    }
+    else if (linkID == SPECIAL_DIAMOND_KEYDOOR)
+    {
+        auto deck = std::vector {
+            CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Vaccine),
+        };
+
+        // Not shuffling on purpose
+
+        return deck | uniranges::to<std::list>();
     }
 
     assert(false);
