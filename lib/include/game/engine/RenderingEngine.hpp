@@ -13,6 +13,7 @@ class [[nodiscard]] RenderingEngine final
 {
 public:
     RenderingEngine(
+        dgm::Window& window,
         dgm::ResourceManager& resmgr,
         const Scene& scene,
         const AppSettings& settings,
@@ -24,7 +25,12 @@ public:
 public:
     void update(const dgm::Time& time);
 
-    void draw(dgm::Window& window);
+    void draw();
+
+    [[nodiscard]] const sf::Vector2f& getMainCardOffset() noexcept
+    {
+        return scene.mainCardBody.getPosition();
+    }
 
     [[nodiscard]] static sf::Vector2f
     getNthInventoryCardOffset(size_t idx) noexcept
@@ -53,6 +59,31 @@ public:
         return { 95.f, 160.f };
     }
 
+public:
+    void operator()(const AnimationCardToDiscard& a);
+
+    void operator()(const AnimationCardTransform& a);
+
+    void operator()(const AnimationDiscardToDeck& a);
+
+    void operator()(const AnimationDoorOpen& a);
+
+    void operator()(const AnimationEnemyAttack& a);
+
+    void operator()(const AnimationEnemyDamaged& a);
+
+    void operator()(const AnimationEnemyDodgedAttack& a);
+
+    void operator()(const AnimationInvalidOperation& a);
+
+    void operator()(const AnimationNewCardsShufflingIntoDeck& a);
+
+    void operator()(const AnimationReturnInventoryToDeck& a);
+
+    void operator()(const AnimationTakeCard& a);
+
+    void operator()(const AnimationTrashMainCard& a);
+
 private:
     /**
      * \brief Create fullscreen camera with a fixed resolution and aspect ratio
@@ -67,37 +98,30 @@ private:
         const sf::Vector2f& currentResolution,
         const sf::Vector2f& desiredResolution);
 
-    void renderWorld(dgm::Window& window);
+    void renderWorld();
 
-    void renderBackground(dgm::Window& window);
+    void renderBackground();
 
-    void renderHud(dgm::Window& window);
+    void renderHud();
 
-    void renderTouchControls(dgm::Window& window);
+    void renderTouchControls();
 
-    void renderCard(
-        dgm::Window& window,
-        const Card& card,
-        const sf::Vector2f& offset,
-        float scale = 1.f)
+    void
+    renderCard(const Card& card, const sf::Vector2f& offset, float scale = 1.f)
     {
-        renderCard(window, card, offset, { scale, scale });
+        renderCard(card, offset, { scale, scale });
     }
 
     void renderCard(
-        dgm::Window& window,
         const Card& card,
         const sf::Vector2f& offset,
         const sf::Vector2f& scale);
 
-    void renderCardBack(
-        dgm::Window& window,
-        const sf::Vector2f& offset,
-        const sf::Vector2f& scale);
+    void renderCardBack(const sf::Vector2f& offset, const sf::Vector2f& scale);
 
-    void renderTopDeckCard(dgm::Window& window);
+    void renderTopDeckCard();
 
-    void renderBoosterChoice(dgm::Window& window);
+    void renderBoosterChoice();
 
     BackgroundType getAppropriateBackgroundType() const;
 
@@ -106,6 +130,7 @@ private:
     Icon getAppropriateDiamondType(const Card& card) const;
 
 private:
+    dgm::Window& window;
     const Scene& scene;
     const AppSettings& settings;
     const TouchController& touchController;

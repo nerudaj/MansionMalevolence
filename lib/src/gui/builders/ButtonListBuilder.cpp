@@ -23,12 +23,11 @@ tgui::Container::Ptr ButtonListBuilder::build(
 
     const std::string& horizontalPosition = [&]
     {
-        if (alignment == tgui::HorizontalAlignment::Left)
-            return "0%";
-        else if (alignment == tgui::HorizontalAlignment::Center)
+        if (alignment == tgui::HorizontalAlignment::Center)
             return "25%";
-        else
+        else if (alignment == tgui::HorizontalAlignment::Right)
             return "50%";
+        return "0%";
     }();
     layout->getRenderer()->setSpaceBetweenWidgets(
         static_cast<float>(sizer.getBaseFontSize()));
@@ -46,12 +45,11 @@ tgui::Container::Ptr ButtonListBuilder::build(
 
     const std::string& verticalPosition = [&]
     {
-        if (verticalAlignment == tgui::VerticalAlignment::Top)
-            return "0%";
-        else if (verticalAlignment == tgui::VerticalAlignment::Center)
+        if (verticalAlignment == tgui::VerticalAlignment::Center)
             return "parent.height / 2 - height / 2";
         else if (verticalAlignment == tgui::VerticalAlignment::Bottom)
             return "parent.height - height";
+        return "0%";
     }();
 
     layout->setPosition(

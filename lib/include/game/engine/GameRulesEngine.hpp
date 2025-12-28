@@ -85,6 +85,9 @@ public:
 
     [[nodiscard]] bool gameWon() const noexcept;
 
+    static std::optional<GameEvent>
+    getEventAfterAnimationEnded(const Animation& animation);
+
 private:
     sf::Vector2f screenToWorld(const sf::Vector2f& pos);
 

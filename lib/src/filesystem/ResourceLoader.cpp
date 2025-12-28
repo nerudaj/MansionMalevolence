@@ -34,7 +34,7 @@ loadTguiTheme(const std::filesystem::path& path)
     }
 }
 
-static std::expected<tiled::FiniteMapModel, dgm::Error>
+static inline std::expected<tiled::FiniteMapModel, dgm::Error>
 loadTiledMap(const std::filesystem::path& path)
 {
     try

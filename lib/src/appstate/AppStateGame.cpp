@@ -65,7 +65,7 @@ void AppStateGame::update()
 
 void AppStateGame::draw()
 {
-    renderingEngine.draw(app.window);
+    renderingEngine.draw();
     dic.virtualCursor.draw();
 }
 
