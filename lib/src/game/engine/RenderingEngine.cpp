@@ -32,11 +32,12 @@ RenderingEngine::RenderingEngine(
                               resmgr.get<sf::Texture>("cardbgr.png"),
                               resmgr.get<dgm::Clip>("cardbgr.png.clip"))
                           .value())
-    , iconsLocation(atlas
-                        .addTileset(
-                            resmgr.get<sf::Texture>("icons.png"),
-                            resmgr.get<dgm::Clip>("icons.png.clip"))
-                        .value())
+    , iconsLocation(
+          atlas
+              .addTileset(
+                  resmgr.get<sf::Texture>("zombie_cards_icons.png"),
+                  resmgr.get<dgm::Clip>("zombie_cards_icons.png.clip"))
+              .value())
     , imagesLocation(
           atlas
               .addTileset(
@@ -270,6 +271,19 @@ void RenderingEngine::operator()(const AnimationTrashMainCard& a)
         scene.deck.front(),
         getMainCardOffset() + animationOffset,
         { scale, scale });
+}
+
+void RenderingEngine::operator()(const AnimationHeal& a)
+{
+    if (!scene.deck.empty())
+        renderCard(scene.deck.front(), getMainCardOffset());
+
+    const auto offset = sf::Vector2f { 63.f, 0.f } * a.perc;
+
+    sprite.setTextureRect(atlas.getClip(iconsLocation)
+                              .getFrame(std::to_underlying(Icon::HealEffect)));
+    sprite.setPosition(sf::Vector2f { 8.f, 150.f } + offset);
+    window.draw(sprite);
 }
 
 dgm::Camera RenderingEngine::createFullscreenCamera(

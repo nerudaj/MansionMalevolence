@@ -97,6 +97,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
 
     scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
     audioEngine.playSound(card.specialSound);
+    scene.activeAnimation = AnimationHeal();
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
@@ -572,7 +573,9 @@ GameRulesEngine::getEventAfterAnimationEnded(const Animation& animation)
             [](const AnimationTakeCard& a) -> std::optional<GameEvent>
             { return CardTakenGameEvent(a.inventorySlotIdx); },
             [](const AnimationTrashMainCard&) -> std::optional<GameEvent>
-            { return MainCardTrashedGameEvent(); } },
+            { return MainCardTrashedGameEvent(); },
+            [](const AnimationHeal&) -> std::optional<GameEvent>
+            { return std::nullopt; } },
         animation);
 }
 

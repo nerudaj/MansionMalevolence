@@ -16,4 +16,5 @@ enum class [[nodiscard]] Icon
     GreenTake,
     RedTake,
     Trash,
+    HealEffect,
 };
