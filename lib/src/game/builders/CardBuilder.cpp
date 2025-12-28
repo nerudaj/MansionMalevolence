@@ -36,7 +36,7 @@ const std::map<CardType, Card> CARD_DEFS = {
              .special = CardSpecial::RefillAmmoOnKill,
              .specialSound = SoundId::Crossbow,
              .quantity = 2,
-             .power = 2,
+             .power = 1,
              .name = "crossbow", .texts = {"refills 1 ammo", "when moster is", "killed."}, } },
     { CardType::RocketLauncher,
       Card { .image = CardImage::RocketLauncher,
