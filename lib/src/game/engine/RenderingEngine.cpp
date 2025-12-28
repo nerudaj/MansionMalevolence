@@ -47,6 +47,7 @@ RenderingEngine::RenderingEngine(
 {
     resmgr.getMutable<sf::Font>("pico-8.ttf").setSmooth(false);
     text.setFillColor(WHITE_COLOR);
+    worldCamera.setPosition(INTERNAL_GAME_RESOLUTION / 2.f);
 }
 
 void RenderingEngine::update(const dgm::Time& time)
@@ -156,7 +157,7 @@ void RenderingEngine::operator()(const AnimationEnemyAttack& a)
 {
     if (a.perc >= 0.6f && !worldCamera.isShaking())
     {
-        worldCamera.shake(sf::seconds(a.duration.asSeconds() * 0.4f), 20.f);
+        worldCamera.shake(sf::seconds(a.duration.asSeconds() * 0.4f), 5.f);
     }
 
     const auto animationOffset =
