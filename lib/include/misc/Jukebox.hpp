@@ -25,6 +25,16 @@ public:
 
     void setVolume(float volume);
 
+    void resume()
+    {
+        resmgr.getMutable<sf::Music>(currentSongName).play();
+    }
+
+    void pause()
+    {
+        resmgr.getMutable<sf::Music>(currentSongName).pause();
+    }
+
 private:
     void playNextSong();
 

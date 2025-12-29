@@ -44,6 +44,10 @@ void AppStateGame::input()
             };
             dic.touchController.processEvent(e);
         }
+        else if (event->is<sf::Event::FocusGained>())
+            dic.jukebox.pause();
+        else if (event->is<sf::Event::FocusLost>())
+            dic.jukebox.resume();
         else
         {
             dic.touchController.processEvent(event);
