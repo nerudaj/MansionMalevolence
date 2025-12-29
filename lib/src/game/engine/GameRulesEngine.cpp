@@ -177,7 +177,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
 {
     auto& weapon = scene.inventory[e.inventoryWeaponIdx].value();
 
-    audioEngine.playSound(weapon.specialSound);
+    const auto soundDuration = audioEngine.playSound(weapon.specialSound);
     --weapon.quantity;
     scene.stats.shotsFired++;
 
@@ -185,7 +185,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
                           && !(weapon.special & CardSpecial::NegatesEvasive);
     if (canEvade && scene.chance.rollForEvasion())
     {
-        scene.activeAnimation = AnimationEnemyDodgedAttack();
+        scene.activeAnimation = AnimationEnemyDodgedAttack(soundDuration);
     }
     else
     {
@@ -194,7 +194,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
                 ? static_cast<int>(scene.chance.rollForCrit())
                 : 0;
         scene.activeAnimation = AnimationEnemyDamaged(
-            weapon.power + extraDamage, e.inventoryWeaponIdx);
+            weapon.power + extraDamage, e.inventoryWeaponIdx, soundDuration);
     }
 }
 

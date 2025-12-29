@@ -72,8 +72,9 @@ struct [[nodiscard]] AnimationEnemyDamaged final : AnimationBase
     int damage = 0;
     size_t usedWeaponInventoryIdx = false;
 
-    AnimationEnemyDamaged(int damage, size_t usedWeaponInventoryIdx)
-        : AnimationBase(sf::seconds(0.25f))
+    AnimationEnemyDamaged(
+        int damage, size_t usedWeaponInventoryIdx, sf::Time duration)
+        : AnimationBase(sf::seconds(std::max(duration.asSeconds(), 0.25f)))
         , damage(damage)
         , usedWeaponInventoryIdx(usedWeaponInventoryIdx)
     {
@@ -82,7 +83,10 @@ struct [[nodiscard]] AnimationEnemyDamaged final : AnimationBase
 
 struct [[nodiscard]] AnimationEnemyDodgedAttack final : AnimationBase
 {
-    AnimationEnemyDodgedAttack() : AnimationBase(sf::seconds(0.3f)) {}
+    explicit AnimationEnemyDodgedAttack(sf::Time duration)
+        : AnimationBase(sf::seconds(std::max(duration.asSeconds(), 0.3f)))
+    {
+    }
 };
 
 struct [[nodiscard]] AnimationInvalidOperation final : AnimationBase

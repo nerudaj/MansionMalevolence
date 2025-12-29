@@ -173,8 +173,11 @@ void RenderingEngine::operator()(const AnimationEnemyAttack& a)
 
 void RenderingEngine::operator()(const AnimationEnemyDamaged& a)
 {
+    const float factor =
+        a.elapsed.asSeconds() <= 0.25 ? a.elapsed.asSeconds() / 0.25f : 0.f;
+
     const auto animationOffset =
-        sf::Vector2f { 76.f * 0.1f, 76.f * 0.1f } * Easing::easeDamage(a.perc);
+        sf::Vector2f { 76.f * 0.1f, 76.f * 0.1f } * Easing::easeDamage(factor);
     renderCard(
         scene.deck.front(),
         getMainCardOffset() + animationOffset,
