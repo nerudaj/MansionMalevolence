@@ -39,29 +39,46 @@ void AppStateLevelSelect::buildLayout()
             .withNoBackgroundImage()
             .withTitle(
                 dic.strings.getString(StringId::LevelSelect), HeadingLevel::H2)
-            .withContent(ButtonListBuilder(dic.strings, dic.sizer)
-                             .addButton(
-                                 StringId::LevelEasy,
-                                 [this]
-                                 {
-                                     app.pushState<AppStatePreGame>(
-                                         dic, settings, GameScenario::Easy);
-                                 })
-                             .addButton(
-                                 StringId::LevelNormal,
-                                 [this]
-                                 {
-                                     app.pushState<AppStatePreGame>(
-                                         dic, settings, GameScenario::Normal);
-                                 })
-                             .addButton(
-                                 StringId::LevelHard,
-                                 [this]
-                                 {
-                                     app.pushState<AppStatePreGame>(
-                                         dic, settings, GameScenario::Hard);
-                                 })
-                             .build())
+            .withContent(
+                ButtonListBuilder(dic.strings, dic.sizer)
+#ifdef _DEBUG
+                    .addButton(
+                        StringId::LevelTutorial1,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::Tutorial_1);
+                        })
+#endif
+                    .addButton(
+                        StringId::LevelEasy,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::Easy);
+                        })
+                    .addButton(
+                        StringId::LevelNormal,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::Normal);
+                        })
+                    .addButton(
+                        StringId::LevelHard,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::Hard);
+                        })
+                    .addButton(
+                        StringId::LevelNightmare,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::Nightmare);
+                        })
+                    .build())
             .withNoTopLeftButton()
             .withNoTopRightButton()
             .withBottomLeftButton(WidgetBuilder::createButton(

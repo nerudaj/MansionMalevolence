@@ -6,4 +6,5 @@ enum class [[nodiscard]] GameScenario
     Easy,
     Normal,
     Hard,
+    Nightmare,
 };

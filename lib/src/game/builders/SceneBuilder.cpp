@@ -19,7 +19,9 @@ makeBuilder(const GameScenario scenario)
         return std::make_unique<EasyScenarioBuilder>();
     else if (scenario == GameScenario::Normal)
         return std::make_unique<NormalScenarioBuilder>();
-    return std::make_unique<HardScenarioBuilder>();
+    else if (scenario == GameScenario::Hard)
+        return std::make_unique<HardScenarioBuilder>();
+    return std::make_unique<NightmareScenarioBuilder>();
 }
 
 Scene SceneBuilder::createScene(const GameScenario scenario)
@@ -93,14 +95,14 @@ int TutorialScenarioBuilder::getInfectionLimit() const noexcept
 std::list<Card> TutorialScenarioBuilder::generateStartRoom()
 {
     return {
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::ShieldDoor),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::GreenHerb),
-        CardBuilder::createCard(CardType::Zombie),
-        CardBuilder::createCard(CardType::Ammo),
         CardBuilder::createCard(CardType::WeaponLockerKey),
+        CardBuilder::createCard(CardType::LockedWeaponLocker),
+        CardBuilder::createCard(CardType::MoonCrestLeft),
+        CardBuilder::createCard(CardType::MoonCrestRight),
+        CardBuilder::createCard(CardType::GreenHerb),
+        CardBuilder::createCard(CardType::RedHerb),
+        CardBuilder::createCard(CardType::RocketLauncher),
+        CardBuilder::createCard(CardType::Licker),
         CardBuilder::createCard(CardType::LockedWeaponLocker),
         CardBuilder::createCard(CardType::ShieldKey),
     };
@@ -327,4 +329,19 @@ std::list<Card> EasyScenarioBuilder::generateRoomDeck(const int linkID)
 
     assert(false);
     return {};
+}
+
+int NightmareScenarioBuilder::getInfectionLimit() const noexcept
+{
+    return 150;
+}
+
+std::list<Card> NightmareScenarioBuilder::generateStartRoom()
+{
+    return std::list<Card>();
+}
+
+std::list<Card> NightmareScenarioBuilder::generateRoomDeck(const int linkID)
+{
+    return std::list<Card>();
 }
