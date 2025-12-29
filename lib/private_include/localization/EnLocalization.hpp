@@ -71,4 +71,10 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { TurnsTaken, "turns taken" },
     { ShotsFired, "shots fired" },
     { EnemiesRouted, "enemies routed" },
+    { KilledByInfection, "infection had turned you into a zombie" },
+    { KilledByZombie, "zombie ate your brain" },
+    { KilledByCerberus, "cerberus hunted you like a rabbit" },
+    { KilledByCrisonHead, "crimson head chased you down" },
+    { KilledByLicker, "licker has torn you into pieces" },
+    { KilledByTyrant, "tyrant has slashed you in half" },
 };

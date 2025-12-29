@@ -64,7 +64,7 @@ void AppStateGame::update()
 
     if (gameRulesEngine.gameEnded())
         app.pushState<AppStateEndGameScreen>(
-            dic, settings, scene.stats, gameRulesEngine.gameWon());
+            dic, settings, scene.stats, gameRulesEngine.getGameEnding());
 }
 
 void AppStateGame::draw()

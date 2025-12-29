@@ -64,6 +64,12 @@ enum class [[nodiscard]] StringId
     TurnsTaken,
     ShotsFired,
     EnemiesRouted,
+    KilledByInfection,
+    KilledByZombie,
+    KilledByCerberus,
+    KilledByCrisonHead,
+    KilledByLicker,
+    KilledByTyrant,
 
     MaxId, // Make sure this one is always the last!
 };

@@ -2,6 +2,7 @@
 
 #include "game/definitions/Scene.hpp"
 #include "game/engine/AudioEngine.hpp"
+#include "game/enums/GameEndReason.hpp"
 #include "game/events/EventQueue.hpp"
 #include "game/events/GameEvents.hpp"
 #include "input/Input.hpp"
@@ -84,6 +85,8 @@ public:
     [[nodiscard]] bool gameEnded() const noexcept;
 
     [[nodiscard]] bool gameWon() const noexcept;
+
+    [[nodiscard]] GameEndReason getGameEnding() const noexcept;
 
     static std::optional<GameEvent>
     getEventAfterAnimationEnded(const Animation& animation);

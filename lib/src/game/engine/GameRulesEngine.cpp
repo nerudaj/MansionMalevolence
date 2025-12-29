@@ -165,6 +165,7 @@ void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 {
     scene.hearts -= scene.deck.front().power;
+    if (scene.hearts <= 0) return;
 
     if (e.skipCardAfterReaction)
     {
@@ -532,6 +533,27 @@ bool GameRulesEngine::gameEnded() const noexcept
 {
     return gameWon() || scene.hearts <= 0
            || scene.stats.turnsTaken >= scene.infectionLimit;
+}
+
+GameEndReason GameRulesEngine::getGameEnding() const noexcept
+{
+    if (gameWon())
+        return GameEndReason::Won;
+    else if (scene.stats.turnsTaken >= scene.infectionLimit)
+        return GameEndReason::InfectionMax;
+    else if (scene.deck.front().image == CardImage::Zombie)
+        return GameEndReason::ZombieBite;
+    else if (scene.deck.front().image == CardImage::Cerberus)
+        return GameEndReason::CerberusBark;
+    else if (scene.deck.front().image == CardImage::CrimsonHead)
+        return GameEndReason::CrimsonHeadScreech;
+    else if (scene.deck.front().image == CardImage::Licker)
+        return GameEndReason::LickerLick;
+    else if (scene.deck.front().image == CardImage::Tyrant)
+        return GameEndReason::TyrantScratch;
+
+    assert(false);
+    return {};
 }
 
 bool GameRulesEngine::gameWon() const noexcept
