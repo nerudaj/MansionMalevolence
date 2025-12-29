@@ -136,6 +136,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         }
         else if (card.link == SPECIAL_LOCKER_KEY)
         {
+            audioEngine.playSound(scene.deck.front().specialSound);
             transformTopCard(
                 CardType::LockedWeaponLocker, CardType::UnlockedWeaponLocker);
         }
