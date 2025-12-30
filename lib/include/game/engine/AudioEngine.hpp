@@ -14,10 +14,12 @@ public:
     }
 
 public:
-    void playSound(SoundId::IdType id)
+    sf::Time playSound(SoundId::IdType id)
     {
-        sound.setBuffer(resmgr.get<sf::SoundBuffer>(id));
+        const auto& buffer = resmgr.get<sf::SoundBuffer>(id);
+        sound.setBuffer(buffer);
         sound.play();
+        return buffer.getDuration();
     }
 
     void setVolume(float volume)

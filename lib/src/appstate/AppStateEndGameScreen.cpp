@@ -8,8 +8,12 @@ AppStateEndGameScreen::AppStateEndGameScreen(
     DependencyContainer& dic,
     const AppSettings& settings,
     const GameStats& stats,
-    bool won) noexcept
-    : dgm::AppState(app), dic(dic), settings(settings), stats(stats), won(won)
+    GameEndReason endReason) noexcept
+    : dgm::AppState(app)
+    , dic(dic)
+    , settings(settings)
+    , stats(stats)
+    , endReason(endReason)
 {
     buildLayout();
     dic.jukebox.switchMode(JukeboxMode::Menu);
@@ -42,25 +46,50 @@ void AppStateEndGameScreen::buildLayout()
             dic.strings.getString(id), dic.sizer);
     };
 
-    auto table = TableBuilder(dic.sizer).withNoHeading();
-    table.addRow(
-        { createLabel(StringId::TurnsTaken),
-          WidgetBuilder::createTextLabel(
-              std::to_string(stats.turnsTaken), dic.sizer, "justify"_true) });
-    table.addRow(
-        { createLabel(StringId::ShotsFired),
-          WidgetBuilder::createTextLabel(
-              std::to_string(stats.shotsFired), dic.sizer, "justify"_true) });
-    table.addRow({ createLabel(StringId::EnemiesRouted),
-                   WidgetBuilder::createTextLabel(
-                       std::to_string(stats.enemiesKilled),
-                       dic.sizer,
-                       "justify"_true) });
-
     auto content = tgui::VerticalLayout::create();
-    auto tablePanel = tgui::ScrollablePanel::create();
-    tablePanel->add(table.build());
-    content->add(tablePanel);
+
+    if (endReason == GameEndReason::Won)
+    {
+        auto table = TableBuilder(dic.sizer).withNoHeading();
+        table.addRow({ createLabel(StringId::TurnsTaken),
+                       WidgetBuilder::createTextLabel(
+                           std::to_string(stats.turnsTaken),
+                           dic.sizer,
+                           "justify"_true) });
+        table.addRow({ createLabel(StringId::ShotsFired),
+                       WidgetBuilder::createTextLabel(
+                           std::to_string(stats.shotsFired),
+                           dic.sizer,
+                           "justify"_true) });
+        table.addRow({ createLabel(StringId::EnemiesRouted),
+                       WidgetBuilder::createTextLabel(
+                           std::to_string(stats.enemiesKilled),
+                           dic.sizer,
+                           "justify"_true) });
+
+        auto tablePanel = tgui::ScrollablePanel::create();
+        tablePanel->add(table.build());
+        content->add(tablePanel);
+    }
+    else
+    {
+        const auto stringId =
+            endReason == GameEndReason::InfectionMax
+                ? StringId::KilledByInfection
+            : endReason == GameEndReason::ZombieBite ? StringId::KilledByZombie
+            : endReason == GameEndReason::CerberusBark
+                ? StringId::KilledByCerberus
+            : endReason == GameEndReason::CrimsonHeadScreech
+                ? StringId::KilledByCrisonHead
+            : endReason == GameEndReason::LickerLick ? StringId::KilledByLicker
+                                                     : StringId::KilledByTyrant;
+        auto label = WidgetBuilder::createTextLabel(
+            dic.strings.getString(stringId), dic.sizer, "justify"_true);
+        label->getRenderer()->setTextColor(tgui::Color(255, 0, 77));
+        auto labelPanel = tgui::Panel::create();
+        labelPanel->add(label);
+        content->add(labelPanel);
+    }
 
     auto buttonList =
         ButtonListBuilder(dic.strings, dic.sizer)
@@ -72,8 +101,6 @@ void AppStateEndGameScreen::buildLayout()
                 [this] { app.popState(Messaging::serialize<PopIfNotMenu>()); })
             .build();
 
-    buttonList->setPosition({ "25%", "parent.height / 2 - height / 2" });
-
     auto buttonPanel = tgui::Panel::create();
     buttonPanel->add(buttonList);
 
@@ -84,7 +111,8 @@ void AppStateEndGameScreen::buildLayout()
             .withNoBackgroundImage()
             .withTitle(
                 dic.strings.getString(
-                    won ? StringId::YouSurvived : StringId::YouDied),
+                    endReason == GameEndReason::Won ? StringId::YouSurvived
+                                                    : StringId::YouDied),
                 HeadingLevel::H2)
             .withContent(content)
             .withNoCornerButtons()

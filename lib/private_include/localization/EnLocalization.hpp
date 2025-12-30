@@ -42,9 +42,10 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     // Level select
     { LevelSelect, "level select" },
     { LevelTutorial1, "tutorial" },
-    { LevelNormal, "normal" },
-    { LevelHard, "hard" },
-    { LevelKillshow, "kill 15" },
+    { LevelEasy, "easy scenario" },
+    { LevelNormal, "normal scenario" },
+    { LevelHard, "hard scenario" },
+    { LevelNightmare, "nightmare scenario" },
 
     // InputKind
     { InputKind_BackButton, "back" },
@@ -70,4 +71,10 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { TurnsTaken, "turns taken" },
     { ShotsFired, "shots fired" },
     { EnemiesRouted, "enemies routed" },
+    { KilledByInfection, "infection had turned you into a zombie" },
+    { KilledByZombie, "zombie ate your brain" },
+    { KilledByCerberus, "cerberus hunted you like a rabbit" },
+    { KilledByCrisonHead, "crimson head chased you down" },
+    { KilledByLicker, "licker has torn you into pieces" },
+    { KilledByTyrant, "tyrant has slashed you in half" },
 };

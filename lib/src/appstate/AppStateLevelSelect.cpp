@@ -41,12 +41,21 @@ void AppStateLevelSelect::buildLayout()
                 dic.strings.getString(StringId::LevelSelect), HeadingLevel::H2)
             .withContent(
                 ButtonListBuilder(dic.strings, dic.sizer)
+#ifdef _DEBUG
                     .addButton(
                         StringId::LevelTutorial1,
                         [this]
                         {
                             app.pushState<AppStatePreGame>(
                                 dic, settings, GameScenario::Tutorial_1);
+                        })
+#endif
+                    .addButton(
+                        StringId::LevelEasy,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::Easy);
                         })
                     .addButton(
                         StringId::LevelNormal,
@@ -61,6 +70,13 @@ void AppStateLevelSelect::buildLayout()
                         {
                             app.pushState<AppStatePreGame>(
                                 dic, settings, GameScenario::Hard);
+                        })
+                    .addButton(
+                        StringId::LevelNightmare,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::Nightmare);
                         })
                     .build())
             .withNoTopLeftButton()

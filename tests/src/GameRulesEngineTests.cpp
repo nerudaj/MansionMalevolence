@@ -1,3 +1,5 @@
+#include "Paths.hpp"
+#include "filesystem/ResourceLoader.hpp"
 #include "game/builders/CardBuilder.hpp"
 #include "game/builders/SceneBuilder.hpp"
 #include "game/engine/GameRulesEngine.hpp"
@@ -10,6 +12,8 @@ TEST_CASE("[GameRulesEngine]")
     auto&& events = EventQueue<GameEvent>();
     auto&& touch = TouchController(sf::Vector2u(INTERNAL_GAME_RESOLUTION));
     auto&& resmgr = dgm::ResourceManager();
+    REQUIRE(resmgr.loadResource<sf::SoundBuffer>(
+        ASSETS_PATH / "sounds" / "error.wav", dgm::Utility::loadSound));
     auto&& audioEngine = AudioEngine(resmgr);
     auto&& input = Input({}, touch);
     auto&& engine =

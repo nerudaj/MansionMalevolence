@@ -26,7 +26,7 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
     scene.stats.turnsTaken++;
-    scene.activeAnimation = std::make_unique<AnimationCardToDiscard>(
+    scene.activeAnimation = AnimationCardToDiscard(
         scene.deck.front(), scene.mainCardBody.getPosition());
     popTopDeckCard();
     audioEngine.playSound(SoundId::CardShuffle);
@@ -41,14 +41,24 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 {
     if (scene.deck.empty()) return;
 
+    const bool hasSilencedPistol = [this]
+    {
+        for (auto card : scene.inventory)
+            if (card.has_value() && card->special & CardSpecial::BoostsEvasion)
+                return true;
+        return false;
+    }();
+
     const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
     const auto special = scene.deck.front().special;
     // clang-format off
-    const bool managedToEvade = special & CardSpecial::Blind
-        ? scene.chance.rollForBlindDodge()
-        : special & CardSpecial::Vigilant
-            ? scene.chance.rollForVigilantDodge()
-            : scene.chance.rollForDodge();
+    const bool managedToEvade = hasSilencedPistol
+        ? scene.chance.rollForSilencedDodge()
+        : special & CardSpecial::Blind
+            ? scene.chance.rollForBlindDodge()
+            : special & CardSpecial::Vigilant
+                ? scene.chance.rollForVigilantDodge()
+                : scene.chance.rollForDodge();
     // clang-format on
 
     if (isEnemy && !managedToEvade)
@@ -67,7 +77,7 @@ void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
     auto card = *scene.inventory[e.inventorySlotIdx];
     scene.inventory[e.inventorySlotIdx].reset();
 
-    scene.activeAnimation = std::make_unique<AnimationCardToDiscard>(
+    scene.activeAnimation = AnimationCardToDiscard(
         card, scene.inventoryBodies[e.inventorySlotIdx].getPosition());
 }
 
@@ -86,7 +96,8 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
     }
 
     scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
-    audioEngine.playSound(card.specialSound);
+    audioEngine.playSound(SoundId::Heal);
+    scene.activeAnimation = AnimationHeal();
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
@@ -125,14 +136,14 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         }
         else if (card.link == SPECIAL_LOCKER_KEY)
         {
+            audioEngine.playSound(scene.deck.front().specialSound);
             transformTopCard(
                 CardType::LockedWeaponLocker, CardType::UnlockedWeaponLocker);
         }
         else
         {
             audioEngine.playSound(scene.deck.front().specialSound);
-            scene.activeAnimation =
-                std::make_unique<AnimationDoorOpen>(card.link);
+            scene.activeAnimation = AnimationDoorOpen(card.link);
         }
     }
     else
@@ -147,14 +158,14 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
 
 void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 {
-    scene.activeAnimation =
-        std::make_unique<AnimationEnemyAttack>(e.skipCardAfterReaction);
+    scene.activeAnimation = AnimationEnemyAttack(e.skipCardAfterReaction);
     audioEngine.playSound(scene.deck.front().specialSound);
 }
 
 void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 {
     scene.hearts -= scene.deck.front().power;
+    if (scene.hearts <= 0) return;
 
     if (e.skipCardAfterReaction)
     {
@@ -166,7 +177,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
 {
     auto& weapon = scene.inventory[e.inventoryWeaponIdx].value();
 
-    audioEngine.playSound(weapon.specialSound);
+    const auto soundDuration = audioEngine.playSound(weapon.specialSound);
     --weapon.quantity;
     scene.stats.shotsFired++;
 
@@ -174,7 +185,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
                           && !(weapon.special & CardSpecial::NegatesEvasive);
     if (canEvade && scene.chance.rollForEvasion())
     {
-        scene.activeAnimation = std::make_unique<AnimationEnemyDodgedAttack>();
+        scene.activeAnimation = AnimationEnemyDodgedAttack(soundDuration);
     }
     else
     {
@@ -182,8 +193,8 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
             weapon.special & CardSpecial::CritChance
                 ? static_cast<int>(scene.chance.rollForCrit())
                 : 0;
-        scene.activeAnimation = std::make_unique<AnimationEnemyDamaged>(
-            weapon.power + extraDamage, e.inventoryWeaponIdx);
+        scene.activeAnimation = AnimationEnemyDamaged(
+            weapon.power + extraDamage, e.inventoryWeaponIdx, soundDuration);
     }
 }
 
@@ -248,7 +259,7 @@ void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
         gameEventQueue.pushEvent<ZombieDiedGameEvent>();
     }
 
-    scene.activeAnimation = std::make_unique<AnimationTrashMainCard>();
+    scene.activeAnimation = AnimationTrashMainCard();
     audioEngine.playSound(SoundId::CardDestroy);
 }
 
@@ -284,7 +295,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     {
         if (!scene.discard.empty())
         {
-            scene.activeAnimation = std::make_unique<AnimationDiscardToDeck>();
+            scene.activeAnimation = AnimationDiscardToDeck();
             scene.cardsToAdd = scene.discard;
             scene.discard.clear();
             return;
@@ -349,13 +360,13 @@ void GameRulesEngine::handleTake()
         else
         {
             scene.activeAnimation =
-                std::make_unique<AnimationTakeCard>(*scene.usableInventorySlot);
+                AnimationTakeCard(*scene.usableInventorySlot);
         }
     }
     else
     {
         audioEngine.playSound(SoundId::Error);
-        scene.activeAnimation = std::make_unique<AnimationInvalidOperation>();
+        scene.activeAnimation = AnimationInvalidOperation();
     }
 }
 
@@ -466,10 +477,13 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 {
     if (!scene.activeAnimation) return;
 
-    if (scene.activeAnimation->update(time)
-        == dgm::Animation::PlaybackStatus::Finished)
+    const auto status = std::visit(
+        [&time](auto& a) { return updateAnimation(a, time); },
+        *scene.activeAnimation);
+
+    if (status == dgm::Animation::PlaybackStatus::Finished)
     {
-        auto event = scene.activeAnimation->finalize();
+        auto event = getEventAfterAnimationEnded(*scene.activeAnimation);
         if (event) gameEventQueue.pushEvent(std::move(*event));
 
         scene.activeAnimation.reset();
@@ -521,9 +535,71 @@ bool GameRulesEngine::gameEnded() const noexcept
            || scene.stats.turnsTaken >= scene.infectionLimit;
 }
 
+GameEndReason GameRulesEngine::getGameEnding() const noexcept
+{
+    if (gameWon())
+        return GameEndReason::Won;
+    else if (scene.stats.turnsTaken >= scene.infectionLimit)
+        return GameEndReason::InfectionMax;
+    else if (scene.deck.front().image == CardImage::Zombie)
+        return GameEndReason::ZombieBite;
+    else if (scene.deck.front().image == CardImage::Cerberus)
+        return GameEndReason::CerberusBark;
+    else if (scene.deck.front().image == CardImage::CrimsonHead)
+        return GameEndReason::CrimsonHeadScreech;
+    else if (scene.deck.front().image == CardImage::Licker)
+        return GameEndReason::LickerLick;
+    else if (scene.deck.front().image == CardImage::Tyrant)
+        return GameEndReason::TyrantScratch;
+
+    assert(false);
+    return {};
+}
+
 bool GameRulesEngine::gameWon() const noexcept
 {
     return scene.infectionLimit == -1;
+}
+
+std::optional<GameEvent>
+GameRulesEngine::getEventAfterAnimationEnded(const Animation& animation)
+{
+    return std::visit(
+        overloads {
+            [](const AnimationCardToDiscard& a) -> std::optional<GameEvent>
+            { return CardSkipEndedGameEvent(a.card); },
+            [](const AnimationCardTransform&) -> std::optional<GameEvent>
+            { return std::nullopt; },
+            [](const AnimationDiscardToDeck&) -> std::optional<GameEvent>
+            { return DiscardReturnedToDeckGameEvent(); },
+            [](const AnimationDoorOpen& a) -> std::optional<GameEvent>
+            { return DoorOpenedGameEvent(a.link); },
+            [](const AnimationEnemyAttack& a) -> std::optional<GameEvent>
+            {
+                return MonsterReactionFinishedGameEvent(
+                    a.skipCardAfterReaction);
+            },
+            [](const AnimationEnemyDamaged& a) -> std::optional<GameEvent>
+            {
+                return MonsterStaggerEndedGameEvent(
+                    a.damage, a.usedWeaponInventoryIdx);
+            },
+            [](const AnimationEnemyDodgedAttack&) -> std::optional<GameEvent>
+            { return std::nullopt; },
+            [](const AnimationInvalidOperation&) -> std::optional<GameEvent>
+            { return std::nullopt; },
+            [](const AnimationNewCardsShufflingIntoDeck&)
+                -> std::optional<GameEvent>
+            { return NewCardShuffledToDiscard(); },
+            [](const AnimationReturnInventoryToDeck&)
+                -> std::optional<GameEvent> { return std::nullopt; },
+            [](const AnimationTakeCard& a) -> std::optional<GameEvent>
+            { return CardTakenGameEvent(a.inventorySlotIdx); },
+            [](const AnimationTrashMainCard&) -> std::optional<GameEvent>
+            { return MainCardTrashedGameEvent(); },
+            [](const AnimationHeal&) -> std::optional<GameEvent>
+            { return std::nullopt; } },
+        animation);
 }
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)
@@ -558,7 +634,7 @@ void GameRulesEngine::popTopDeckCard()
 
 void GameRulesEngine::transformTopCard(CardType from, CardType to)
 {
-    scene.activeAnimation = std::make_unique<AnimationCardTransform>(from);
+    scene.activeAnimation = AnimationCardTransform(from);
 
     scene.deck.front() = CardBuilder::createCard(to);
 }
@@ -568,8 +644,7 @@ void GameRulesEngine::shuffleNewCardIntoDeck()
     if (scene.cardsToAdd.empty()) return;
 
     audioEngine.playSound(SoundId::CardShuffle);
-    scene.activeAnimation =
-        std::make_unique<AnimationNewCardsShufflingIntoDeck>();
+    scene.activeAnimation = AnimationNewCardsShufflingIntoDeck();
 }
 
 void GameRulesEngine::combineCards(Card& inventoryCard, const Card& incoming)

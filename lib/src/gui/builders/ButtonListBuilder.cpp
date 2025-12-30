@@ -14,18 +14,21 @@ ButtonListBuilder& ButtonListBuilder::addButton(
     return *this;
 }
 
-tgui::Container::Ptr
-ButtonListBuilder::build(tgui::HorizontalAlignment alignment)
+tgui::Container::Ptr ButtonListBuilder::build(
+    tgui::HorizontalAlignment alignment,
+    tgui::VerticalAlignment verticalAlignment)
 {
     auto&& layout = tgui::GrowVerticalLayout::create();
     layout->setSize({ "50%", "100%" });
 
-    if (alignment == tgui::HorizontalAlignment::Left)
-        layout->setPosition({ "0%", "0%" });
-    else if (alignment == tgui::HorizontalAlignment::Center)
-        layout->setPosition({ "25%", "0%" });
-    else
-        layout->setPosition({ "50%", "0%" });
+    const std::string& horizontalPosition = [&]
+    {
+        if (alignment == tgui::HorizontalAlignment::Center)
+            return "25%";
+        else if (alignment == tgui::HorizontalAlignment::Right)
+            return "50%";
+        return "0%";
+    }();
     layout->getRenderer()->setSpaceBetweenWidgets(
         static_cast<float>(sizer.getBaseFontSize()));
 
@@ -39,6 +42,18 @@ ButtonListBuilder::build(tgui::HorizontalAlignment alignment)
 
         layout->add(group);
     }
+
+    const std::string& verticalPosition = [&]
+    {
+        if (verticalAlignment == tgui::VerticalAlignment::Center)
+            return "parent.height / 2 - height / 2";
+        else if (verticalAlignment == tgui::VerticalAlignment::Bottom)
+            return "parent.height - height";
+        return "0%";
+    }();
+
+    layout->setPosition(
+        { horizontalPosition.c_str(), verticalPosition.c_str() });
 
     return layout;
 }

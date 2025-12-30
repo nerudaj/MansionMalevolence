@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/definitions/GameStats.hpp"
+#include "game/enums/GameEndReason.hpp"
 #include "misc/DependencyContainer.hpp"
 #include "settings/AppSettings.hpp"
 #include <DGM/classes/AppState.hpp>
@@ -13,7 +14,7 @@ public:
         DependencyContainer& dic,
         const AppSettings& settings,
         const GameStats& stats,
-        bool won) noexcept;
+        GameEndReason endReason) noexcept;
 
 public:
     void input() override;
@@ -29,5 +30,5 @@ private:
     DependencyContainer& dic;
     const AppSettings& settings;
     GameStats stats;
-    bool won;
+    GameEndReason endReason;
 };

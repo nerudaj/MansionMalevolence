@@ -44,6 +44,10 @@ void AppStateGame::input()
             };
             dic.touchController.processEvent(e);
         }
+        else if (event->is<sf::Event::FocusGained>())
+            dic.jukebox.pause();
+        else if (event->is<sf::Event::FocusLost>())
+            dic.jukebox.resume();
         else
         {
             dic.touchController.processEvent(event);
@@ -60,12 +64,12 @@ void AppStateGame::update()
 
     if (gameRulesEngine.gameEnded())
         app.pushState<AppStateEndGameScreen>(
-            dic, settings, scene.stats, gameRulesEngine.gameWon());
+            dic, settings, scene.stats, gameRulesEngine.getGameEnding());
 }
 
 void AppStateGame::draw()
 {
-    renderingEngine.draw(app.window);
+    renderingEngine.draw();
     dic.virtualCursor.draw();
 }
 

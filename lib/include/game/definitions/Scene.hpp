@@ -1,6 +1,6 @@
 #pragma once
 
-#include "game/animations/AnimationInterface.hpp"
+#include "game/animations/Animations.hpp"
 #include "game/builders/CardBuilder.hpp"
 #include "game/definitions/Chance.hpp"
 #include "game/definitions/DragDrop.hpp"
@@ -46,7 +46,7 @@ struct [[nodiscard]] Scene final
     std::list<Card> cardsToAdd = {};
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = MAX_HEARTS;
-    std::unique_ptr<AnimationInterface> activeAnimation = nullptr;
+    std::optional<Animation> activeAnimation = std::nullopt;
     std::optional<DragDrop> dragDrop = std::nullopt;
     std::optional<std::array<CardType, 3u>> boosterChoice = std::nullopt;
 

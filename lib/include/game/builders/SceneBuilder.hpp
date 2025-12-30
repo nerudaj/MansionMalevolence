@@ -22,6 +22,16 @@ public:
     std::list<Card> generateRoomDeck(const int linkID) override;
 };
 
+class [[nodiscard]] EasyScenarioBuilder final : public ScenarioBuilderInterface
+{
+public:
+    int getInfectionLimit() const noexcept override;
+
+    std::list<Card> generateStartRoom() override;
+
+    std::list<Card> generateRoomDeck(const int linkID) override;
+};
+
 class [[nodiscard]] NormalScenarioBuilder final
     : public ScenarioBuilderInterface
 {
@@ -34,6 +44,17 @@ public:
 };
 
 class [[nodiscard]] HardScenarioBuilder final : public ScenarioBuilderInterface
+{
+public:
+    int getInfectionLimit() const noexcept override;
+
+    std::list<Card> generateStartRoom() override;
+
+    std::list<Card> generateRoomDeck(const int linkID) override;
+};
+
+class [[nodiscard]] NightmareScenarioBuilder final
+    : public ScenarioBuilderInterface
 {
 public:
     int getInfectionLimit() const noexcept override;

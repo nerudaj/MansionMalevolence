@@ -7,6 +7,7 @@ namespace SoundId
     const IdType None = "buzzer.wav";
     const IdType CardShuffle = "zombiecard_skip.wav";
     const IdType CardDestroy = "zombiecards_paper_crumple.wav";
+    const IdType Crafting = "crafting.wav";
     const IdType DogGrowl = "zombiecards_dog.wav";
     const IdType DogWhine = "zombiecards_dog_whine.wav";
     const IdType ZombieGrowl = "zombiecards_zombie_growl.wav";
@@ -16,9 +17,9 @@ namespace SoundId
     const IdType WeaponReload = "shotgun_reload.wav";
     const IdType ShotgunFire = "SHOT01.wav";
     const IdType PistolFire = "GUN01.wav";
-    const IdType SilencedPistolFire = "GUN01_muffled.wav";
+    const IdType SilencedPistolFire = "zombie_cards_silenced_pistol.wav";
     const IdType Crossbow = "crossbow.wav";
-    const IdType LauncherFire = "launcher_fire.wav";
+    const IdType LauncherFire = "zombie_cards_launcher.wav";
     const IdType CrateOpen = "crate.wav";
     const IdType DoorUnlock = "KEY_DOOR.wav";
     const IdType Heal = "heal.wav";
