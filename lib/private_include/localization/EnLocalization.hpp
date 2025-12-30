@@ -77,4 +77,15 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { KilledByCrisonHead, "crimson head chased you down" },
     { KilledByLicker, "licker has torn you into pieces" },
     { KilledByTyrant, "tyrant has slashed you in half" },
+
+    // How to play
+    { Prev, "prev" },
+    { Next, "next" },
+    { SkipText, "swipe right to skip card you can't deal with right now." },
+    { TakeText,
+      "swipe down to take card into your inventory. some cards automatically "
+      "combine if there is no space left." },
+    { InventoryText,
+      "you can combine cards in your inventory, use them on the main card, "
+      "heal yourself, or put the inventory card back into deck." },
 };

@@ -25,6 +25,8 @@ private:
 
     void onOptions();
 
+    void onHowToPlay();
+
     void onExit();
 
 private:

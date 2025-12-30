@@ -71,5 +71,12 @@ enum class [[nodiscard]] StringId
     KilledByLicker,
     KilledByTyrant,
 
+    // How to play
+    Prev,
+    Next,
+    SkipText,
+    TakeText,
+    InventoryText,
+
     MaxId, // Make sure this one is always the last!
 };

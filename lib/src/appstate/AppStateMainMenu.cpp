@@ -1,6 +1,7 @@
 #include "appstate/AppStateMainMenu.hpp"
 #include "appstate/AppStateLevelSelect.hpp"
 #include "appstate/AppStateOptions.hpp"
+#include "appstate/AppStateTutorial.hpp"
 #include "appstate/CommonHandler.hpp"
 #include "gui/Builders.hpp"
 #include "misc/CMakeVars.hpp"
@@ -46,15 +47,16 @@ void AppStateMainMenu::buildLayout()
             .withNoBackgroundImage()
             .withTexturedTitle(
                 dic.resmgr.get<sf::Texture>("zombiecards_logo.png"))
-            .withContent(ButtonListBuilder(dic.strings, dic.sizer)
-                             .addButton(StringId::PlayButton, [&] { onPlay(); })
-                             .addButton(StringId::Options, [&] { onOptions(); })
-                             .addButton(StringId::HowToPlay, [&] {})
-                             .addButton(
-                                 StringId::ExitButton,
-                                 [&] { onExit(); },
-                                 "MainMenu_Button_Exit")
-                             .build())
+            .withContent(
+                ButtonListBuilder(dic.strings, dic.sizer)
+                    .addButton(StringId::PlayButton, [&] { onPlay(); })
+                    .addButton(StringId::Options, [&] { onOptions(); })
+                    .addButton(StringId::HowToPlay, [&] { onHowToPlay(); })
+                    .addButton(
+                        StringId::ExitButton,
+                        [&] { onExit(); },
+                        "MainMenu_Button_Exit")
+                    .build())
             .withNoCornerButtons()
             .build());
 }
@@ -67,6 +69,11 @@ void AppStateMainMenu::onPlay()
 void AppStateMainMenu::onOptions()
 {
     app.pushState<AppStateOptions>(dic, settings);
+}
+
+void AppStateMainMenu::onHowToPlay()
+{
+    app.pushState<AppStateTutorial>(dic);
 }
 
 void AppStateMainMenu::onExit()

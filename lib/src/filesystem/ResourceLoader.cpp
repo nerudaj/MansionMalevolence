@@ -34,6 +34,24 @@ loadTguiTheme(const std::filesystem::path& path)
     }
 }
 
+static inline std::expected<tgui::Texture, dgm::Error>
+loadTguiTexture(const std::filesystem::path& path)
+{
+    try
+    {
+        auto sfTexture = dgm::Utility::loadTexture(path);
+        auto texture = tgui::Texture();
+        texture.loadFromPixelData(
+            sfTexture.value().getSize(),
+            sfTexture.value().copyToImage().getPixelsPtr());
+        return texture;
+    }
+    catch (const std::exception& ex)
+    {
+        return std::unexpected { dgm::Error(ex.what()) };
+    }
+}
+
 static inline std::expected<tiled::FiniteMapModel, dgm::Error>
 loadTiledMap(const std::filesystem::path& path)
 {
@@ -132,6 +150,14 @@ ResourceLoader::loadResources(const std::filesystem::path& assetDir)
     {
         throw std::runtime_error(uni::format(
             "Could not load clip: {}", result.error().getMessage()));
+    }
+
+    if (auto result = resmgr.loadResourcesFromDirectory<tgui::Texture>(
+            assetDir / "graphics-tgui", loadTguiTexture, { ".jpeg" });
+        !result)
+    {
+        throw std::runtime_error(uni::format(
+            "Could not load TGUI texture: {}", result.error().getMessage()));
     }
 
     if (auto result = resmgr.loadResourcesFromDirectory<sf::SoundBuffer>(
