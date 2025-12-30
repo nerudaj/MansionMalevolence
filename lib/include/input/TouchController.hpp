@@ -64,7 +64,7 @@ public:
 struct [[nodiscard]] TouchModel final
 {
 public:
-    TouchModel(const sf::Vector2u& windowSize);
+    explicit TouchModel(const sf::Vector2u& windowSize);
 
     void updateFromNewWindowSize(const sf::Vector2u& windowSize);
 
@@ -85,7 +85,9 @@ public:
 class [[nodiscard]] TouchController final
 {
 public:
-    TouchController(const sf::Vector2u& windowSize) : model(windowSize) {}
+    explicit TouchController(const sf::Vector2u& windowSize) : model(windowSize)
+    {
+    }
 
 public:
     void updateFromNewWindowSize(const sf::Vector2u& windowSize);

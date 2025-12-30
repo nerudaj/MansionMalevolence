@@ -10,7 +10,10 @@
 class [[nodiscard]] Gui final
 {
 public:
-    Gui(dgm::Window& window) noexcept : gui(window.getSfmlWindowContext()) {}
+    explicit Gui(dgm::Window& window) noexcept
+        : gui(window.getSfmlWindowContext())
+    {
+    }
 
 public:
     template<class T>

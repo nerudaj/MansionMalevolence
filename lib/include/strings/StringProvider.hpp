@@ -9,7 +9,7 @@
 class [[nodiscard]] StringProvider final
 {
 public:
-    StringProvider(Language primary);
+    explicit StringProvider(Language primary);
 
     StringProvider(StringProvider&&) = delete;
     StringProvider(const StringProvider&) = delete;

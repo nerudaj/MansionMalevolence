@@ -399,7 +399,8 @@ template<class Callable>
 class ScopeGuard
 {
 public:
-    ScopeGuard(Callable&& callable) : callable(std::forward<Callable>(callable))
+    explicit ScopeGuard(Callable&& callable)
+        : callable(std::forward<Callable>(callable))
     {
     }
 

@@ -18,7 +18,7 @@ struct DeserializationWrapper<std::variant<Ts...>>
 {
     std::optional<AppMessage> deserialized;
 
-    DeserializationWrapper(const std::string& str)
+    explicit DeserializationWrapper(const std::string& str)
     {
         deserialized = deserializeFrom<Ts...>(str);
     }

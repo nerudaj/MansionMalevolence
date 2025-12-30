@@ -20,7 +20,7 @@ public:
         return *this;
     }
 
-    operator T() const
+    operator T() const // NOLINT
     {
         return value;
     }

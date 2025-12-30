@@ -42,7 +42,10 @@ struct [[nodiscard]] InventoryCardUsedForHealingGameEvent final
 {
     size_t inventorySlotIdx;
 
-    InventoryCardUsedForHealingGameEvent(size_t idx) : inventorySlotIdx(idx) {}
+    explicit InventoryCardUsedForHealingGameEvent(size_t idx)
+        : inventorySlotIdx(idx)
+    {
+    }
 };
 
 struct [[nodiscard]] InventoryCardUsedOnMainCardGameEvent final

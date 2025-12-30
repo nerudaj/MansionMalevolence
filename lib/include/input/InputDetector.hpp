@@ -26,7 +26,7 @@ public:
     using ReadyForInputsCallbackType = std::function<void()>;
 
 public:
-    InputDetector(ReadyForInputsCallbackType markReadyForInputs)
+    explicit InputDetector(ReadyForInputsCallbackType markReadyForInputs)
         : markReadyForInputs(markReadyForInputs)
     {
     }

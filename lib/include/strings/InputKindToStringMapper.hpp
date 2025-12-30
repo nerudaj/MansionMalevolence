@@ -7,7 +7,10 @@
 class [[nodiscard]] InputKindToStringMapper final
 {
 public:
-    InputKindToStringMapper(const StringProvider& strings) : strings(strings) {}
+    explicit InputKindToStringMapper(const StringProvider& strings)
+        : strings(strings)
+    {
+    }
 
     InputKindToStringMapper(InputKindToStringMapper&&) = delete;
     InputKindToStringMapper(const InputKindToStringMapper&) = delete;
