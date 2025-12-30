@@ -25,8 +25,10 @@ void VirtualCursor::update(const dgm::Time& time, const float cursorSpeed)
 
 void VirtualCursor::draw()
 {
+#ifndef ANDROID
     sprite.setPosition(position);
     window.draw(sprite);
+#endif
 }
 
 sf::Vector2f VirtualCursor::clampPositionByWindow(
