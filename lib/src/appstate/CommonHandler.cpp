@@ -13,9 +13,9 @@ void CommonHandler::handleInput(
         if (event->is<sf::Event::Closed>())
             app.exit();
         else if (event->is<sf::Event::FocusGained>())
-            dic.jukebox.pause();
-        else if (event->is<sf::Event::FocusLost>())
             dic.jukebox.resume();
+        else if (event->is<sf::Event::FocusLost>())
+            dic.jukebox.pause();
         else
         {
             dic.gui.handleEvent(*event);
