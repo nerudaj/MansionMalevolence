@@ -19,14 +19,26 @@ tgui::Container::Ptr ButtonListBuilder::build(
     tgui::VerticalAlignment verticalAlignment)
 {
     auto&& layout = tgui::GrowVerticalLayout::create();
+#ifdef ANDROID
+    layout->setSize({ "90%", "100%" });
+#else
     layout->setSize({ "50%", "100%" });
+#endif
 
     const std::string& horizontalPosition = [&]
     {
         if (alignment == tgui::HorizontalAlignment::Center)
+#ifdef ANDROID
+            return "5%";
+#else
             return "25%";
+#endif
         else if (alignment == tgui::HorizontalAlignment::Right)
+#ifdef ANDROID
+            return "10%";
+#else
             return "50%";
+#endif
         return "0%";
     }();
     layout->getRenderer()->setSpaceBetweenWidgets(
