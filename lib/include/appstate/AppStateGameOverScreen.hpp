@@ -1,18 +1,17 @@
 #pragma once
 
-#include "game/definitions/GameStats.hpp"
+#include "game/animations/Animations.hpp"
 #include "game/enums/GameEndReason.hpp"
 #include "misc/DependencyContainer.hpp"
-#include "settings/AppSettings.hpp"
 #include <DGM/classes/AppState.hpp>
 
-class [[nodiscard]] AppStateEndGameScreen final : public dgm::AppState
+class [[nodiscard]] AppStateGameOverScreen final : public dgm::AppState
 {
 public:
-    AppStateEndGameScreen(
+    AppStateGameOverScreen(
         dgm::App& app,
         DependencyContainer& dic,
-        const GameStats& stats) noexcept;
+        GameEndReason endReason) noexcept;
 
 public:
     void input() override;
@@ -26,5 +25,7 @@ private:
 
 private:
     DependencyContainer& dic;
-    GameStats stats;
+    GameEndReason endReason;
+    AnimationBase fadeInAnimation;
+    tgui::Label::Ptr deathReasonLabel;
 };

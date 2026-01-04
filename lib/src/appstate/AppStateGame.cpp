@@ -1,5 +1,6 @@
 #include "appstate/AppStateGame.hpp"
 #include "appstate/AppStateEndGameScreen.hpp"
+#include "appstate/AppStateGameOverScreen.hpp"
 #include "appstate/AppStatePause.hpp"
 #include "appstate/Messaging.hpp"
 
@@ -63,14 +64,25 @@ void AppStateGame::update()
     gameEvents.processEvents(gameRulesEngine);
 
     if (gameRulesEngine.gameEnded())
-        app.pushState<AppStateEndGameScreen>(
-            dic, settings, scene.stats, gameRulesEngine.getGameEnding());
+    {
+        onGameEnded();
+    }
 }
 
 void AppStateGame::draw()
 {
     renderingEngine.draw();
     dic.virtualCursor.draw();
+}
+
+void AppStateGame::onGameEnded()
+{
+    auto ending = gameRulesEngine.getGameEnding();
+
+    if (ending == GameEndReason::Won)
+        app.pushState<AppStateEndGameScreen>(dic, scene.stats);
+    else
+        app.pushState<AppStateGameOverScreen>(dic, ending);
 }
 
 void AppStateGame::restoreFocusImpl(const std::string& msg)

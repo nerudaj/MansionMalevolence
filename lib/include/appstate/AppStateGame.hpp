@@ -40,6 +40,8 @@ public:
 
     void draw() override;
 
+    void onGameEnded();
+
 private:
     void restoreFocusImpl(const std::string& msg) override;
 
