@@ -86,8 +86,7 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
     auto& card = scene.inventory[e.inventorySlotIdx].value();
     if (!(card.traits & CardTrait::Healing))
     {
-        // TODO: trigger return animation
-        // TODO: play sound
+        audioEngine.playSound(SoundId::Error);
         return;
     }
     else if (card.special & CardSpecial::WinGame)
@@ -148,8 +147,8 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     }
     else
     {
-        // TODO: trigger return animation
-        // TODO: play sound
+        audioEngine.playSound(SoundId::Error);
+        scene.activeAnimation = AnimationInvalidOperation();
         return; // skip stats increment
     }
 
