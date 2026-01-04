@@ -1,0 +1,117 @@
+
+TextColor = rgba(255, 241, 232, 255);
+
+ArrowBackgroundColor = rgba(126, 37, 83, 255);
+ArrowColor = rgba(255, 0, 77, 255);
+ArrowColorHover = rgba(255, 0, 77, 255);
+
+Label 
+{
+    TextColor = rgba(255, 241, 232, 255);
+    TextOutlineColor = rgba(255, 241, 232, 255);
+    TextOutlineThickness = 0;
+}
+
+Panel
+{
+    BackgroundColor = rgba(0, 0, 0, 255);
+    BorderColor = rgba(255, 241, 232, 255);
+    Borders = 0;
+}
+
+ScrollablePanel
+{
+    BackgroundColor = rgba(0, 0, 0, 255);
+    BorderColor = rgba(255, 241, 232, 255);
+    Borders = 2;
+}
+
+Button
+{
+    Borders = 2;
+
+    BackgroundColor = rgba(0, 0, 0, 255);
+    TextColor = rgba(255, 241, 232, 255);
+    BorderColor = rgba(255, 241, 232, 255);
+
+    BackgroundColorHover = rgba(126, 37, 83, 255);
+    TextColorHover = rgba(255, 0, 77, 255);
+    BorderColorHover = rgba(255, 0, 77, 255);
+
+    BackgroundColorDown = rgba(0, 0, 0, 255);
+    TextColorDown = rgba(255, 241, 232, 255);
+    BorderColorDown = rgba(255, 241, 232, 255);
+}
+
+Scrollbar
+{
+    TrackColor = rgba(126, 37, 83, 255);
+
+    ThumbColor = rgba(255, 0, 77, 255);
+    ThumbColorHover = rgba(255, 0, 77, 255);
+}
+
+Slider
+{
+    TrackColor = rgba(126, 37, 83, 255);
+
+    ThumbColor = rgba(255, 0, 77, 255);
+    ThumbColorHover = rgba(255, 0, 77, 255);
+
+    Borders = 2;
+    BorderColor = rgba(255, 241, 232, 255);
+}
+
+CheckBox
+{
+    Borders = 2;
+    BorderColor = rgba(255, 241, 232, 255);
+
+    BackgroundColor = rgba(126, 37, 83, 255);
+
+    CheckColor = rgba(255, 0, 77, 255);
+
+    CheckColorHover = rgba(255, 0, 77, 255);
+    BackgroundColorHover = rgba(126, 37, 83, 255);
+    BorderColorHover = rgba(255, 0, 77, 255);
+}
+
+ComboBox
+{
+    Borders = 2;
+    BorderColor = rgba(255, 241, 232, 255);
+
+    BackgroundColor = rgba(126, 37, 83, 255);
+}
+
+ListBox
+{
+    Borders = 2;
+    BorderColor = rgba(255, 241, 232, 255);
+
+    TextColor = rgba(255, 241, 232, 255);
+    BackgroundColor = rgba(0, 0, 0, 255);
+
+    SelectedTextColor = rgba(255, 241, 232, 255);
+    SelectedBackgroundColor = rgba(0, 0, 0, 255);
+
+    TextColorHover = rgba(255, 0, 77, 255);
+    BackgroundColorHover = rgba(126, 37, 83, 255);
+}
+
+Tabs
+{
+    Borders = 2;
+    BorderColor = rgba(255, 241, 232, 255);
+
+    BackgroundColor = rgba(0, 0, 0, 255);
+    TextColor = rgba(255, 241, 232, 255);
+
+    SelectedBorderColor = rgba(255, 241, 232, 255);
+    SelectedBackgroundColor = rgba(0, 0, 0, 255);
+    SelectedTextColor = rgba(255, 241, 232, 255);
+
+    TextColorHover = rgba(255, 0, 77, 255);
+    BackgroundColorHover = rgba(126, 37, 83, 255);
+    BorderColorHover = rgba(255, 0, 77, 255);
+}
