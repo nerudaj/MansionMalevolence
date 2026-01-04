@@ -532,8 +532,9 @@ bool GameRulesEngine::canCardInteractWithDeck(
 
 bool GameRulesEngine::gameEnded() const noexcept
 {
-    return gameWon() || scene.hearts <= 0
-           || scene.stats.turnsTaken >= scene.infectionLimit;
+    return !scene.activeAnimation
+           && (gameWon() || scene.hearts <= 0
+               || scene.stats.turnsTaken >= scene.infectionLimit);
 }
 
 GameEndReason GameRulesEngine::getGameEnding() const noexcept
