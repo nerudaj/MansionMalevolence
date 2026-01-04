@@ -77,6 +77,7 @@ enum class [[nodiscard]] StringId
     SkipText,
     TakeText,
     InventoryText,
+    VaccineText,
 
     MaxId, // Make sure this one is always the last!
 };

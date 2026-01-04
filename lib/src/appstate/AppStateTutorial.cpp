@@ -23,51 +23,16 @@ void AppStateTutorial::draw()
 
 void AppStateTutorial::buildLayout()
 {
-    auto content = tgui::Panel::create();
-
-    auto hbox = tgui::HorizontalLayout::create();
-    auto prevButton = WidgetBuilder::createButton(
-        dic.strings.getString(StringId::Prev),
-        [this]
-        {
-            page = page == 0 ? images.size() - 1 : page - 1;
-            updatePage();
-        },
-        dic.sizer);
-    auto nextButton = WidgetBuilder::createButton(
-        dic.strings.getString(StringId::Next),
-        [this]
-        {
-            page = (page + 1) % images.size();
-            updatePage();
-        },
-        dic.sizer);
-    hbox->add(prevButton);
-    hbox->add(nextButton);
-    hbox->setSize({ "90%", dic.sizer.getBaseContainerHeight() });
-    hbox->setPosition({ "5%", "parent.height - height" });
-    content->add(hbox, "HButtonBox");
-
-    auto label = WidgetBuilder::createTextLabel("", dic.sizer);
-    label->setSize({ "90%", dic.sizer.getBaseContainerHeight() * 2 });
-    label->setPosition({ "5%", "parent.height - height - HButtonBox.height" });
-    content->add(label, "DescriptionLabel");
-
-    auto image = tgui::Panel::create();
-    image->setSize(
-        { "(parent.height - HButtonBox.height - DescriptionLabel.height) * 921 "
-          "/ 1416",
-          "parent.height - HButtonBox.height - DescriptionLabel.height" });
-    image->setPosition({ "parent.width / 2 - width / 2", "0%" });
-    image->getRenderer()->setBorders(1);
-    content->add(image, "ImagePanel");
-
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
             .withNoBackgroundImage()
             .withTitle(
                 dic.strings.getString(StringId::HowToPlay), HeadingLevel::H2)
-            .withContent(content)
+            .withContent(WidgetBuilder::createCarousel(
+                images.size(),
+                [this](tgui::Container::Ptr content, size_t pageIdx)
+                { onPageChanged(content, pageIdx); },
+                dic.sizer))
             .withNoTopLeftButton()
             .withNoTopRightButton()
             .withBottomLeftButton(WidgetBuilder::createButton(
@@ -76,16 +41,25 @@ void AppStateTutorial::buildLayout()
                 dic.sizer))
             .withNoBottomRightButton()
             .build());
-
-    updatePage();
 }
 
-void AppStateTutorial::updatePage()
+void AppStateTutorial::onPageChanged(
+    tgui::Container::Ptr content, size_t pageIdx)
 {
-    auto image = dic.gui.get<tgui::Panel>("ImagePanel");
-    image->getRenderer()->setTextureBackground(
-        dic.resmgr.get<tgui::Texture>(images[page]));
+    auto label = WidgetBuilder::createTextLabel(
+        dic.strings.getString(labelIds[pageIdx]), dic.sizer, "justify"_true);
+    label->setSize({ "100%", dic.sizer.getBaseContainerHeight() * 2 });
+    label->setPosition({ "0%", "parent.height - height" });
+    content->add(label, "DescriptionLabel");
 
-    auto label = dic.gui.get<tgui::Label>("DescriptionLabel");
-    label->setText(dic.strings.getString(labelIds[page]));
+    auto image = tgui::Panel::create();
+    image->getRenderer()->setTextureBackground(
+        dic.resmgr.get<tgui::Texture>(images[pageIdx]));
+    image->setSize(
+        { "(parent.height - DescriptionLabel.height) * 921 "
+          "/ 1416",
+          "parent.height - DescriptionLabel.height" });
+    image->setPosition({ "parent.width / 2 - width / 2", "0%" });
+    image->getRenderer()->setBorders(1);
+    content->add(image, "ImagePanel");
 }

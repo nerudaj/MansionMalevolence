@@ -88,4 +88,6 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { InventoryText,
       "you can combine cards in your inventory, use them on the main card, "
       "heal yourself, or put the inventory card back into deck." },
+    { VaccineText,
+      "find and use the vaccine on yourself to heal the infection!" },
 };
