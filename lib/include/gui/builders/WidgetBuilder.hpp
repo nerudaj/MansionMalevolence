@@ -133,6 +133,11 @@ public:
         return "[1-9][0-9]*";
     }
 
+    [[nodiscard]] static tgui::Container::Ptr createCarousel(
+        const size_t pageCount,
+        std::function<void(const tgui::Container::Ptr, size_t)> onPageChange,
+        const Sizer& sizer);
+
 private:
     [[nodiscard]] static tgui::Label::Ptr createLabelInternal(
         const std::string& text,
