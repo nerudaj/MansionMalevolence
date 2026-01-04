@@ -44,7 +44,7 @@ void AppStateMainMenu::buildLayout()
 {
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
-            .withNoBackgroundImage()
+            .withBackgroundImage(dic.resmgr.get<sf::Texture>("menubgr.png"))
             .withTexturedTitle(
                 dic.resmgr.get<sf::Texture>("zombiecards_logo.png"))
             .withContent(

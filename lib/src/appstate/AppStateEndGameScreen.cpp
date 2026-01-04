@@ -108,7 +108,7 @@ void AppStateEndGameScreen::buildLayout()
 
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
-            .withNoBackgroundImage()
+            .withBackgroundImage(dic.resmgr.get<sf::Texture>("menubgr.png"))
             .withTitle(
                 dic.strings.getString(
                     endReason == GameEndReason::Won ? StringId::YouSurvived
