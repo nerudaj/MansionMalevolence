@@ -89,14 +89,11 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
         audioEngine.playSound(SoundId::Error);
         return;
     }
-    else if (card.special & CardSpecial::WinGame)
-    {
-        scene.infectionLimit = -1;
-    }
 
     scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
     audioEngine.playSound(SoundId::Heal);
-    scene.activeAnimation = AnimationHeal();
+    scene.activeAnimation = AnimationHeal(
+        card.special & CardSpecial::WinGame, scene.infectionProgress);
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
@@ -284,6 +281,8 @@ void GameRulesEngine::operator()(const DiscardReturnedToDeckGameEvent&)
 
 void GameRulesEngine::update(const dgm::Time& time)
 {
+    scene.infectionProgress = scene.stats.turnsTaken;
+
     if (scene.activeAnimation)
     {
         updateActiveAnimation(time);
@@ -478,7 +477,9 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
     if (!scene.activeAnimation) return;
 
     const auto status = std::visit(
-        [&time](auto& a) { return updateAnimation(a, time); },
+        overloads { [&time, this](AnimationHeal& a)
+                    { return updateHealAnimation(a, time); },
+                    [&time](auto& a) { return updateAnimation(a, time); } },
         *scene.activeAnimation);
 
     if (status == dgm::Animation::PlaybackStatus::Finished)
@@ -558,7 +559,7 @@ GameEndReason GameRulesEngine::getGameEnding() const noexcept
 
 bool GameRulesEngine::gameWon() const noexcept
 {
-    return scene.infectionLimit == -1;
+    return scene.infectionProgress == -1;
 }
 
 std::optional<GameEvent>
@@ -600,6 +601,18 @@ GameRulesEngine::getEventAfterAnimationEnded(const Animation& animation)
             [](const AnimationHeal&) -> std::optional<GameEvent>
             { return std::nullopt; } },
         animation);
+}
+
+dgm::Animation::PlaybackStatus
+GameRulesEngine::updateHealAnimation(AnimationHeal& a, const dgm::Time& time)
+{
+    auto result = updateAnimation(a, time);
+    if (a.isVaccineHeal)
+    {
+        scene.infectionProgress = std::lerp(a.initialInfection, -1, a.perc);
+    }
+
+    return result;
 }
 
 sf::Vector2f GameRulesEngine::screenToWorld(const sf::Vector2f& pos)

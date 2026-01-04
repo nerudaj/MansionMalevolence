@@ -40,6 +40,7 @@ public:
 struct [[nodiscard]] Scene final
 {
     std::list<Card> deck;
+    int infectionProgress = 0;
     int infectionLimit = -1;
     std::unique_ptr<ScenarioBuilderInterface> builder;
     std::list<Card> discard = {};

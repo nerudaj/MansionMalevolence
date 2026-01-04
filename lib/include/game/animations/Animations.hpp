@@ -122,7 +122,15 @@ struct [[nodiscard]] AnimationTrashMainCard final : AnimationBase
 
 struct [[nodiscard]] AnimationHeal final : AnimationBase
 {
-    AnimationHeal() : AnimationBase(sf::seconds(1.4f)) {}
+    bool isVaccineHeal = false;
+    int initialInfection = 0;
+
+    explicit AnimationHeal(bool isVaccineHeal = false, int initialInfection = 0)
+        : AnimationBase(sf::seconds(1.4f))
+        , isVaccineHeal(isVaccineHeal)
+        , initialInfection(initialInfection)
+    {
+    }
 };
 
 using Animation = std::variant<

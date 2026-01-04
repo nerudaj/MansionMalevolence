@@ -91,6 +91,9 @@ public:
     static std::optional<GameEvent>
     getEventAfterAnimationEnded(const Animation& animation);
 
+    dgm::Animation::PlaybackStatus
+    updateHealAnimation(AnimationHeal& a, const dgm::Time& time);
+
 private:
     sf::Vector2f screenToWorld(const sf::Vector2f& pos);
 

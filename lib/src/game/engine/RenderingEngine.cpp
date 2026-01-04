@@ -380,7 +380,7 @@ void RenderingEngine::renderHud()
     }
 
     text.setString(std::to_string(static_cast<int>(
-        100.f * scene.stats.turnsTaken / scene.infectionLimit)));
+        100.f * scene.infectionProgress / scene.infectionLimit)));
     text.setFillColor(RED_COLOR);
     text.setScale({ 2.f, 2.f });
     text.setPosition(getInfectionTextOffset());
