@@ -223,7 +223,7 @@ tgui::Container::Ptr WidgetBuilder::createCarousel(
         [pageIdx, pageCount, pageLabel, onPageChange, content](int increment)
     {
         *pageIdx = (*pageIdx + pageCount + increment) % pageCount;
-        pageLabel->setText(std::format("{} / {}", *pageIdx + 1, pageCount));
+        pageLabel->setText(uni::format("{} / {}", *pageIdx + 1, pageCount));
         content->removeAllWidgets();
         onPageChange(content, *pageIdx);
     };
