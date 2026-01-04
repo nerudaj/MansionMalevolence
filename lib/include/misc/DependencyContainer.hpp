@@ -55,7 +55,7 @@ struct [[nodiscard]] DependencyContainer final
               resmgr.get<sf::Texture>("cursor.png"))
         , sizer(settings.video)
     {
-        gui.setFont(resmgr.get<tgui::Font>("pico-8.ttf"));
+        gui.setFont(resmgr.get<tgui::Font>("pico-8-fixed-line-spacing.ttf"));
         // NOTE: You can create your own theme file and use it here
         gui.setTheme(resmgr.get<tgui::Theme::Ptr>("Pico8.txt"));
         tgui::Texture::setDefaultSmooth(false);
