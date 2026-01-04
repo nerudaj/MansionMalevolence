@@ -9,5 +9,5 @@ Checks: >
   google-explicit-constructor
 WarningsAsErrors: '*'
 HeaderFilterRegex: '.*'
-ExcludeHeaderFilterRegex: 'catch_amalgamated.*'
+ExcludeHeaderFilterRegex: '.*(catch_amalgamated|SFML|DGM|TGUI).*'
 FormatStyle: none
