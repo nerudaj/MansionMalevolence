@@ -64,6 +64,7 @@ enum class [[nodiscard]] StringId
     TurnsTaken,
     ShotsFired,
     EnemiesRouted,
+    DamageTaken,
     KilledByInfection,
     KilledByZombie,
     KilledByCerberus,

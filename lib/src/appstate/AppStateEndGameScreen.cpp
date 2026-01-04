@@ -35,25 +35,26 @@ void AppStateEndGameScreen::buildLayout()
     auto createLabel = [&](StringId id)
     {
         return WidgetBuilder::createTextLabel(
-            dic.strings.getString(id), dic.sizer);
+            dic.strings.getString(id), dic.sizer, "justify"_true);
+    };
+
+    auto createIntLabel = [&](int value)
+    {
+        return WidgetBuilder::createTextLabel(
+            std::to_string(value), dic.sizer, "justify"_true);
     };
 
     auto content = tgui::VerticalLayout::create();
 
     auto table = TableBuilder(dic.sizer).withNoHeading();
-    table.addRow(
-        { createLabel(StringId::TurnsTaken),
-          WidgetBuilder::createTextLabel(
-              std::to_string(stats.turnsTaken), dic.sizer, "justify"_true) });
-    table.addRow(
-        { createLabel(StringId::ShotsFired),
-          WidgetBuilder::createTextLabel(
-              std::to_string(stats.shotsFired), dic.sizer, "justify"_true) });
+    table.addRow({ createLabel(StringId::TurnsTaken),
+                   createIntLabel(stats.turnsTaken) });
+    table.addRow({ createLabel(StringId::ShotsFired),
+                   createIntLabel(stats.shotsFired) });
     table.addRow({ createLabel(StringId::EnemiesRouted),
-                   WidgetBuilder::createTextLabel(
-                       std::to_string(stats.enemiesKilled),
-                       dic.sizer,
-                       "justify"_true) });
+                   createIntLabel(stats.enemiesKilled) });
+    table.addRow({ createLabel(StringId::DamageTaken),
+                   createIntLabel(stats.damageTaken) });
 
     auto tablePanel = tgui::ScrollablePanel::create();
     tablePanel->add(table.build());

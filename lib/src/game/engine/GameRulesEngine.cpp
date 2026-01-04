@@ -161,6 +161,7 @@ void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 {
     scene.hearts -= scene.deck.front().power;
+    scene.stats.damageTaken += scene.deck.front().power;
     if (scene.hearts <= 0) return;
 
     if (e.skipCardAfterReaction)

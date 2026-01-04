@@ -6,4 +6,5 @@ struct [[nodiscard]] GameStats final
     int heartsRestored = 0;
     int enemiesKilled = 0;
     int shotsFired = 0;
+    int damageTaken = 0;
 };
