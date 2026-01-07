@@ -117,6 +117,7 @@ if ( ${USE_NSIS} )
     set ( CPACK_NSIS_PACKAGE_NAME "${THE_PROJECT_NAME}" )
     set ( CPACK_PACKAGE_INSTALL_DIRECTORY "${THE_PROJECT_NAME}" )
     set ( CPACK_PACKAGE_INSTALL_REGISTRY_KEY "${THE_PROJECT_NAME}" )
+	set ( CPACK_RESOURCE_FILE_LICENSE "${CMAKE_SOURCE_DIR}/assets-private/nsis-license.txt" )
     
     # Create desktop shortcut pointing to correct location
     list ( APPEND CPACK_NSIS_EXTRA_INSTALL_COMMANDS "  SetOutPath '$INSTDIR\\bin'" )
