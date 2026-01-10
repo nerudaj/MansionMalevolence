@@ -165,10 +165,12 @@ void RenderingEngine::operator()(const AnimationEnemyAttack& a)
         (RenderingEngine::getInfectionTextOffset()
          - (getMainCardOffset() + scene.mainCardBody.getSize()))
         * Easing::easeAttack(a.perc);
-    renderCard(
-        scene.deck.front(),
-        getMainCardOffset() + animationOffset,
-        sf::Vector2f { 1.f, 1.f });
+    renderCard(scene.deck.front(), getMainCardOffset() + animationOffset);
+}
+
+void RenderingEngine::operator()(const AnimationEnemyDamagedWindup&)
+{
+    renderCard(scene.deck.front(), getMainCardOffset());
 }
 
 void RenderingEngine::operator()(const AnimationEnemyDamaged& a)
@@ -178,30 +180,34 @@ void RenderingEngine::operator()(const AnimationEnemyDamaged& a)
 
     const auto animationOffset =
         sf::Vector2f { 76.f * 0.1f, 76.f * 0.1f } * Easing::easeDamage(factor);
-    renderCard(
-        scene.deck.front(),
-        getMainCardOffset() + animationOffset,
-        { 1.f, 1.f });
+    renderCard(scene.deck.front(), getMainCardOffset() + animationOffset);
+
+    if (a.perc >= 1.f) return;
+
+    const size_t iconOffset = a.impactIconId == Icon::Explosion1
+                                  ? static_cast<size_t>(a.perc * 10 / 2)
+                                  : 0u;
+
+    sprite.setTextureRect(
+        atlas.getClip(iconsLocation)
+            .getFrame(std::to_underlying(a.impactIconId) + iconOffset));
+    sprite.setPosition(
+        getMainCardOffset() + sf::Vector2f(30.f, 30.f) + animationOffset);
+    window.draw(sprite);
 }
 
 void RenderingEngine::operator()(const AnimationEnemyDodgedAttack& a)
 {
     const auto animationOffset =
         sf::Vector2f { -15.f, 0.f } * Easing::easeOutThenBack(a.perc);
-    renderCard(
-        scene.deck.front(),
-        getMainCardOffset() + animationOffset,
-        { 1.f, 1.f });
+    renderCard(scene.deck.front(), getMainCardOffset() + animationOffset);
 }
 
 void RenderingEngine::operator()(const AnimationInvalidOperation& a)
 {
     const auto animationOffset =
         sf::Vector2f { 4.f, 4.f } * Easing::easeDamage(a.perc);
-    renderCard(
-        scene.deck.front(),
-        getMainCardOffset() + animationOffset,
-        { 1.f, 1.f });
+    renderCard(scene.deck.front(), getMainCardOffset() + animationOffset);
 }
 
 void RenderingEngine::operator()(const AnimationNewCardsShufflingIntoDeck& a)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "game/definitions/Card.hpp"
+#include "game/enums/Icon.hpp"
 #include <DGM/classes/Animation.hpp>
 #include <DGM/classes/Time.hpp>
 #include <SFML/System/Vector2.hpp>
@@ -67,16 +68,35 @@ struct [[nodiscard]] AnimationEnemyAttack final : AnimationBase
     }
 };
 
+struct [[nodiscard]] AnimationEnemyDamagedWindup final : AnimationBase
+{
+    int damage = 0;
+    size_t usedWeaponInventoryIdx = 0;
+
+    AnimationEnemyDamagedWindup(
+        int damage, size_t usedWeaponInventoryIdx, sf::Time duration)
+        : AnimationBase(duration)
+        , damage(damage)
+        , usedWeaponInventoryIdx(usedWeaponInventoryIdx)
+    {
+    }
+};
+
 struct [[nodiscard]] AnimationEnemyDamaged final : AnimationBase
 {
     int damage = 0;
-    size_t usedWeaponInventoryIdx = false;
+    size_t usedWeaponInventoryIdx = 0;
+    Icon impactIconId;
 
     AnimationEnemyDamaged(
-        int damage, size_t usedWeaponInventoryIdx, sf::Time duration)
+        int damage,
+        size_t usedWeaponInventoryIdx,
+        Icon impactIconId,
+        sf::Time duration)
         : AnimationBase(sf::seconds(std::max(duration.asSeconds(), 0.25f)))
         , damage(damage)
         , usedWeaponInventoryIdx(usedWeaponInventoryIdx)
+        , impactIconId(impactIconId)
     {
     }
 };
@@ -139,6 +159,7 @@ using Animation = std::variant<
     AnimationDiscardToDeck,
     AnimationDoorOpen,
     AnimationEnemyAttack,
+    AnimationEnemyDamagedWindup,
     AnimationEnemyDamaged,
     AnimationEnemyDodgedAttack,
     AnimationInvalidOperation,

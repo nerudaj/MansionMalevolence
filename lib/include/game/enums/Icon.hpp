@@ -17,4 +17,12 @@ enum class [[nodiscard]] Icon
     RedTake,
     Trash,
     HealEffect,
+    BulletHole,
+    ThreeBulletHole,
+    Dart,
+    Explosion1,
+    Explosion2,
+    Explosion3,
+    Explosion4,
+    Explosion5,
 };

@@ -20,6 +20,7 @@ namespace SoundId
     const IdType SilencedPistolFire = "zombie_cards_silenced_pistol.wav";
     const IdType Crossbow = "crossbow.wav";
     const IdType LauncherFire = "zombie_cards_launcher.wav";
+    const IdType Explosion = "rocket_explosion.wav";
     const IdType CrateOpen = "crate.wav";
     const IdType DoorUnlock = "KEY_DOOR.wav";
     const IdType Heal = "heal.wav";

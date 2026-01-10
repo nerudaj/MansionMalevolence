@@ -70,6 +70,8 @@ public:
 
     void operator()(const AnimationEnemyAttack& a);
 
+    void operator()(const AnimationEnemyDamagedWindup& a);
+
     void operator()(const AnimationEnemyDamaged& a);
 
     void operator()(const AnimationEnemyDodgedAttack& a);

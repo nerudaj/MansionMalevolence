@@ -174,7 +174,10 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
 {
     auto& weapon = scene.inventory[e.inventoryWeaponIdx].value();
 
-    const auto soundDuration = audioEngine.playSound(weapon.specialSound);
+    const auto soundDuration =
+        weapon.image == CardImage::RocketLauncher
+            ? audioEngine.playSound(SoundId::LauncherFire)
+            : sf::seconds(0.001f);
     --weapon.quantity;
     scene.stats.shotsFired++;
 
@@ -190,7 +193,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
             weapon.special & CardSpecial::CritChance
                 ? static_cast<int>(scene.chance.rollForCrit())
                 : 0;
-        scene.activeAnimation = AnimationEnemyDamaged(
+        scene.activeAnimation = AnimationEnemyDamagedWindup(
             weapon.power + extraDamage, e.inventoryWeaponIdx, soundDuration);
     }
 }
@@ -278,6 +281,23 @@ void GameRulesEngine::operator()(const DiscardReturnedToDeckGameEvent&)
 {
     scene.deck = scene.cardsToAdd;
     scene.cardsToAdd.clear();
+}
+
+void GameRulesEngine::operator()(const AttackWindupAnimationEndedGameEvent& e)
+{
+    assert(scene.inventory[e.usedWeaponInventoryIdx]);
+    auto& weapon = scene.inventory[e.usedWeaponInventoryIdx].value();
+    const auto soundDuration = audioEngine.playSound(weapon.specialSound);
+
+    const auto icon =
+        weapon.image == CardImage::Pistol           ? Icon::BulletHole
+        : weapon.image == CardImage::SilencedPistol ? Icon::BulletHole
+        : weapon.image == CardImage::Crossbow       ? Icon::Dart
+        : weapon.image == CardImage::Shotgun        ? Icon::ThreeBulletHole
+                                                    : Icon::Explosion1;
+
+    scene.activeAnimation = AnimationEnemyDamaged(
+        e.damage, e.usedWeaponInventoryIdx, icon, soundDuration);
 }
 
 void GameRulesEngine::update(const dgm::Time& time)
@@ -581,6 +601,11 @@ GameRulesEngine::getEventAfterAnimationEnded(const Animation& animation)
             {
                 return MonsterReactionFinishedGameEvent(
                     a.skipCardAfterReaction);
+            },
+            [](const AnimationEnemyDamagedWindup& a) -> std::optional<GameEvent>
+            {
+                return AttackWindupAnimationEndedGameEvent(
+                    a.damage, a.usedWeaponInventoryIdx);
             },
             [](const AnimationEnemyDamaged& a) -> std::optional<GameEvent>
             {

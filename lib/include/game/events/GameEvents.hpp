@@ -140,6 +140,18 @@ struct [[nodiscard]] DiscardReturnedToDeckGameEvent
 {
 };
 
+struct [[nodiscard]] AttackWindupAnimationEndedGameEvent
+{
+    int damage;
+    size_t usedWeaponInventoryIdx;
+
+    AttackWindupAnimationEndedGameEvent(
+        int damage, size_t usedWeaponInventoryIdx) noexcept
+        : damage(damage), usedWeaponInventoryIdx(usedWeaponInventoryIdx)
+    {
+    }
+};
+
 using GameEvent = std::variant<
     CardTakenGameEvent,
     BeforeCardSkipGameEvent,
@@ -158,4 +170,5 @@ using GameEvent = std::variant<
     MainCardResolvedGameEvent,
     DoorOpenedGameEvent,
     NewCardShuffledToDiscard,
-    DiscardReturnedToDeckGameEvent>;
+    DiscardReturnedToDeckGameEvent,
+    AttackWindupAnimationEndedGameEvent>;

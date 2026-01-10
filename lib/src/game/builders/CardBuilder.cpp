@@ -41,7 +41,7 @@ const std::map<CardType, Card> CARD_DEFS = {
     { CardType::RocketLauncher,
       Card { .image = CardImage::RocketLauncher,
              .traits = CardTrait::Pickable | CardTrait::Weapon,
-             .specialSound = SoundId::LauncherFire,
+             .specialSound = SoundId::Explosion,
              .quantity = 1,
              .power = 3,
              .name = "rocket launcher" } },

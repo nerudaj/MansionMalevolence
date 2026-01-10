@@ -65,6 +65,8 @@ public:
 
     void operator()(const DiscardReturnedToDeckGameEvent&);
 
+    void operator()(const AttackWindupAnimationEndedGameEvent&);
+
 public:
     void update(const dgm::Time& time);
 
