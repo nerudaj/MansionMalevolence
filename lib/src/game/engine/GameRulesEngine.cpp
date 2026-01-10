@@ -636,7 +636,8 @@ GameRulesEngine::updateHealAnimation(AnimationHeal& a, const dgm::Time& time)
     auto result = updateAnimation(a, time);
     if (a.isVaccineHeal)
     {
-        scene.infectionProgress = std::lerp(a.initialInfection, -1, a.perc);
+        scene.infectionProgress =
+            static_cast<int>(std::lerp(a.initialInfection, -1, a.perc));
     }
 
     return result;

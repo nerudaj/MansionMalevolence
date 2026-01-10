@@ -27,6 +27,8 @@ private:
 
     void onHowToPlay();
 
+    void onCardGallery();
+
     void onExit();
 
 private:

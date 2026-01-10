@@ -44,7 +44,6 @@ enum class [[nodiscard]] CardType
     CrimsonHead,
     Licker,
     Cerberus,
-    Hunter,
     Tyrant,
 
     Crate,

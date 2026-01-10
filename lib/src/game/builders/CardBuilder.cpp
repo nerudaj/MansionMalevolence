@@ -61,7 +61,7 @@ const std::map<CardType, Card> CARD_DEFS = {
              .special = CardSpecial::Combines,
              .specialSound = SoundId::Crafting,
              .link = SPECIAL_SILENCER,
-             .name = "ammo",
+             .name = "pistol parts",
              .texts = {
                 "upgrade your", "pistol with", "these parts"}, } },
 
@@ -334,6 +334,7 @@ const std::map<CardType, Card> CARD_DEFS = {
 
 Card CardBuilder::createCard(CardType type)
 {
+    assert(CARD_DEFS.contains(type));
     return CARD_DEFS.at(type);
 }
 

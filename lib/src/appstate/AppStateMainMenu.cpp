@@ -1,4 +1,5 @@
 #include "appstate/AppStateMainMenu.hpp"
+#include "appstate/AppStateGallery.hpp"
 #include "appstate/AppStateLevelSelect.hpp"
 #include "appstate/AppStateOptions.hpp"
 #include "appstate/AppStateTutorial.hpp"
@@ -52,6 +53,7 @@ void AppStateMainMenu::buildLayout()
                     .addButton(StringId::PlayButton, [&] { onPlay(); })
                     .addButton(StringId::Options, [&] { onOptions(); })
                     .addButton(StringId::HowToPlay, [&] { onHowToPlay(); })
+                    .addButton(StringId::CardGallery, [&] { onCardGallery(); })
                     .addButton(
                         StringId::ExitButton,
                         [&] { onExit(); },
@@ -74,6 +76,11 @@ void AppStateMainMenu::onOptions()
 void AppStateMainMenu::onHowToPlay()
 {
     app.pushState<AppStateTutorial>(dic);
+}
+
+void AppStateMainMenu::onCardGallery()
+{
+    app.pushState<AppStateGallery>(dic);
 }
 
 void AppStateMainMenu::onExit()

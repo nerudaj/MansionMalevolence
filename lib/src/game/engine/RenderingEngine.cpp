@@ -260,8 +260,7 @@ void RenderingEngine::operator()(const AnimationTakeCard& a)
 {
     const auto scale = std::lerp(1.f, 1.f / 3.f, a.perc);
     const auto animationOffset =
-        (RenderingEngine::getNthInventoryCardOffset(a.inventorySlotIdx)
-         - getMainCardOffset())
+        (getNthInventoryCardOffset(a.inventorySlotIdx) - getMainCardOffset())
         * Easing::easeInOut(a.perc);
 
     if (!scene.deck.empty())
@@ -421,65 +420,6 @@ void RenderingEngine::renderTouchControls()
             thumb.debugRender(window, sf::Color(128, 128, 128));
         }
     }
-}
-
-void RenderingEngine::renderCard(
-    const Card& card, const sf::Vector2f& offset, const sf::Vector2f& scale)
-{
-    text.setScale(scale);
-    sprite.setScale(scale);
-
-    sprite.setTextureRect(atlas.getClip(cardbgrLocation)
-                              .getFrame(std::to_underlying(
-                                  getAppropriateCardBackgroundType(card))));
-    sprite.setPosition(offset);
-    window.draw(sprite);
-
-    sprite.setTextureRect(
-        atlas.getClip(imagesLocation).getFrame(std::to_underlying(card.image)));
-    sprite.setPosition(
-        offset + sf::Vector2f { 10.f, 9.f }.componentWiseMul(scale));
-    window.draw(sprite);
-
-    auto& iconsClip = atlas.getClip(iconsLocation);
-    sprite.setTextureRect(
-        iconsClip.getFrame(std::to_underlying(Icon::BulletBig)));
-
-    for (auto i = 0; i < card.quantity && card.traits & CardTrait::Weapon; ++i)
-    {
-        sprite.setPosition(
-            offset + sf::Vector2f { 0.f, 13.f + i * 7.f } * scale.y);
-        window.draw(sprite);
-    }
-
-    sprite.setTextureRect(iconsClip.getFrame(
-        std::to_underlying(getAppropriateDiamondType(card))));
-
-    for (auto i = 0; i < card.power; ++i)
-    {
-        sprite.setPosition(
-            offset
-            + sf::Vector2f { 2.f + i * 12.f, 102.f }.componentWiseMul(scale));
-        window.draw(sprite);
-    }
-
-    text.setCharacterSize(5);
-    text.setPosition(
-        offset + sf::Vector2f { 10.f, 2.f }.componentWiseMul(scale));
-    text.setString(card.name.data());
-    window.draw(text);
-
-    for (auto [idx, line] : std::ranges::views::enumerate(card.texts))
-    {
-        text.setPosition(
-            offset
-            + sf::Vector2f { 5.f, 76.f + 6.f * idx }.componentWiseMul(scale));
-        text.setString(line.data());
-        window.draw(text);
-    }
-
-    text.setScale({ 1.f, 1.f });
-    sprite.setScale({ 1.f, 1.f });
 }
 
 void RenderingEngine::renderCardBack(

@@ -26,43 +26,15 @@ makeBuilder(const GameScenario scenario)
 
 Scene SceneBuilder::createScene(const GameScenario scenario)
 {
-    const sf::Vector2f CARD_SIZE = { 76.f, 114.f };
     auto builder = makeBuilder(scenario);
 
-    return Scene
-    {
+    return Scene {
         .deck = builder->generateStartRoom(),
         .infectionLimit = builder->getInfectionLimit(),
         .builder = std::move(builder),
-        .inventory = { CardBuilder::createCard(CardType::Pistol), std::nullopt, std::nullopt },
-        .mainCardBody =
-            dgm::Rect(sf::Vector2f { 6.f, 27.f }, CARD_SIZE),
-        .healthbarBody = dgm::Rect({ 3.f, 150.f }, { 80.f, 24.f }),
-        .trashBody = dgm::Rect({ 94.f, 102.f }, CARD_SIZE / 3.f),
-// clang-format off
-        .inventoryBodies = {
-            dgm::Rect(
-                RenderingEngine::getNthInventoryCardOffset(0),
-                CARD_SIZE / 3.f),
-            dgm::Rect(
-                RenderingEngine::getNthInventoryCardOffset(1),
-                CARD_SIZE / 3.f),
-            dgm::Rect(
-                RenderingEngine::getNthInventoryCardOffset(2),
-                CARD_SIZE / 3.f),
-        },
-        .choiceBodies = {
-            dgm::Rect(
-                RenderingEngine::getNthBoosterChoiceOffset(0),
-                CARD_SIZE / 3.f),
-            dgm::Rect(
-                RenderingEngine::getNthBoosterChoiceOffset(1),
-                CARD_SIZE / 3.f),
-            dgm::Rect(
-                RenderingEngine::getNthBoosterChoiceOffset(2),
-                CARD_SIZE / 3.f),
-        },
-// clang-format on
+        .inventory = { CardBuilder::createCard(CardType::Pistol),
+                       std::nullopt,
+                       std::nullopt },
     };
 }
 
