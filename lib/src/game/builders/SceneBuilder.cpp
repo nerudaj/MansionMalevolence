@@ -87,7 +87,7 @@ std::list<Card> TutorialScenarioBuilder::generateRoomDeck(const int)
 
 int NormalScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 75;
+    return 50; // prev 75
 }
 
 std::list<Card> NormalScenarioBuilder::generateStartRoom()
@@ -163,7 +163,7 @@ std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
 
 int HardScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 115;
+    return 90; // prev 115
 }
 
 std::list<Card> HardScenarioBuilder::generateStartRoom()
@@ -245,7 +245,7 @@ std::list<Card> HardScenarioBuilder::generateRoomDeck(const int linkID)
 
 int EasyScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 45;
+    return 35; // prev 45
 }
 
 std::list<Card> EasyScenarioBuilder::generateStartRoom()
@@ -305,7 +305,7 @@ std::list<Card> EasyScenarioBuilder::generateRoomDeck(const int linkID)
 
 int NightmareScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 150;
+    return 100; // prev 150
 }
 
 std::list<Card> NightmareScenarioBuilder::generateStartRoom()
