@@ -146,10 +146,10 @@ private:
         const bool justify = false);
 
     static void
-    applyOptionsToWidget(WidgetOptions options, tgui::Widget::Ptr widget)
+    applyOptionsToWidget(WidgetOptions options, tgui::Widget& widget)
     {
-        if (options.id) widget->setWidgetName(options.id.value());
-        widget->setEnabled(options.enabled);
+        if (options.id) widget.setWidgetName(options.id.value());
+        widget.setEnabled(options.enabled);
     }
 
     static void updateDropdownItems(

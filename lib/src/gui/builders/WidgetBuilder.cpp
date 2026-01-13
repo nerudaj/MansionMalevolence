@@ -50,7 +50,7 @@ tgui::Button::Ptr WidgetBuilder::createButton(
     button->setTextSize(sizer.getBaseFontSize());
     button->setSize({ "100%", "100%" });
 
-    applyOptionsToWidget(options, button);
+    applyOptionsToWidget(options, *button);
 
     return button;
 }
@@ -78,7 +78,7 @@ tgui::CheckBox::Ptr WidgetBuilder::createCheckbox(
     checkbox->setChecked(checked);
     checkbox->onChange(onChange);
 
-    applyOptionsToWidget(options, checkbox);
+    applyOptionsToWidget(options, *checkbox);
 
     return checkbox;
 }
@@ -122,7 +122,7 @@ tgui::Container::Ptr WidgetBuilder::createSlider(
             onChange(value);
         });
 
-    applyOptionsToWidget(options, slider);
+    applyOptionsToWidget(options, *slider);
 
     result->add(slider);
 
@@ -145,8 +145,7 @@ tgui::ComboBox::Ptr WidgetBuilder::createDropdown(
     updateDropdownItems(dropdown, items);
     dropdown->setSelectedItem(selected);
     dropdown->onItemSelect(onSelect);
-
-    applyOptionsToWidget(options, dropdown);
+    applyOptionsToWidget(options, *dropdown);
 
     return dropdown;
 }
@@ -166,7 +165,7 @@ tgui::EditBox::Ptr WidgetBuilder::createTextInput(
     box->setTextSize(sizer.getBaseFontSize());
     box->onTextChange(onChange);
 
-    applyOptionsToWidget(options, box);
+    applyOptionsToWidget(options, *box);
 
     return box;
 }
@@ -188,7 +187,7 @@ tgui::Tabs::Ptr WidgetBuilder::createTabs(
 
     tabs->onTabSelect(onTabChange);
 
-    applyOptionsToWidget(options, tabs);
+    applyOptionsToWidget(options, *tabs);
 
     return tabs;
 }
