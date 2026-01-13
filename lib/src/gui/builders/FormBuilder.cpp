@@ -7,6 +7,7 @@ FormBuilder& FormBuilder::addOption(
     const StringId labelId, tgui::Widget::Ptr widget, OptionConfig config)
 {
     widget->setEnabled(!config.disabled);
+    widget->getRenderer()->setOpacity(config.disabled ? 0.5f : 1.f);
     rowsToBuild.push_back({
         .label = strings.getString(labelId),
         .widget = widget,
