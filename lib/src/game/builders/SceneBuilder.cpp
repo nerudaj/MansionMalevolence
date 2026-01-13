@@ -142,6 +142,7 @@ std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
             CardBuilder::createCard(CardType::Licker),
             CardBuilder::createCard(CardType::Zombie),
             CardBuilder::createCard(CardType::Cerberus),
+            CardBuilder::createCard(CardType::CrimsonHead),
             CardBuilder::createCard(CardType::Crate),
             CardBuilder::createCard(CardType::Ammo),
         };
@@ -231,6 +232,7 @@ std::list<Card> HardScenarioBuilder::generateRoomDeck(const int linkID)
     else if (linkID == SPECIAL_CREST_DOOR)
     {
         auto&& incoming = std::vector<Card> {
+            CardBuilder::createCard(CardType::Licker),
             CardBuilder::createCard(CardType::Crate),
             CardBuilder::createCard(CardType::Tyrant),
             CardBuilder::createCard(CardType::Vaccine),
@@ -277,6 +279,7 @@ std::list<Card> EasyScenarioBuilder::generateRoomDeck(const int linkID)
         auto deck = std::vector {
             CardBuilder::createCard(CardType::DiamondKey),
             CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::Cerberus),
             CardBuilder::createCard(CardType::Cerberus),
             CardBuilder::createCard(CardType::Crossbow),
             CardBuilder::createCard(CardType::Zombie),
