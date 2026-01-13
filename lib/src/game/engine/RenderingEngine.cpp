@@ -462,7 +462,7 @@ void RenderingEngine::renderTopDeckCard()
     else if (!scene.deck.empty())
     {
         const auto isDraggingMainCard =
-            scene.dragDrop.value_or({}).draggingMainCard;
+            scene.dragDrop.value_or(DragDrop {}).draggingMainCard;
         const auto offset =
             isDraggingMainCard ? scene.dragDrop->position : getMainCardOffset();
         renderCard(scene.deck.front(), offset, isDraggingMainCard ? 0.5f : 1.f);
