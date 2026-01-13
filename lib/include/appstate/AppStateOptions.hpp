@@ -12,7 +12,8 @@ public:
     AppStateOptions(
         dgm::App& app,
         DependencyContainer& dic,
-        AppSettings& settings) noexcept;
+        AppSettings& settings,
+        bool invokedFromPause = false) noexcept;
 
 public:
     void input() override;
@@ -33,4 +34,5 @@ private:
 private:
     DependencyContainer& dic;
     AppSettings& settings;
+    bool invokedFromPause;
 };

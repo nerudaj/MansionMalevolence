@@ -31,8 +31,14 @@ static std::string intValueFormatter(float val)
 }
 
 AppStateOptions::AppStateOptions(
-    dgm::App& app, DependencyContainer& dic, AppSettings& settings) noexcept
-    : dgm::AppState(app), dic(dic), settings(settings)
+    dgm::App& app,
+    DependencyContainer& dic,
+    AppSettings& settings,
+    bool invokedFromPause) noexcept
+    : dgm::AppState(app)
+    , dic(dic)
+    , settings(settings)
+    , invokedFromPause(invokedFromPause)
 {
     buildLayout();
 }
@@ -109,7 +115,8 @@ void AppStateOptions::buildLayout()
                                     sf::VideoMode::getFullscreenModes()[idx]
                                         .size);
                             },
-                            dic.sizer))
+                            dic.sizer),
+                        OptionConfig { .disabled = invokedFromPause })
                     .addOption(
                         StringId::EnableFullscreen,
                         WidgetBuilder::createCheckbox(

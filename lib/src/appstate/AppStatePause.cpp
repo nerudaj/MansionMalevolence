@@ -42,7 +42,7 @@ void AppStatePause::onResume()
 
 void AppStatePause::onOptions()
 {
-    app.pushState<AppStateOptions>(dic, settings);
+    app.pushState<AppStateOptions>(dic, settings, "invokedFromPause"_true);
 }
 
 void AppStatePause::onBackToMenu()
