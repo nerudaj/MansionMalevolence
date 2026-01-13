@@ -125,6 +125,8 @@ void AppStateOptions::buildLayout()
                             {
                                 settings.video.fullscreen = val;
                                 app.window.toggleFullscreen();
+                                app.window.getSfmlWindowContext()
+                                    .setMouseCursorVisible(false);
                             }))
 #endif
                     .build())
@@ -155,6 +157,7 @@ void AppStateOptions::onResolutionSelected(const sf::Vector2u& resolution)
     dic.gui.setWindow(app.window.getSfmlWindowContext());
     dic.touchController.updateFromNewWindowSize(resolution);
     dic.virtualCursor.forceSyncPosition();
+    app.window.getSfmlWindowContext().setMouseCursorVisible(false);
 
     refresh();
 
