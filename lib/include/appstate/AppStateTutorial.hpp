@@ -21,12 +21,15 @@ private:
     void onPageChanged(tgui::Container::Ptr content, size_t pageIdx);
 
 private:
-    const std::vector<std::string> images = {
-        "skip.jpeg", "take.jpeg", "inventory.jpeg", "vaccine.jpeg"
-    };
+    const std::vector<std::string> images = { "skip.jpeg",
+                                              "take.jpeg",
+                                              "inventory.jpeg",
+                                              "diamonds.jpeg",
+                                              "vaccine.jpeg" };
     const std::vector<StringId> labelIds = { StringId::SkipText,
                                              StringId::TakeText,
                                              StringId::InventoryText,
+                                             StringId::DiamondsText,
                                              StringId::VaccineText };
     DependencyContainer& dic;
 };
