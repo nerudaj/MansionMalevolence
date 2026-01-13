@@ -97,9 +97,9 @@ const std::map<CardType, Card> CARD_DEFS = {
       Card { .image = CardImage::FirstAid,
              .traits = CardTrait::Pickable | CardTrait::Healing,
              .specialSound = SoundId::Heal,
-             .power = 5,
+             .power = 3,
              .name = "first-aid spray",
-             .texts = {"restores to full","health."} } },
+             .texts = {"restores most","of your health."} } },
     { CardType::Vaccine,
       Card {
           .image = CardImage::Vaccine,
@@ -316,10 +316,9 @@ const std::map<CardType, Card> CARD_DEFS = {
              .specialSound = SoundId::CrateOpen,
              .name = "crate",
              .texts = {
-                 "take this card",
-                 "so you can pick",
-                 "one out of three",
-                 "support cards.",
+                 "try putting this",
+                 "card into your",
+                 "inventory."
              } } },
     { CardType::UnlockedWeaponLocker,
       Card { .image = CardImage::WeaponLocker,
@@ -327,10 +326,9 @@ const std::map<CardType, Card> CARD_DEFS = {
              .specialSound = SoundId::CrateOpen,
              .name = "weapon box",
              .texts = {
-                 "take this card",
-                 "so you can pick",
-                 "one out of three",
-                 "weapon cards.",
+                 "try putting this",
+                 "card into your",
+                 "inventory."
              } } },
 };
 
