@@ -185,6 +185,8 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
                           && !(weapon.special & CardSpecial::NegatesEvasive);
     if (canEvade && scene.chance.rollForEvasion())
     {
+        if (weapon.image != CardImage::RocketLauncher)
+            std::ignore = audioEngine.playSound(weapon.specialSound);
         scene.activeAnimation = AnimationEnemyDodgedAttack(soundDuration);
     }
     else
