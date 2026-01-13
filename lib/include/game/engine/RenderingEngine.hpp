@@ -76,6 +76,8 @@ public:
 
     void operator()(const AnimationHeal& a);
 
+    void operator()(const AnimationReturnDraggedMainCard& a);
+
 public:
     /**
      * \brief Create fullscreen camera with a fixed resolution and aspect ratio

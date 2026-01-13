@@ -387,7 +387,8 @@ void GameRulesEngine::handleTake()
     else
     {
         audioEngine.playSound(SoundId::Error);
-        scene.activeAnimation = AnimationInvalidOperation();
+        scene.activeAnimation =
+            AnimationReturnDraggedMainCard(scene.dragDrop->position);
     }
 }
 
@@ -440,16 +441,14 @@ void GameRulesEngine::handleDragEnded()
 
     if (scene.dragDrop->draggingMainCard)
     {
-        const auto dir =
-            scene.dragDrop->position - scene.dragDrop->initialPosition;
-
-        const bool swipedDown = dir.y > 0.f && dir.y > std::abs(dir.x);
-        const bool swipedRight = dir.x > 0.f && dir.x > std::abs(dir.y);
-        if (swipedDown)
-            handleTake();
-        else if (swipedRight)
+        if (dgm::Collision::basic(scene.trashBody, scene.dragDrop->position))
             handleSkip();
-
+        else if (dgm::Collision::basic(
+                     scene.wholeInventoryBody, scene.dragDrop->position))
+            handleTake();
+        else
+            scene.activeAnimation =
+                AnimationReturnDraggedMainCard(scene.dragDrop->position);
         return;
     }
 
@@ -628,7 +627,9 @@ GameRulesEngine::getEventAfterAnimationEnded(const Animation& animation)
             [](const AnimationTrashMainCard&) -> std::optional<GameEvent>
             { return MainCardTrashedGameEvent(); },
             [](const AnimationHeal&) -> std::optional<GameEvent>
-            { return std::nullopt; } },
+            { return std::nullopt; },
+            [](const AnimationReturnDraggedMainCard&)
+                -> std::optional<GameEvent> { return std::nullopt; } },
         animation);
 }
 

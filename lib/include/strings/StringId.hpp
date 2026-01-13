@@ -80,6 +80,7 @@ enum class [[nodiscard]] StringId
     TakeText,
     InventoryText,
     VaccineText,
+    DiamondsText,
 
     MaxId, // Make sure this one is always the last!
 };

@@ -294,6 +294,18 @@ void RenderingEngine::operator()(const AnimationHeal& a)
     window.draw(sprite);
 }
 
+void RenderingEngine::operator()(const AnimationReturnDraggedMainCard& a)
+{
+    const auto animationOffset =
+        (a.origin - getMainCardOffset()) * Easing::easeInOut(1.f - a.perc);
+    const auto scale = std::lerp(0.5f, 1.f, Easing::easeInOut(a.perc));
+
+    if (scene.deck.size() > 1)
+        renderCard(*(++scene.deck.begin()), getMainCardOffset());
+    renderCard(
+        scene.deck.front(), getMainCardOffset() + animationOffset, scale);
+}
+
 dgm::Camera RenderingEngine::createFullscreenCamera(
     const sf::Vector2f& currentResolution,
     const sf::Vector2f& desiredResolution)
@@ -331,6 +343,18 @@ dgm::Camera RenderingEngine::createFullscreenCamera(
 
 void RenderingEngine::renderWorld()
 {
+    const auto draggedInventoryCardIdx =
+        scene.dragDrop.value_or(DragDrop {})
+            .inventoryIdx.value_or(std::numeric_limits<size_t>::max());
+
+    for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
+    {
+        if (!card) continue;
+        if (draggedInventoryCardIdx == static_cast<size_t>(idx)) continue;
+
+        renderCard(card.value(), getNthInventoryCardOffset(idx), 1.f / 3.f);
+    }
+
     if (!scene.discard.empty())
     {
         renderCardBack(
@@ -343,17 +367,12 @@ void RenderingEngine::renderWorld()
 
     renderTopDeckCard();
 
-    for (auto&& [idx, card] : std::ranges::views::enumerate(scene.inventory))
+    if (draggedInventoryCardIdx != std::numeric_limits<size_t>::max())
     {
-        if (!card) continue;
-
         renderCard(
-            card.value(),
-            scene.dragDrop.value_or(DragDrop {}).inventoryIdx.value_or(-1)
-                    == static_cast<size_t>(idx)
-                ? scene.dragDrop.value_or(DragDrop {}).position
-                : getNthInventoryCardOffset(idx),
-            1.f / 3.f);
+            *scene.inventory[draggedInventoryCardIdx],
+            scene.dragDrop.value_or(DragDrop {}).position,
+            1 / 3.f);
     }
 
     renderBoosterChoice();
@@ -442,7 +461,11 @@ void RenderingEngine::renderTopDeckCard()
     }
     else if (!scene.deck.empty())
     {
-        renderCard(scene.deck.front(), getMainCardOffset());
+        const auto isDraggingMainCard =
+            scene.dragDrop.value_or({}).draggingMainCard;
+        const auto offset =
+            isDraggingMainCard ? scene.dragDrop->position : getMainCardOffset();
+        renderCard(scene.deck.front(), offset, isDraggingMainCard ? 0.5f : 1.f);
     }
 }
 
@@ -469,13 +492,25 @@ void RenderingEngine::renderBoosterChoice()
 BackgroundType RenderingEngine::getAppropriateBackgroundType() const
 {
     const auto dragDrop = scene.dragDrop.value_or(DragDrop {});
-    const auto isDragRelevant = dragDrop.inventoryIdx.has_value();
     const auto dragPosition = dragDrop.position;
     const auto&& draggedCard =
         scene.inventory[dragDrop.inventoryIdx.value_or(0)].value_or(
             CardBuilder::createCard(CardType::Empty));
 
-    if (!isDragRelevant) return BackgroundType::Plain;
+    if (dragDrop.draggingMainCard)
+    {
+        if (dgm::Collision::basic(scene.trashBody, dragPosition))
+        {
+            return BackgroundType::Trash;
+        }
+        else if (dgm::Collision::basic(scene.wholeInventoryBody, dragPosition))
+        {
+            return scene.canTakeCard ? BackgroundType::InventoryWhole
+                                     : BackgroundType::InventoryWholeGreyed;
+        }
+
+        return BackgroundType::Plain;
+    }
 
     if (dgm::Collision::basic(scene.mainCardBody, dragPosition))
     {
@@ -491,7 +526,6 @@ BackgroundType RenderingEngine::getAppropriateBackgroundType() const
     }
     else if (dgm::Collision::basic(scene.trashBody, dragPosition))
     {
-
         return BackgroundType::Trash;
     }
 

@@ -153,6 +153,16 @@ struct [[nodiscard]] AnimationHeal final : AnimationBase
     }
 };
 
+struct [[nodiscard]] AnimationReturnDraggedMainCard final : AnimationBase
+{
+    sf::Vector2f origin;
+
+    explicit AnimationReturnDraggedMainCard(const sf::Vector2f& origin)
+        : origin(origin)
+    {
+    }
+};
+
 using Animation = std::variant<
     AnimationCardToDiscard,
     AnimationCardTransform,
@@ -167,4 +177,5 @@ using Animation = std::variant<
     AnimationReturnInventoryToDeck,
     AnimationTakeCard,
     AnimationTrashMainCard,
-    AnimationHeal>;
+    AnimationHeal,
+    AnimationReturnDraggedMainCard>;

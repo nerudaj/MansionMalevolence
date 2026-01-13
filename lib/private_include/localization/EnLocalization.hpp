@@ -83,13 +83,21 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     // How to play
     { Prev, "prev" },
     { Next, "next" },
-    { SkipText, "swipe right to skip card you can't deal with right now." },
+    { SkipText,
+      "drag the main card over discard to skip it. beware - enemies might "
+      "attack you "
+      "when they are skipped!" },
     { TakeText,
-      "swipe down to take card into your inventory. some cards automatically "
-      "combine if there is no space left." },
+      "drag the main card over your inventory to pick it up. certain cards "
+      "might "
+      "automatically combine if there is no space left." },
     { InventoryText,
       "you can combine cards in your inventory, use them on the main card, "
       "heal yourself, or put the inventory card back into deck." },
     { VaccineText,
       "find and use the vaccine on yourself to heal the infection!" },
+    { DiamondsText,
+      "diamonds on weapons indicate damage, amount of hitpoints healed on "
+      "healing cards and both health and damage for monsters. damaging a "
+      "monster will reduce the damage it can deal!" },
 };
