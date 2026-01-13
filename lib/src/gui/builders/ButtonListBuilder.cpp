@@ -67,5 +67,10 @@ tgui::Container::Ptr ButtonListBuilder::build(
     layout->setPosition(
         { horizontalPosition.c_str(), verticalPosition.c_str() });
 
-    return layout;
+    auto&& scrollablePanel = tgui::ScrollablePanel::create();
+    scrollablePanel->add(layout);
+    auto&& renderer = scrollablePanel->getRenderer();
+    renderer->setBorders(0);
+    renderer->setBackgroundColor(tgui::Color::Transparent);
+    return scrollablePanel;
 }
