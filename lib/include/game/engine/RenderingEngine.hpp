@@ -48,11 +48,13 @@ public:
     }
 
 public:
-    void operator()(const AnimationCardToDiscard& a);
+    void operator()(const AnimationMainCardToDiscard& a);
+
+    void operator()(const AnimationInventoryCardToDiscard& a);
 
     void operator()(const AnimationCardTransform& a);
 
-    void operator()(const AnimationDiscardToDeck& a);
+    void operator()(const AnimationReturnDiscardToDeck& a);
 
     void operator()(const AnimationDoorOpen& a);
 
@@ -68,8 +70,6 @@ public:
 
     void operator()(const AnimationNewCardsShufflingIntoDeck& a);
 
-    void operator()(const AnimationReturnInventoryToDeck& a);
-
     void operator()(const AnimationTakeCard& a);
 
     void operator()(const AnimationTrashMainCard& a);
@@ -77,6 +77,8 @@ public:
     void operator()(const AnimationHeal& a);
 
     void operator()(const AnimationReturnDraggedMainCard& a);
+
+    void operator()(const AnimationFlipMainCardToVisible& a);
 
 public:
     /**
@@ -178,11 +180,21 @@ public:
         renderCard(window, card, offset, scale);
     }
 
+    void renderCardBack(const sf::Vector2f& offset, float scale = 1.f)
+    {
+        renderCardBack(offset, { scale, scale });
+    }
+
     void renderCardBack(const sf::Vector2f& offset, const sf::Vector2f& scale);
 
     void renderTopDeckCard();
 
     void renderBoosterChoice();
+
+    void renderMainCardBackIfDeckNotEmpty()
+    {
+        if (!scene.deck.empty()) renderCardBack(getMainCardOffset());
+    }
 
     BackgroundType getAppropriateBackgroundType() const;
 

@@ -99,10 +99,6 @@ struct [[nodiscard]] MonsterStaggerEndedGameEvent final
     }
 };
 
-struct [[nodiscard]] MainCardTrashedGameEvent final
-{
-};
-
 struct [[nodiscard]] CardUsedOnAnotherInventoryCardGameEvent final
 {
     size_t sourceCardInventoryIdx;
@@ -125,21 +121,6 @@ struct [[nodiscard]] MainCardResolvedGameEvent final
 {
 };
 
-struct [[nodiscard]] DoorOpenedGameEvent final
-{
-    int link;
-
-    explicit DoorOpenedGameEvent(int link) noexcept : link(link) {}
-};
-
-struct [[nodiscard]] NewCardShuffledToDiscard final
-{
-};
-
-struct [[nodiscard]] DiscardReturnedToDeckGameEvent
-{
-};
-
 struct [[nodiscard]] AttackWindupAnimationEndedGameEvent
 {
     int damage;
@@ -150,6 +131,10 @@ struct [[nodiscard]] AttackWindupAnimationEndedGameEvent
         : damage(damage), usedWeaponInventoryIdx(usedWeaponInventoryIdx)
     {
     }
+};
+
+struct [[nodiscard]] FlipCardAnimationEndedGameEvent final
+{
 };
 
 using GameEvent = std::variant<
@@ -164,11 +149,8 @@ using GameEvent = std::variant<
     MonsterReactionFinishedGameEvent,
     MonsterShotAtGameEvent,
     MonsterStaggerEndedGameEvent,
-    MainCardTrashedGameEvent,
     CardUsedOnAnotherInventoryCardGameEvent,
     ZombieDiedGameEvent,
     MainCardResolvedGameEvent,
-    DoorOpenedGameEvent,
-    NewCardShuffledToDiscard,
-    DiscardReturnedToDeckGameEvent,
-    AttackWindupAnimationEndedGameEvent>;
+    AttackWindupAnimationEndedGameEvent,
+    FlipCardAnimationEndedGameEvent>;

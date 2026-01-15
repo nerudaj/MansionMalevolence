@@ -10,25 +10,26 @@ void GameRulesEngine::operator()(const CardTakenGameEvent& e)
 {
     scene.stats.turnsTaken++;
 
+    assert(scene.mainCard);
     if (scene.inventory[e.inventorySlotIdx].has_value())
     {
         auto& inventoryCard = scene.inventory[e.inventorySlotIdx].value();
-        combineCards(inventoryCard, scene.deck.front());
+        combineCards(inventoryCard, *scene.mainCard);
     }
     else
     {
-        scene.inventory[e.inventorySlotIdx] = scene.deck.front();
+        scene.inventory[e.inventorySlotIdx] = *scene.mainCard;
     }
 
-    popTopDeckCard();
+    scene.mainCard.reset();
 }
 
 void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
 {
+    assert(!scene.activeAnimation);
     scene.stats.turnsTaken++;
-    scene.activeAnimation = AnimationCardToDiscard(
-        scene.deck.front(), scene.mainCardBody.getPosition());
-    popTopDeckCard();
+    scene.activeAnimation =
+        AnimationMainCardToDiscard(scene.mainCardBody.getPosition());
     audioEngine.playSound(SoundId::CardShuffle);
 }
 
@@ -39,8 +40,6 @@ void GameRulesEngine::operator()(const CardSkipEndedGameEvent& e)
 
 void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 {
-    if (scene.deck.empty()) return;
-
     const bool hasSilencedPistol = [this]
     {
         for (auto card : scene.inventory)
@@ -49,8 +48,8 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
         return false;
     }();
 
-    const bool isEnemy = scene.deck.front().traits & CardTrait::Enemy;
-    const auto special = scene.deck.front().special;
+    const bool isEnemy = scene.mainCard->traits & CardTrait::Enemy;
+    const auto special = scene.mainCard->special;
     // clang-format off
     const bool managedToEvade = hasSilencedPistol
         ? scene.chance.rollForSilencedDodge()
@@ -74,15 +73,17 @@ void GameRulesEngine::operator()(const BeforeCardSkipGameEvent&)
 
 void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
 {
+    assert(!scene.activeAnimation);
     auto card = *scene.inventory[e.inventorySlotIdx];
     scene.inventory[e.inventorySlotIdx].reset();
 
-    scene.activeAnimation = AnimationCardToDiscard(
-        card, scene.inventoryBodies[e.inventorySlotIdx].getPosition());
+    scene.activeAnimation = AnimationInventoryCardToDiscard(
+        scene.inventoryBodies[e.inventorySlotIdx].getPosition(), card);
 }
 
 void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
 {
+    assert(!scene.activeAnimation);
     auto& card = scene.inventory[e.inventorySlotIdx].value();
     if (!(card.traits & CardTrait::Healing))
     {
@@ -93,14 +94,15 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
     scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
     audioEngine.playSound(SoundId::Heal);
     scene.activeAnimation = AnimationHeal(
-        card.special & CardSpecial::WinGame, scene.infectionProgress);
+        card.special & CardSpecial::WinGame, scene.infection.progress);
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
 void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
 {
+    assert(!scene.activeAnimation);
     auto& card = scene.inventory[e.inventorySlotIdx].value();
-    auto& deckCard = scene.deck.front();
+    auto& deckCard = *scene.mainCard;
     if (card.traits & CardTrait::Weapon && deckCard.traits & CardTrait::Enemy)
     {
         if (card.quantity != 0)
@@ -132,13 +134,13 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
         }
         else if (card.link == SPECIAL_LOCKER_KEY)
         {
-            audioEngine.playSound(scene.deck.front().specialSound);
+            audioEngine.playSound(scene.mainCard->specialSound);
             transformTopCard(
                 CardType::LockedWeaponLocker, CardType::UnlockedWeaponLocker);
         }
         else
         {
-            audioEngine.playSound(scene.deck.front().specialSound);
+            audioEngine.playSound(scene.mainCard->specialSound);
             scene.activeAnimation = AnimationDoorOpen(card.link);
         }
     }
@@ -155,13 +157,13 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
 void GameRulesEngine::operator()(const MonsterReactionTriggeredGameEvent& e)
 {
     scene.activeAnimation = AnimationEnemyAttack(e.skipCardAfterReaction);
-    audioEngine.playSound(scene.deck.front().specialSound);
+    audioEngine.playSound(scene.mainCard->specialSound);
 }
 
 void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 {
-    scene.hearts -= scene.deck.front().power;
-    scene.stats.damageTaken += scene.deck.front().power;
+    scene.hearts -= scene.mainCard->power;
+    scene.stats.damageTaken += scene.mainCard->power;
     if (scene.hearts <= 0) return;
 
     if (e.skipCardAfterReaction)
@@ -172,6 +174,7 @@ void GameRulesEngine::operator()(const MonsterReactionFinishedGameEvent& e)
 
 void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
 {
+    assert(!scene.activeAnimation);
     auto& weapon = scene.inventory[e.inventoryWeaponIdx].value();
 
     const auto soundDuration =
@@ -181,7 +184,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
     --weapon.quantity;
     scene.stats.shotsFired++;
 
-    const bool canEvade = scene.deck.front().special & CardSpecial::Evasive
+    const bool canEvade = scene.mainCard->special & CardSpecial::Evasive
                           && !(weapon.special & CardSpecial::NegatesEvasive);
     if (canEvade && scene.chance.rollForEvasion())
     {
@@ -202,7 +205,7 @@ void GameRulesEngine::operator()(const MonsterShotAtGameEvent& e)
 
 void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
 {
-    auto& deckCard = scene.deck.front();
+    auto& deckCard = *scene.mainCard;
     deckCard.power -= e.damage;
     if (deckCard.power <= 0)
     {
@@ -221,11 +224,6 @@ void GameRulesEngine::operator()(const MonsterStaggerEndedGameEvent& e)
         gameEventQueue.pushEvent<MonsterReactionTriggeredGameEvent>(
             "skipCardAfterReaction"_false);
     }
-}
-
-void GameRulesEngine::operator()(const MainCardTrashedGameEvent&)
-{
-    popTopDeckCard();
 }
 
 void GameRulesEngine::operator()(
@@ -256,33 +254,14 @@ void GameRulesEngine::operator()(const ZombieDiedGameEvent&)
 
 void GameRulesEngine::operator()(const MainCardResolvedGameEvent&)
 {
-    if (scene.deck.front().special & CardSpecial::SpawnCrimsonHead)
+    assert(!scene.activeAnimation);
+    if (scene.mainCard->special & CardSpecial::SpawnCrimsonHead)
     {
         gameEventQueue.pushEvent<ZombieDiedGameEvent>();
     }
 
     scene.activeAnimation = AnimationTrashMainCard();
     audioEngine.playSound(SoundId::CardDestroy);
-}
-
-void GameRulesEngine::operator()(const DoorOpenedGameEvent& e)
-{
-    scene.cardsToAdd = scene.builder->generateRoomDeck(e.link);
-    popTopDeckCard();
-    shuffleNewCardIntoDeck();
-}
-
-void GameRulesEngine::operator()(const NewCardShuffledToDiscard&)
-{
-    scene.discard.push_back(scene.cardsToAdd.front());
-    scene.cardsToAdd.pop_front();
-    shuffleNewCardIntoDeck();
-}
-
-void GameRulesEngine::operator()(const DiscardReturnedToDeckGameEvent&)
-{
-    scene.deck = scene.cardsToAdd;
-    scene.cardsToAdd.clear();
 }
 
 void GameRulesEngine::operator()(const AttackWindupAnimationEndedGameEvent& e)
@@ -302,9 +281,16 @@ void GameRulesEngine::operator()(const AttackWindupAnimationEndedGameEvent& e)
         e.damage, e.usedWeaponInventoryIdx, icon, soundDuration);
 }
 
+void GameRulesEngine::operator()(const FlipCardAnimationEndedGameEvent&)
+{
+    assert(!scene.mainCard);
+    scene.mainCard = scene.deck.front();
+    scene.deck.pop_front();
+}
+
 void GameRulesEngine::update(const dgm::Time& time)
 {
-    scene.infectionProgress = scene.stats.turnsTaken;
+    scene.infection.progress = scene.stats.turnsTaken;
 
     if (scene.activeAnimation)
     {
@@ -312,32 +298,39 @@ void GameRulesEngine::update(const dgm::Time& time)
         return;
     }
 
-    if (scene.deck.empty())
+    if (scene.mainCard)
+    {
+        scene.usableInventorySlot = getUsableInventorySlot(*scene.mainCard);
+        scene.canTakeCard =
+            (scene.mainCard->traits & CardTrait::Pickable
+             && scene.usableInventorySlot)
+            || scene.mainCard->special & CardSpecial::BoosterPack;
+        scene.canSafelySkipCard = !(scene.mainCard->traits & CardTrait::Enemy);
+    }
+    else if (scene.deck.empty())
     {
         if (!scene.discard.empty())
         {
-            scene.activeAnimation = AnimationDiscardToDeck();
+            scene.activeAnimation = AnimationReturnDiscardToDeck();
             scene.cardsToAdd = scene.discard;
             scene.discard.clear();
             return;
         }
+        else
+        {
+            scene.usableInventorySlot = std::nullopt;
+            scene.canSafelySkipCard = false;
+            scene.canTakeCard = false;
+        }
     }
-
-    if (scene.deck.empty())
+    else if (!scene.mainCard)
     {
-        scene.usableInventorySlot = std::nullopt;
-        scene.canSafelySkipCard = false;
-        scene.canTakeCard = false;
+        scene.activeAnimation = AnimationFlipMainCardToVisible();
+        return;
     }
     else
     {
-        scene.usableInventorySlot = getUsableInventorySlot(scene.deck.front());
-        scene.canTakeCard =
-            (scene.deck.front().traits & CardTrait::Pickable
-             && scene.usableInventorySlot)
-            || scene.deck.front().special & CardSpecial::BoosterPack;
-        scene.canSafelySkipCard =
-            !(scene.deck.front().traits & CardTrait::Enemy);
+        assert(false);
     }
 
     if (scene.boosterChoice)
@@ -369,19 +362,20 @@ void GameRulesEngine::update(const dgm::Time& time)
 
 void GameRulesEngine::handleTake()
 {
+    assert(!scene.activeAnimation);
+
     if (scene.canTakeCard)
     {
-        assert(!scene.deck.empty());
-        if (scene.deck.front().special & CardSpecial::BoosterPack)
+        if (scene.mainCard->special & CardSpecial::BoosterPack)
         {
             scene.boosterChoice =
-                SceneBuilder::generateBooster(scene.deck.front().image);
-            audioEngine.playSound(scene.deck.front().specialSound);
+                SceneBuilder::generateBooster(scene.mainCard->image);
+            audioEngine.playSound(scene.mainCard->specialSound);
         }
         else
         {
-            scene.activeAnimation =
-                AnimationTakeCard(*scene.usableInventorySlot);
+            scene.activeAnimation = AnimationTakeCard(
+                *scene.usableInventorySlot, scene.dragDrop->position);
         }
     }
     else
@@ -494,6 +488,76 @@ void GameRulesEngine::handleDragEnded()
     }
 }
 
+#define NULL_ANIMATION_HANDLER(AnimationType) [](const AnimationType&) {}
+
+void GameRulesEngine::handleFinishedAnimation()
+{
+    const auto animation = *scene.activeAnimation;
+    scene.activeAnimation.reset();
+    std::visit(
+        overloads {
+            [&](const AnimationMainCardToDiscard&)
+            {
+                scene.discard.push_back(*scene.mainCard);
+                scene.mainCard.reset();
+            },
+            [&](const AnimationInventoryCardToDiscard& a)
+            { scene.discard.push_back(a.card); },
+            NULL_ANIMATION_HANDLER(AnimationCardTransform),
+            [&](const AnimationReturnDiscardToDeck&)
+            {
+                scene.deck = scene.cardsToAdd;
+                scene.cardsToAdd.clear();
+            },
+            [&](const AnimationDoorOpen& a)
+            {
+                scene.cardsToAdd = scene.builder->generateRoomDeck(a.link);
+                scene.mainCard.reset();
+                shuffleNewCardIntoDeck();
+            },
+            [&](const AnimationEnemyAttack& a)
+            {
+                gameEventQueue.pushEvent<MonsterReactionFinishedGameEvent>(
+                    a.skipCardAfterReaction);
+            },
+            [&](const AnimationEnemyDamagedWindup& a)
+            {
+                gameEventQueue.pushEvent<AttackWindupAnimationEndedGameEvent>(
+                    a.damage, a.usedWeaponInventoryIdx);
+            },
+            [&](const AnimationEnemyDamaged& a)
+            {
+                gameEventQueue.pushEvent<MonsterStaggerEndedGameEvent>(
+                    a.damage, a.usedWeaponInventoryIdx);
+            },
+            NULL_ANIMATION_HANDLER(AnimationEnemyDodgedAttack),
+            NULL_ANIMATION_HANDLER(AnimationInvalidOperation),
+            [&](const AnimationNewCardsShufflingIntoDeck&)
+            {
+                scene.discard.push_back(scene.cardsToAdd.front());
+                scene.cardsToAdd.pop_front();
+                shuffleNewCardIntoDeck();
+            },
+            [&](const AnimationTakeCard& a)
+            {
+                gameEventQueue.pushEvent<CardTakenGameEvent>(
+                    a.inventorySlotIdx);
+            },
+            [&](const AnimationTrashMainCard&) { scene.mainCard.reset(); },
+            NULL_ANIMATION_HANDLER(AnimationHeal),
+            NULL_ANIMATION_HANDLER(AnimationReturnDraggedMainCard),
+            [&](const AnimationFlipMainCardToVisible&)
+            {
+                assert(!scene.mainCard);
+                scene.mainCard = scene.deck.front();
+                scene.deck.pop_front();
+            },
+        },
+        animation);
+}
+
+#undef NULL_ANIMATION_HANDLER
+
 void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 {
     if (!scene.activeAnimation) return;
@@ -506,10 +570,7 @@ void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 
     if (status == dgm::Animation::PlaybackStatus::Finished)
     {
-        auto event = getEventAfterAnimationEnded(*scene.activeAnimation);
-        if (event) gameEventQueue.pushEvent(std::move(*event));
-
-        scene.activeAnimation.reset();
+        handleFinishedAnimation();
     }
 }
 
@@ -543,37 +604,37 @@ bool GameRulesEngine::canInventoryCardCombineWithIncoming(
                   && inventoryCard.link == incomingCard.link;
 }
 
-bool GameRulesEngine::canCardInteractWithDeck(
-    const Card& a, const std::list<Card>& deck)
+bool GameRulesEngine::canCardInteractWithMainCard(
+    const Card& a, const Card& mainCard)
 {
-    const auto deckTraits = deck.front().traits;
+    const auto deckTraits = mainCard.traits;
     return deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
            || deckTraits & CardTrait::KeyTarget && a.traits & CardTrait::KeyItem
-                  && deck.front().link == a.link;
+                  && mainCard.link == a.link;
 }
 
 bool GameRulesEngine::gameEnded() const noexcept
 {
     return !scene.activeAnimation
            && (gameWon() || scene.hearts <= 0
-               || scene.stats.turnsTaken >= scene.infectionLimit);
+               || scene.stats.turnsTaken >= scene.infection.limit);
 }
 
 GameEndReason GameRulesEngine::getGameEnding() const noexcept
 {
     if (gameWon())
         return GameEndReason::Won;
-    else if (scene.stats.turnsTaken >= scene.infectionLimit)
+    else if (scene.stats.turnsTaken >= scene.infection.limit)
         return GameEndReason::InfectionMax;
-    else if (scene.deck.front().image == CardImage::Zombie)
+    else if (scene.mainCard->image == CardImage::Zombie)
         return GameEndReason::ZombieBite;
-    else if (scene.deck.front().image == CardImage::Cerberus)
+    else if (scene.mainCard->image == CardImage::Cerberus)
         return GameEndReason::CerberusBark;
-    else if (scene.deck.front().image == CardImage::CrimsonHead)
+    else if (scene.mainCard->image == CardImage::CrimsonHead)
         return GameEndReason::CrimsonHeadScreech;
-    else if (scene.deck.front().image == CardImage::Licker)
+    else if (scene.mainCard->image == CardImage::Licker)
         return GameEndReason::LickerLick;
-    else if (scene.deck.front().image == CardImage::Tyrant)
+    else if (scene.mainCard->image == CardImage::Tyrant)
         return GameEndReason::TyrantScratch;
 
     assert(false);
@@ -582,55 +643,7 @@ GameEndReason GameRulesEngine::getGameEnding() const noexcept
 
 bool GameRulesEngine::gameWon() const noexcept
 {
-    return scene.infectionProgress == -1;
-}
-
-std::optional<GameEvent>
-GameRulesEngine::getEventAfterAnimationEnded(const Animation& animation)
-{
-    return std::visit(
-        overloads {
-            [](const AnimationCardToDiscard& a) -> std::optional<GameEvent>
-            { return CardSkipEndedGameEvent(a.card); },
-            [](const AnimationCardTransform&) -> std::optional<GameEvent>
-            { return std::nullopt; },
-            [](const AnimationDiscardToDeck&) -> std::optional<GameEvent>
-            { return DiscardReturnedToDeckGameEvent(); },
-            [](const AnimationDoorOpen& a) -> std::optional<GameEvent>
-            { return DoorOpenedGameEvent(a.link); },
-            [](const AnimationEnemyAttack& a) -> std::optional<GameEvent>
-            {
-                return MonsterReactionFinishedGameEvent(
-                    a.skipCardAfterReaction);
-            },
-            [](const AnimationEnemyDamagedWindup& a) -> std::optional<GameEvent>
-            {
-                return AttackWindupAnimationEndedGameEvent(
-                    a.damage, a.usedWeaponInventoryIdx);
-            },
-            [](const AnimationEnemyDamaged& a) -> std::optional<GameEvent>
-            {
-                return MonsterStaggerEndedGameEvent(
-                    a.damage, a.usedWeaponInventoryIdx);
-            },
-            [](const AnimationEnemyDodgedAttack&) -> std::optional<GameEvent>
-            { return std::nullopt; },
-            [](const AnimationInvalidOperation&) -> std::optional<GameEvent>
-            { return std::nullopt; },
-            [](const AnimationNewCardsShufflingIntoDeck&)
-                -> std::optional<GameEvent>
-            { return NewCardShuffledToDiscard(); },
-            [](const AnimationReturnInventoryToDeck&)
-                -> std::optional<GameEvent> { return std::nullopt; },
-            [](const AnimationTakeCard& a) -> std::optional<GameEvent>
-            { return CardTakenGameEvent(a.inventorySlotIdx); },
-            [](const AnimationTrashMainCard&) -> std::optional<GameEvent>
-            { return MainCardTrashedGameEvent(); },
-            [](const AnimationHeal&) -> std::optional<GameEvent>
-            { return std::nullopt; },
-            [](const AnimationReturnDraggedMainCard&)
-                -> std::optional<GameEvent> { return std::nullopt; } },
-        animation);
+    return scene.infection.progress == -1;
 }
 
 dgm::Animation::PlaybackStatus
@@ -639,7 +652,7 @@ GameRulesEngine::updateHealAnimation(AnimationHeal& a, const dgm::Time& time)
     auto result = updateAnimation(a, time);
     if (a.isVaccineHeal)
     {
-        scene.infectionProgress =
+        scene.infection.progress =
             static_cast<int>(std::lerp(a.initialInfection, -1, a.perc));
     }
 
@@ -671,22 +684,17 @@ void GameRulesEngine::reloadWeapon(Card& weapon, int quantity)
     weapon.quantity = std::clamp(weapon.quantity + quantity, 0, MAX_AMMO);
 }
 
-void GameRulesEngine::popTopDeckCard()
-{
-    scene.deck.pop_front();
-}
-
 void GameRulesEngine::transformTopCard(CardType from, CardType to)
 {
+    assert(!scene.activeAnimation);
     scene.activeAnimation = AnimationCardTransform(from);
-
-    scene.deck.front() = CardBuilder::createCard(to);
+    scene.mainCard = CardBuilder::createCard(to);
 }
 
 void GameRulesEngine::shuffleNewCardIntoDeck()
 {
     if (scene.cardsToAdd.empty()) return;
-
+    assert(!scene.activeAnimation);
     audioEngine.playSound(SoundId::CardShuffle);
     scene.activeAnimation = AnimationNewCardsShufflingIntoDeck();
 }

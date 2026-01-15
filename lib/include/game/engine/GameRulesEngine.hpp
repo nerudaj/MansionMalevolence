@@ -51,21 +51,15 @@ public:
 
     void operator()(const MonsterStaggerEndedGameEvent& e);
 
-    void operator()(const MainCardTrashedGameEvent& e);
-
     void operator()(const CardUsedOnAnotherInventoryCardGameEvent& e);
 
     void operator()(const ZombieDiedGameEvent& e);
 
     void operator()(const MainCardResolvedGameEvent& e);
 
-    void operator()(const DoorOpenedGameEvent& e);
-
-    void operator()(const NewCardShuffledToDiscard& e);
-
-    void operator()(const DiscardReturnedToDeckGameEvent&);
-
     void operator()(const AttackWindupAnimationEndedGameEvent&);
+
+    void operator()(const FlipCardAnimationEndedGameEvent&);
 
 public:
     void update(const dgm::Time& time);
@@ -76,22 +70,21 @@ public:
 
     void handleDragEnded();
 
+    void handleFinishedAnimation();
+
     std::optional<size_t> getUsableInventorySlot(const Card& card) const;
 
     static bool canInventoryCardCombineWithIncoming(
         const Card& inventoryCard, const Card& incomingCard);
 
     static bool
-    canCardInteractWithDeck(const Card& a, const std::list<Card>& deck);
+    canCardInteractWithMainCard(const Card& a, const Card& mainCard);
 
     [[nodiscard]] bool gameEnded() const noexcept;
 
     [[nodiscard]] bool gameWon() const noexcept;
 
     [[nodiscard]] GameEndReason getGameEnding() const noexcept;
-
-    static std::optional<GameEvent>
-    getEventAfterAnimationEnded(const Animation& animation);
 
     dgm::Animation::PlaybackStatus
     updateHealAnimation(AnimationHeal& a, const dgm::Time& time);
@@ -107,8 +100,6 @@ private:
     findCollidingInventoryIdx(const sf::Vector2f& pointerPos);
 
     void reloadWeapon(Card& weapon, int quantity);
-
-    void popTopDeckCard();
 
     void transformTopCard(CardType from, CardType to);
 

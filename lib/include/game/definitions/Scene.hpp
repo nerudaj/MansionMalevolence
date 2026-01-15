@@ -5,6 +5,7 @@
 #include "game/definitions/Chance.hpp"
 #include "game/definitions/DragDrop.hpp"
 #include "game/definitions/GameStats.hpp"
+#include "game/definitions/Infection.hpp"
 #include "game/enums/GameScenario.hpp"
 #include <DGM/dgm.hpp>
 #include <array>
@@ -50,12 +51,12 @@ public:
 
 struct [[nodiscard]] Scene final
 {
+    std::optional<Card> mainCard = std::nullopt;
     std::list<Card> deck;
-    int infectionProgress = 0;
-    int infectionLimit = -1;
-    std::unique_ptr<ScenarioBuilderInterface> builder;
     std::list<Card> discard = {};
     std::list<Card> cardsToAdd = {};
+    Infection infection = {};
+    std::unique_ptr<ScenarioBuilderInterface> builder;
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = MAX_HEARTS;
     std::optional<Animation> activeAnimation = std::nullopt;

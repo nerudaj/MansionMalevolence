@@ -29,13 +29,24 @@ updateAnimation(AnimationBase& animation, const dgm::Time& time)
                : dgm::Animation::PlaybackStatus::Playing;
 }
 
-struct [[nodiscard]] AnimationCardToDiscard final : AnimationBase
+struct [[nodiscard]] AnimationMainCardToDiscard final : AnimationBase
 {
-    Card card;
     sf::Vector2f origin;
 
-    AnimationCardToDiscard(const Card& card, const sf::Vector2f& origin)
-        : AnimationBase(sf::seconds(0.75f)), card(card), origin(origin)
+    explicit AnimationMainCardToDiscard(const sf::Vector2f& origin)
+        : AnimationBase(sf::seconds(0.75f)), origin(origin)
+    {
+    }
+};
+
+struct [[nodiscard]] AnimationInventoryCardToDiscard final : AnimationBase
+{
+    sf::Vector2f origin;
+    Card card;
+
+    AnimationInventoryCardToDiscard(
+        const sf::Vector2f& origin, const Card& card)
+        : AnimationBase(sf::seconds(10.f)), origin(origin), card(card)
     {
     }
 };
@@ -47,7 +58,7 @@ struct [[nodiscard]] AnimationCardTransform final : AnimationBase
     explicit AnimationCardTransform(CardType cardType) : cardType(cardType) {}
 };
 
-struct [[nodiscard]] AnimationDiscardToDeck final : AnimationBase
+struct [[nodiscard]] AnimationReturnDiscardToDeck final : AnimationBase
 {
 };
 
@@ -119,19 +130,13 @@ struct [[nodiscard]] AnimationNewCardsShufflingIntoDeck final : AnimationBase
     AnimationNewCardsShufflingIntoDeck() : AnimationBase(sf::seconds(0.3f)) {}
 };
 
-struct [[nodiscard]] AnimationReturnInventoryToDeck final : AnimationBase
-{
-    Card card;
-
-    explicit AnimationReturnInventoryToDeck(Card card) : card(card) {}
-};
-
 struct [[nodiscard]] AnimationTakeCard final : AnimationBase
 {
     size_t inventorySlotIdx;
+    sf::Vector2f origin;
 
-    explicit AnimationTakeCard(size_t inventorySlotIdx)
-        : inventorySlotIdx(inventorySlotIdx)
+    AnimationTakeCard(size_t inventorySlotIdx, const sf::Vector2f& origin)
+        : inventorySlotIdx(inventorySlotIdx), origin(origin)
     {
     }
 };
@@ -163,10 +168,15 @@ struct [[nodiscard]] AnimationReturnDraggedMainCard final : AnimationBase
     }
 };
 
+struct [[nodiscard]] AnimationFlipMainCardToVisible final : public AnimationBase
+{
+};
+
 using Animation = std::variant<
-    AnimationCardToDiscard,
+    AnimationMainCardToDiscard,
+    AnimationInventoryCardToDiscard,
     AnimationCardTransform,
-    AnimationDiscardToDeck,
+    AnimationReturnDiscardToDeck,
     AnimationDoorOpen,
     AnimationEnemyAttack,
     AnimationEnemyDamagedWindup,
@@ -174,8 +184,8 @@ using Animation = std::variant<
     AnimationEnemyDodgedAttack,
     AnimationInvalidOperation,
     AnimationNewCardsShufflingIntoDeck,
-    AnimationReturnInventoryToDeck,
     AnimationTakeCard,
     AnimationTrashMainCard,
     AnimationHeal,
-    AnimationReturnDraggedMainCard>;
+    AnimationReturnDraggedMainCard,
+    AnimationFlipMainCardToVisible>;

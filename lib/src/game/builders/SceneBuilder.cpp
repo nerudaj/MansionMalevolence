@@ -30,7 +30,9 @@ Scene SceneBuilder::createScene(const GameScenario scenario)
 
     return Scene {
         .deck = builder->generateStartRoom(),
-        .infectionLimit = builder->getInfectionLimit(),
+        .infection = {
+            .limit = builder->getInfectionLimit(),
+        },
         .builder = std::move(builder),
         .inventory = { CardBuilder::createCard(CardType::Pistol),
                        std::nullopt,
