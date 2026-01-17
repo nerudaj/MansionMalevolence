@@ -61,7 +61,7 @@ void AppStateGameOverScreen::buildLayout()
     content->add(labelPanel);
 
     auto buttonList =
-        ButtonListBuilder(dic.strings, dic.sizer)
+        ButtonListBuilder(dic.strings, dic.sizer, dic.resmgr)
             .addButton(
                 StringId::Retry,
                 [this] { app.popState(Messaging::serialize<RestartGame>()); })

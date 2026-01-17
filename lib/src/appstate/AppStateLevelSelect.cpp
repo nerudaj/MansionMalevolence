@@ -34,58 +34,36 @@ void AppStateLevelSelect::restoreFocusImpl(const std::string& msg)
 
 void AppStateLevelSelect::buildLayout()
 {
+    const std::vector<std::tuple<StringId, GameScenario>> levels = {
+#ifdef _DEBUG
+        { StringId::LevelTutorial1, GameScenario::Tutorial_1 },
+#endif
+        { StringId::LevelEasy, GameScenario::Easy },
+        { StringId::LevelNormal, GameScenario::Normal },
+        { StringId::LevelHard, GameScenario::Hard },
+        { StringId::LevelNightmare, GameScenario::Nightmare },
+        { StringId::LevelNightmare2, GameScenario::OneRoom },
+    };
+
+    auto btnListBuilder = ButtonListBuilder(dic.strings, dic.sizer, dic.resmgr);
+    for (auto&& [stringId, scenario] : levels)
+    {
+        const bool isCleared = dic.settings.save.clearedScenarioNames.contains(
+            nlohmann::json(scenario).dump());
+
+        btnListBuilder.addButton(
+            stringId,
+            [this, scenario]
+            { app.pushState<AppStatePreGame>(dic, settings, scenario); },
+            isCleared);
+    }
+
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
             .withBackgroundImage(dic.resmgr.get<sf::Texture>("menubgr.png"))
             .withTitle(
                 dic.strings.getString(StringId::LevelSelect), HeadingLevel::H2)
-            .withContent(
-                ButtonListBuilder(dic.strings, dic.sizer)
-#ifdef _DEBUG
-                    .addButton(
-                        StringId::LevelTutorial1,
-                        [this]
-                        {
-                            app.pushState<AppStatePreGame>(
-                                dic, settings, GameScenario::Tutorial_1);
-                        })
-#endif
-                    .addButton(
-                        StringId::LevelEasy,
-                        [this]
-                        {
-                            app.pushState<AppStatePreGame>(
-                                dic, settings, GameScenario::Easy);
-                        })
-                    .addButton(
-                        StringId::LevelNormal,
-                        [this]
-                        {
-                            app.pushState<AppStatePreGame>(
-                                dic, settings, GameScenario::Normal);
-                        })
-                    .addButton(
-                        StringId::LevelHard,
-                        [this]
-                        {
-                            app.pushState<AppStatePreGame>(
-                                dic, settings, GameScenario::Hard);
-                        })
-                    .addButton(
-                        StringId::LevelNightmare,
-                        [this]
-                        {
-                            app.pushState<AppStatePreGame>(
-                                dic, settings, GameScenario::Nightmare);
-                        })
-                    .addButton(
-                        StringId::LevelNightmare2,
-                        [this]
-                        {
-                            app.pushState<AppStatePreGame>(
-                                dic, settings, GameScenario::OneRoom);
-                        })
-                    .build())
+            .withContent(btnListBuilder.build())
             .withNoTopLeftButton()
             .withNoTopRightButton()
             .withBottomLeftButton(WidgetBuilder::createButton(

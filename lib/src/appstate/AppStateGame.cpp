@@ -80,7 +80,11 @@ void AppStateGame::onGameEnded()
     auto ending = gameRulesEngine.getGameEnding();
 
     if (ending == GameEndReason::Won)
+    {
+        dic.settings.save.clearedScenarioNames.insert(
+            nlohmann::json(scenario).dump());
         app.pushState<AppStateEndGameScreen>(dic, scene.stats);
+    }
     else
         app.pushState<AppStateGameOverScreen>(dic, ending);
 }

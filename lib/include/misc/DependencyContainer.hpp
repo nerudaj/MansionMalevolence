@@ -46,6 +46,7 @@ struct [[nodiscard]] DependencyContainer final
             .video = settingsSM.video,
             .input = settingsSM.input,
             .bindings = settingsSM.bindings,
+            .save = settingsSM.save,
         })
         , touchController(settings.video.resolution)
         , input(settings.bindings, touchController)

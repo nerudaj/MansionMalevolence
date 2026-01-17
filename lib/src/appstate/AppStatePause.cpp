@@ -25,7 +25,7 @@ void AppStatePause::buildLayout()
             .withTitle(
                 dic.strings.getString(StringId::PauseTitle), HeadingLevel::H2)
             .withContent(
-                ButtonListBuilder(dic.strings, dic.sizer)
+                ButtonListBuilder(dic.strings, dic.sizer, dic.resmgr)
                     .addButton(StringId::Resume, [&] { onResume(); })
                     .addButton(StringId::Options, [&] { onOptions(); })
                     .addButton(StringId::BackToMenu, [&] { onBackToMenu(); })

@@ -49,7 +49,7 @@ void AppStateMainMenu::buildLayout()
             .withTexturedTitle(
                 dic.resmgr.get<sf::Texture>("zombiecards_logo.png"))
             .withContent(
-                ButtonListBuilder(dic.strings, dic.sizer)
+                ButtonListBuilder(dic.strings, dic.sizer, dic.resmgr)
                     .addButton(StringId::PlayButton, [&] { onPlay(); })
                     .addButton(StringId::Options, [&] { onOptions(); })
                     .addButton(StringId::HowToPlay, [&] { onHowToPlay(); })
@@ -57,6 +57,7 @@ void AppStateMainMenu::buildLayout()
                     .addButton(
                         StringId::ExitButton,
                         [&] { onExit(); },
+                        "cleared"_false,
                         "MainMenu_Button_Exit")
                     .build())
             .withNoCornerButtons()

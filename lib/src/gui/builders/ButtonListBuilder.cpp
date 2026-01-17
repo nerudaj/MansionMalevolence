@@ -8,9 +8,11 @@
 ButtonListBuilder& ButtonListBuilder::addButton(
     const StringId labelId,
     std::function<void(void)> onClick,
+    bool cleared,
     const std::string& buttonId)
 {
-    buttonProps.emplace_back(strings.getString(labelId), onClick, buttonId);
+    buttonProps.emplace_back(
+        strings.getString(labelId), onClick, cleared, buttonId);
     return *this;
 }
 
@@ -46,11 +48,21 @@ tgui::Container::Ptr ButtonListBuilder::build(
 
     for (auto&& [idx, props] : std::views::enumerate(buttonProps))
     {
+
         auto group = tgui::Group::create(
             { "100%", sizer.getBaseContainerHeight() * 1.5f });
         auto&& button =
             WidgetBuilder::createButton(props.label, props.onClick, sizer);
         group->add(button, props.buttonId);
+
+        if (props.cleared)
+        {
+            auto clearedMark = tgui::Panel::create({ "height", "80%" });
+            clearedMark->getRenderer()->setTextureBackground(
+                resmgr.get<tgui::Texture>("checkmark.png"));
+            clearedMark->setPosition({ "80%", "10%" });
+            group->add(clearedMark);
+        }
 
         layout->add(group);
     }

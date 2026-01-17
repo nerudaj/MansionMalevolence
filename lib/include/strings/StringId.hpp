@@ -41,6 +41,7 @@ enum class [[nodiscard]] StringId
     LevelHard,
     LevelNightmare,
     LevelNightmare2,
+    LevelCleared,
 
     // InputKind
     InputKind_BackButton,

@@ -153,7 +153,7 @@ ResourceLoader::loadResources(const std::filesystem::path& assetDir)
     }
 
     if (auto result = resmgr.loadResourcesFromDirectory<tgui::Texture>(
-            assetDir / "graphics-tgui", loadTguiTexture, { ".jpeg" });
+            assetDir / "graphics-tgui", loadTguiTexture, { ".jpeg", ".png" });
         !result)
     {
         throw std::runtime_error(uni::format(

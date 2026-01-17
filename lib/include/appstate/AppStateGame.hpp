@@ -25,6 +25,7 @@ public:
         , dic(dic)
         , settings(settings)
         , scene(SceneBuilder::createScene(scenario))
+        , scenario(scenario)
         , gameRulesEngine(
               gameEvents, dic.audioEngine, scene, dic.input, settings.video)
         , renderingEngine(
@@ -49,6 +50,7 @@ private:
     DependencyContainer& dic;
     AppSettings& settings;
     Scene scene;
+    GameScenario scenario;
     EventQueue<GameEvent> gameEvents;
     GameRulesEngine gameRulesEngine;
     RenderingEngine renderingEngine;
