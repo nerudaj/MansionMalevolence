@@ -93,7 +93,7 @@ std::list<Card> TutorialScenarioBuilder::generateRoomDeck(const int)
 
 int NormalScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 50; // prev 75
+    return 60; // prev 75
 }
 
 std::list<Card> NormalScenarioBuilder::generateStartRoom()
@@ -170,7 +170,7 @@ std::list<Card> NormalScenarioBuilder::generateRoomDeck(const int linkID)
 
 int HardScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 90; // prev 115
+    return 80; // prev 115
 }
 
 std::list<Card> HardScenarioBuilder::generateStartRoom()
