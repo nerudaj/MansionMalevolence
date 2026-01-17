@@ -37,9 +37,13 @@ public:
         return sf::Vector2f { 54.f, 204.f };
     }
 
-    [[nodiscard]] static sf::Vector2f getNthHeartOffset(size_t idx) noexcept
+    [[nodiscard]] sf::Vector2f getNthHeartOffset(size_t idx) noexcept
     {
-        return { 3.f + idx * 14.f, 150.f };
+        const float heartIconWidth =
+            10.f < 71.f / scene.maxHearts ? 10.f : 71.f / scene.maxHearts;
+        const float heartSpace = 71.f / scene.maxHearts;
+        const float offset = 8.f + heartSpace / 2.f - heartIconWidth / 2.f;
+        return { offset + idx * heartSpace, 150.f };
     }
 
     [[nodiscard]] static sf::Vector2f getInfectionTextOffset() noexcept

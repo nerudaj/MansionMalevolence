@@ -91,10 +91,16 @@ void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
         return;
     }
 
-    scene.hearts = std::clamp(scene.hearts + card.power, 0, MAX_HEARTS);
+    if (card.special & CardSpecial::HealBoost) ++scene.maxHearts;
+
+    const int healingPower =
+        std::clamp(scene.hearts + card.power, 0, scene.maxHearts)
+        - scene.hearts;
     audioEngine.playSound(SoundId::Heal);
     scene.activeAnimation = AnimationHeal(
-        card.special & CardSpecial::WinGame, scene.infection.progress);
+        healingPower,
+        card.special & CardSpecial::WinGame,
+        scene.infection.progress);
     scene.inventory[e.inventorySlotIdx].reset();
 }
 
@@ -544,7 +550,7 @@ void GameRulesEngine::handleFinishedAnimation()
                     a.inventorySlotIdx);
             },
             [&](const AnimationTrashMainCard&) { scene.mainCard.reset(); },
-            NULL_ANIMATION_HANDLER(AnimationHeal),
+            [&](const AnimationHeal& a) { scene.hearts += a.healAmount; },
             NULL_ANIMATION_HANDLER(AnimationReturnDraggedMainCard),
             [&](const AnimationFlipMainCardToVisible&)
             {

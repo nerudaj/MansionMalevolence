@@ -15,6 +15,7 @@ enum class [[nodiscard]] CardSpecial
     BoostsEvasion = 1024,
     CritChance = 2048,
     RefillAmmoOnKill = 4096,
+    HealBoost = 8192,
 };
 
 constexpr const int SPECIAL_HERBS = 1;

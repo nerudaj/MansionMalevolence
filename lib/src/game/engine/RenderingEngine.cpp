@@ -281,7 +281,9 @@ void RenderingEngine::operator()(const AnimationHeal& a)
 {
     if (!scene.deck.empty()) renderCard(*scene.mainCard, getMainCardOffset());
 
-    const auto offset = sf::Vector2f { 63.f, 0.f } * a.perc;
+    const auto travelAmount =
+        (scene.hearts + a.healAmount) * 63.f / scene.maxHearts;
+    const auto offset = sf::Vector2f { travelAmount, 0.f } * a.perc;
 
     sprite.setTextureRect(atlas.getClip(iconsLocation)
                               .getFrame(std::to_underlying(Icon::HealEffect)));
@@ -411,7 +413,16 @@ void RenderingEngine::renderHud()
 
     // Hearts
     sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Heart)));
-    for (auto i = 0; i < scene.hearts; ++i)
+    const auto isHealAnimationActive =
+        scene.activeAnimation
+        && std::holds_alternative<AnimationHeal>(*scene.activeAnimation);
+    const auto healAnimation =
+        isHealAnimationActive ? std::get<AnimationHeal>(*scene.activeAnimation)
+                              : AnimationHeal(0);
+    int amountOfHeartsToRender =
+        scene.hearts
+        + static_cast<int>(healAnimation.healAmount * healAnimation.perc);
+    for (auto i = 0; i < amountOfHeartsToRender; ++i)
     {
         sprite.setPosition(getNthHeartOffset(i));
         window.draw(sprite);

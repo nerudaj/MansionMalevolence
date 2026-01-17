@@ -59,6 +59,7 @@ struct [[nodiscard]] Scene final
     std::unique_ptr<ScenarioBuilderInterface> builder;
     std::array<std::optional<Card>, 3u> inventory = {};
     int hearts = MAX_HEARTS;
+    int maxHearts = MAX_HEARTS;
     std::optional<Animation> activeAnimation = std::nullopt;
     std::optional<DragDrop> dragDrop = std::nullopt;
     std::optional<std::array<CardType, 3u>> boosterChoice = std::nullopt;

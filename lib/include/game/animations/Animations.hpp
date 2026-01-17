@@ -147,11 +147,14 @@ struct [[nodiscard]] AnimationTrashMainCard final : AnimationBase
 
 struct [[nodiscard]] AnimationHeal final : AnimationBase
 {
+    int healAmount = 0;
     bool isVaccineHeal = false;
     int initialInfection = 0;
 
-    explicit AnimationHeal(bool isVaccineHeal = false, int initialInfection = 0)
+    explicit AnimationHeal(
+        int healAmount, bool isVaccineHeal = false, int initialInfection = 0)
         : AnimationBase(sf::seconds(1.4f))
+        , healAmount(healAmount)
         , isVaccineHeal(isVaccineHeal)
         , initialInfection(initialInfection)
     {
