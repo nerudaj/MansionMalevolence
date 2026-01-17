@@ -51,6 +51,14 @@ public:
         return { 95.f, 160.f };
     }
 
+    [[nodiscard]] sf::Vector2f getDeckOffset() noexcept
+    {
+        return {
+            scene.trashBody.getPosition().x,
+            scene.mainCardBody.getPosition().y,
+        };
+    }
+
 public:
     void operator()(const AnimationMainCardToDiscard& a);
 
@@ -82,7 +90,7 @@ public:
 
     void operator()(const AnimationReturnDraggedMainCard& a);
 
-    void operator()(const AnimationFlipMainCardToVisible& a);
+    void operator()(const AnimationDrawCard& a);
 
 public:
     /**
@@ -194,11 +202,6 @@ public:
     void renderTopDeckCard();
 
     void renderBoosterChoice();
-
-    void renderMainCardBackIfDeckNotEmpty()
-    {
-        if (!scene.deck.empty()) renderCardBack(getMainCardOffset());
-    }
 
     BackgroundType getAppropriateBackgroundType() const;
 

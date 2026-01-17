@@ -76,48 +76,20 @@ void RenderingEngine::draw()
 
 void RenderingEngine::operator()(const AnimationMainCardToDiscard& a)
 {
-    const auto easedF = Easing::easeValley2(a.perc);
-
-    const auto flipOffset =
-        sf::Vector2f { scene.mainCardBody.getSize().x * 0.5f, -3.f }
-        * (1.f - easedF);
-    const auto travelOffset =
+    const auto transitionOffset =
         (scene.trashBody.getPosition() - a.origin) * Easing::easeInOut(a.perc);
+    const auto scale = std::lerp(1.f, 1.f / 3.f, Easing::easeInOut(a.perc));
 
-    const auto position = a.origin + travelOffset + flipOffset;
-    const auto scale =
-        sf::Vector2f { easedF, 1.f } * std::lerp(1.f, 1.f / 3.f, a.perc);
-
-    renderMainCardBackIfDeckNotEmpty();
-
-    assert(scene.mainCard);
-    if (a.perc <= 0.25f)
-        renderCard(*scene.mainCard, position, scale);
-    else
-        renderCardBack(position, scale);
+    renderCard(*scene.mainCard, a.origin + transitionOffset, scale);
 }
 
 void RenderingEngine::operator()(const AnimationInventoryCardToDiscard& a)
 {
-    const auto easedF = Easing::easeValley2(a.perc);
-
-    const auto flipOffset =
-        sf::Vector2f { scene.mainCardBody.getSize().x * 0.5f / 3.f, -3.f }
-        * (1.f - easedF);
-    const auto travelOffset =
+    const auto transitionOffset =
         (scene.trashBody.getPosition() - a.origin) * Easing::easeInOut(a.perc);
 
-    const auto position = a.origin + travelOffset + flipOffset;
-
-    if (scene.mainCard)
-        renderCard(*scene.mainCard, getMainCardOffset());
-    else if (!scene.deck.empty())
-        renderCardBack(getMainCardOffset());
-
-    if (a.perc <= 0.25f)
-        renderCard(a.card, position, 1.f / 3.f);
-    else
-        renderCardBack(position, 1.f / 3.f);
+    if (scene.mainCard) renderCard(*scene.mainCard, getMainCardOffset());
+    renderCard(a.card, a.origin + transitionOffset, 1.f / 3.f);
 }
 
 void RenderingEngine::operator()(const AnimationCardTransform& a)
@@ -128,8 +100,6 @@ void RenderingEngine::operator()(const AnimationCardTransform& a)
     const auto animationOffset =
         sf::Vector2f { 76.f * 0.5f, -3.f } * (1.f - easedF);
 
-    renderMainCardBackIfDeckNotEmpty();
-
     renderCard(
         a.perc <= 0.5f ? preTransformCard : *scene.mainCard,
         getMainCardOffset() + animationOffset,
@@ -138,15 +108,26 @@ void RenderingEngine::operator()(const AnimationCardTransform& a)
 
 void RenderingEngine::operator()(const AnimationReturnDiscardToDeck& a)
 {
-    const auto travelOffset =
-        (scene.trashBody.getPosition() - getMainCardOffset())
-        * (1.f - Easing::easeInOut(a.perc));
+    const auto direction = getDeckOffset() - scene.trashBody.getPosition();
+    const auto transitionOffset = direction * a.perc;
 
-    const auto position = getMainCardOffset() + travelOffset;
-    const auto scale = sf::Vector2f { Easing::easeValley2(a.perc), 1.f }
-                       * std::lerp(1.f / 3.f, 1.f, a.perc);
+    const auto easedF = Easing::easeValley(a.perc);
+    const auto flipOffset =
+        sf::Vector2f(CARD_SIZE.x / 3.f / 2.f, -6.f) * (1.f - easedF);
 
-    renderCardBack(position, scale);
+    if (a.perc <= 0.5f)
+    {
+        renderCard(
+            scene.cardsToAdd.front(),
+            scene.trashBody.getPosition() + transitionOffset + flipOffset,
+            sf::Vector2f { easedF, 1.f } / 3.f);
+    }
+    else
+    {
+        renderCardBack(
+            scene.trashBody.getPosition() + transitionOffset + flipOffset,
+            sf::Vector2f { easedF, 1.f } / 3.f);
+    }
 }
 
 void RenderingEngine::operator()(const AnimationDoorOpen& a)
@@ -155,8 +136,6 @@ void RenderingEngine::operator()(const AnimationDoorOpen& a)
 
     const auto animationOffset =
         sf::Vector2f { 76.f * 0.5f, -3.f } * (1.f - easedF);
-
-    renderMainCardBackIfDeckNotEmpty();
 
     if (a.perc <= 0.5f)
     {
@@ -180,8 +159,6 @@ void RenderingEngine::operator()(const AnimationEnemyAttack& a)
         worldCamera.shake(sf::seconds(a.duration.asSeconds() * 0.4f), 5.f);
     }
 
-    renderMainCardBackIfDeckNotEmpty();
-
     const auto animationOffset =
         (RenderingEngine::getInfectionTextOffset()
          - (getMainCardOffset() + scene.mainCardBody.getSize()))
@@ -198,8 +175,6 @@ void RenderingEngine::operator()(const AnimationEnemyDamaged& a)
 {
     const float factor =
         a.elapsed.asSeconds() <= 0.25 ? a.elapsed.asSeconds() / 0.25f : 0.f;
-
-    renderMainCardBackIfDeckNotEmpty();
 
     const auto animationOffset =
         sf::Vector2f { 76.f * 0.1f, 76.f * 0.1f } * Easing::easeDamage(factor);
@@ -221,8 +196,6 @@ void RenderingEngine::operator()(const AnimationEnemyDamaged& a)
 
 void RenderingEngine::operator()(const AnimationEnemyDodgedAttack& a)
 {
-    renderMainCardBackIfDeckNotEmpty();
-
     const auto animationOffset =
         sf::Vector2f { -15.f, 0.f } * Easing::easeOutThenBack(a.perc);
     renderCard(*scene.mainCard, getMainCardOffset() + animationOffset);
@@ -230,8 +203,6 @@ void RenderingEngine::operator()(const AnimationEnemyDodgedAttack& a)
 
 void RenderingEngine::operator()(const AnimationInvalidOperation& a)
 {
-    renderMainCardBackIfDeckNotEmpty();
-
     const auto animationOffset =
         sf::Vector2f { 4.f, 4.f } * Easing::easeDamage(a.perc);
     renderCard(*scene.mainCard, getMainCardOffset() + animationOffset);
@@ -239,17 +210,17 @@ void RenderingEngine::operator()(const AnimationInvalidOperation& a)
 
 void RenderingEngine::operator()(const AnimationNewCardsShufflingIntoDeck& a)
 {
-    renderMainCardBackIfDeckNotEmpty();
-
     const auto count = scene.cardsToAdd.size();
 
     const auto animationOffset =
-        (scene.trashBody.getPosition() - getMainCardOffset())
-        * Easing::easeInOut(a.perc);
-    const auto scaleFactor = std::lerp(1.f, 1.f / 3.f, a.perc);
+        (getDeckOffset() - getMainCardOffset()) * Easing::easeInOut(a.perc);
+    const auto scaleFactor = std::lerp(1.f, 1.f / 4.f, a.perc);
 
     if (count > 1) renderCardBack(getMainCardOffset());
     renderCardBack(getMainCardOffset() + animationOffset, scaleFactor);
+
+    // Render deck over the shuffled card
+    if (!scene.deck.empty()) renderCardBack(getDeckOffset(), 1.f / 3.f);
 }
 
 void RenderingEngine::operator()(const AnimationTakeCard& a)
@@ -259,15 +230,11 @@ void RenderingEngine::operator()(const AnimationTakeCard& a)
         (getNthInventoryCardOffset(a.inventorySlotIdx) - a.origin)
         * Easing::easeInOut(a.perc);
 
-    renderMainCardBackIfDeckNotEmpty();
-
     renderCard(*scene.mainCard, a.origin + animationOffset, { scale, scale });
 }
 
 void RenderingEngine::operator()(const AnimationTrashMainCard& a)
 {
-    renderMainCardBackIfDeckNotEmpty();
-
     const auto scale = std::lerp(1.f, 1.f / 10.f, a.perc);
     const auto animationOffset =
         sf::Vector2f { 0.f, -100.f } * Easing::easeInOut(a.perc);
@@ -293,8 +260,6 @@ void RenderingEngine::operator()(const AnimationHeal& a)
 
 void RenderingEngine::operator()(const AnimationReturnDraggedMainCard& a)
 {
-    renderMainCardBackIfDeckNotEmpty();
-
     const auto animationOffset =
         (a.origin - getMainCardOffset()) * Easing::easeInOut(1.f - a.perc);
     const auto scale = std::lerp(0.5f, 1.f, Easing::easeInOut(a.perc));
@@ -302,27 +267,30 @@ void RenderingEngine::operator()(const AnimationReturnDraggedMainCard& a)
     renderCard(*scene.mainCard, getMainCardOffset() + animationOffset, scale);
 }
 
-void RenderingEngine::operator()(const AnimationFlipMainCardToVisible& a)
+void RenderingEngine::operator()(const AnimationDrawCard& a)
 {
-    renderMainCardBackIfDeckNotEmpty();
+    const auto direction = getMainCardOffset() - getDeckOffset();
+    const auto transitionOffset = direction * a.perc;
 
+    const auto cardWidth = std::lerp(CARD_SIZE.x / 3.f, CARD_SIZE.x, a.perc);
     const auto easedF = Easing::easeValley(a.perc);
+    const auto flipOffset =
+        sf::Vector2f(cardWidth / 2.f, -6.f) * (1.f - easedF);
 
-    const auto animationOffset =
-        sf::Vector2f { 76.f * 0.5f, -3.f } * (1.f - easedF);
+    const auto scaleDownFactor = std::lerp(3.f, 1.f, a.perc);
 
     if (a.perc <= 0.5f)
     {
         renderCardBack(
-            getMainCardOffset() + animationOffset,
-            sf::Vector2f { easedF, 1.f });
+            getDeckOffset() + transitionOffset + flipOffset,
+            sf::Vector2f { easedF, 1.f } / scaleDownFactor);
     }
     else
     {
         renderCard(
             scene.deck.front(),
-            getMainCardOffset() + animationOffset,
-            sf::Vector2f { easedF, 1.f });
+            getDeckOffset() + transitionOffset + flipOffset,
+            sf::Vector2f { easedF, 1.f } / scaleDownFactor);
     }
 }
 
@@ -375,11 +343,10 @@ void RenderingEngine::renderWorld()
         renderCard(card.value(), getNthInventoryCardOffset(idx), 1.f / 3.f);
     }
 
+    if (!scene.deck.empty()) renderCardBack(getDeckOffset(), 1.f / 3.f);
     if (!scene.discard.empty())
-    {
-        renderCardBack(
-            scene.trashBody.getPosition(), sf::Vector2f { 1.f, 1.f } / 3.f);
-    }
+        renderCard(
+            scene.discard.back(), scene.trashBody.getPosition(), 1.f / 3.f);
 
     renderTopDeckCard();
 
@@ -525,6 +492,10 @@ BackgroundType RenderingEngine::getAppropriateBackgroundType() const
     const auto&& draggedCard =
         scene.inventory[dragDrop.inventoryIdx.value_or(0)].value_or(
             CardBuilder::createCard(CardType::Empty));
+
+    if (scene.dragDrop && !scene.dragDrop->inventoryIdx
+        && !scene.dragDrop->draggingMainCard)
+        return BackgroundType::Plain;
 
     if (dragDrop.draggingMainCard)
     {

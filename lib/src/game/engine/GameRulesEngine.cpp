@@ -77,8 +77,7 @@ void GameRulesEngine::operator()(const InventoryCardTrashedGameEvent& e)
     auto card = *scene.inventory[e.inventorySlotIdx];
     scene.inventory[e.inventorySlotIdx].reset();
 
-    scene.activeAnimation = AnimationInventoryCardToDiscard(
-        scene.inventoryBodies[e.inventorySlotIdx].getPosition(), card);
+    scene.activeAnimation = AnimationInventoryCardToDiscard(e.origin, card);
 }
 
 void GameRulesEngine::operator()(const InventoryCardUsedForHealingGameEvent& e)
@@ -331,7 +330,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else if (!scene.mainCard)
     {
-        scene.activeAnimation = AnimationFlipMainCardToVisible();
+        scene.activeAnimation = AnimationDrawCard();
         return;
     }
     else
@@ -471,7 +470,8 @@ void GameRulesEngine::handleDragEnded()
     }
     else if (dgm::Collision::basic(scene.trashBody, dragPos))
     {
-        gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(inventoryIdx);
+        gameEventQueue.pushEvent<InventoryCardTrashedGameEvent>(
+            inventoryIdx, dragPos);
     }
     else
     {
@@ -540,7 +540,7 @@ void GameRulesEngine::handleFinishedAnimation()
             NULL_ANIMATION_HANDLER(AnimationInvalidOperation),
             [&](const AnimationNewCardsShufflingIntoDeck&)
             {
-                scene.discard.push_back(scene.cardsToAdd.front());
+                scene.deck.push_back(scene.cardsToAdd.front());
                 scene.cardsToAdd.pop_front();
                 shuffleNewCardIntoDeck();
             },
@@ -552,7 +552,7 @@ void GameRulesEngine::handleFinishedAnimation()
             [&](const AnimationTrashMainCard&) { scene.mainCard.reset(); },
             [&](const AnimationHeal& a) { scene.hearts += a.healAmount; },
             NULL_ANIMATION_HANDLER(AnimationReturnDraggedMainCard),
-            [&](const AnimationFlipMainCardToVisible&)
+            [&](const AnimationDrawCard&)
             {
                 assert(!scene.mainCard);
                 scene.mainCard = scene.deck.front();

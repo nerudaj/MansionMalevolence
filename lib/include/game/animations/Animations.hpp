@@ -46,7 +46,7 @@ struct [[nodiscard]] AnimationInventoryCardToDiscard final : AnimationBase
 
     AnimationInventoryCardToDiscard(
         const sf::Vector2f& origin, const Card& card)
-        : AnimationBase(sf::seconds(10.f)), origin(origin), card(card)
+        : origin(origin), card(card)
     {
     }
 };
@@ -171,7 +171,7 @@ struct [[nodiscard]] AnimationReturnDraggedMainCard final : AnimationBase
     }
 };
 
-struct [[nodiscard]] AnimationFlipMainCardToVisible final : public AnimationBase
+struct [[nodiscard]] AnimationDrawCard final : public AnimationBase
 {
 };
 
@@ -191,4 +191,4 @@ using Animation = std::variant<
     AnimationTrashMainCard,
     AnimationHeal,
     AnimationReturnDraggedMainCard,
-    AnimationFlipMainCardToVisible>;
+    AnimationDrawCard>;

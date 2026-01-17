@@ -31,9 +31,11 @@ struct [[nodiscard]] CardSkipEndedGameEvent final
 struct [[nodiscard]] InventoryCardTrashedGameEvent final
 {
     size_t inventorySlotIdx;
+    sf::Vector2f origin;
 
-    constexpr explicit InventoryCardTrashedGameEvent(size_t idx) noexcept
-        : inventorySlotIdx(idx)
+    constexpr explicit InventoryCardTrashedGameEvent(
+        size_t idx, const sf::Vector2f& origin) noexcept
+        : inventorySlotIdx(idx), origin(origin)
     {
     }
 };
