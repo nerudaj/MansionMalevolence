@@ -94,11 +94,21 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
       "drag the main card over your inventory to pick it up. certain cards "
       "might "
       "automatically combine if there is no space left." },
-    { InventoryText,
-      "you can combine cards in your inventory, use them on the main card, "
-      "heal yourself, or put the inventory card back into deck." },
+    { AttackText,
+      "drag inventory card onto the main card to attack it, or use key item on "
+      "it." },
+    { CombineText,
+      "drag inventory card onto another inventory card to reload weapons or "
+      "craft new items." },
+    { HealText,
+      "drag healing item from the inventory onto your healthbar to heal." },
+    { DiscardText,
+      "you can discard a card from your inventory to make place for something "
+      "more useful. Note that certain cards can combine upon taking even if "
+      "inventory is "
+      "full!" },
     { VaccineText,
-      "find and use the vaccine on yourself to heal the infection!" },
+      "find and use the vaccine on yourself to cure the infection!" },
     { DiamondsText,
       "diamonds on weapons indicate damage, amount of hitpoints healed on "
       "healing cards and both health and damage for monsters. damaging a "

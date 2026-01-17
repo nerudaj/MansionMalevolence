@@ -81,7 +81,10 @@ enum class [[nodiscard]] StringId
     Next,
     SkipText,
     TakeText,
-    InventoryText,
+    AttackText,
+    CombineText,
+    HealText,
+    DiscardText,
     VaccineText,
     DiamondsText,
 
