@@ -13,7 +13,11 @@ struct [[nodiscard]] RestartGame final
 {
 };
 
-using AppMessage = std::variant<PopIfNotMenu, RestartGame>;
+struct [[nodiscard]] PopIfNotLevelSelect final
+{
+};
+
+using AppMessage = std::variant<PopIfNotMenu, RestartGame, PopIfNotLevelSelect>;
 
 template<class T>
 concept IsAppMessage = std::constructible_from<AppMessage, T>;

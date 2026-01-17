@@ -66,8 +66,9 @@ void AppStateGameOverScreen::buildLayout()
                 StringId::Retry,
                 [this] { app.popState(Messaging::serialize<RestartGame>()); })
             .addButton(
-                StringId::BackToMenu,
-                [this] { app.popState(Messaging::serialize<PopIfNotMenu>()); })
+                StringId::BackToLevelSelect,
+                [this]
+                { app.popState(Messaging::serialize<PopIfNotLevelSelect>()); })
             .build();
 
     auto buttonPanel = tgui::Group::create();

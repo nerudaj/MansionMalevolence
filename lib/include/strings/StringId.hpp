@@ -74,6 +74,7 @@ enum class [[nodiscard]] StringId
     KilledByCrisonHead,
     KilledByLicker,
     KilledByTyrant,
+    BackToLevelSelect,
 
     // How to play
     Prev,

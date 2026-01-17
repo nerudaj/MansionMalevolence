@@ -27,8 +27,8 @@ void AppStatePreGame::restoreFocusImpl(const std::string& msg)
     {
         std::visit(
             overloads {
-                [&](PopIfNotMenu) { app.popState(msg); },
                 [&](RestartGame) { /*continue*/ },
+                [&](auto) { app.popState(msg); },
             },
             *message);
     }

@@ -81,6 +81,7 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { KilledByCrisonHead, "crimson head chased you down" },
     { KilledByLicker, "licker has torn you into pieces" },
     { KilledByTyrant, "tyrant has slashed you in half" },
+    { BackToLevelSelect, "back to scenarios" },
 
     // How to play
     { Prev, "prev" },
