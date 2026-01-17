@@ -6,6 +6,7 @@
 #include "misc/Compatibility.hpp"
 #include "strings/InputKindToStringMapper.hpp"
 #include "types/Overloads.hpp"
+#include <filesystem/AppStorage.hpp>
 #include <ranges>
 
 const tgui::Color CONTENT_BGCOLOR = tgui::Color(255, 255, 255, 64);
@@ -134,7 +135,12 @@ void AppStateOptions::buildLayout()
             .withNoTopRightButton()
             .withBottomLeftButton(WidgetBuilder::createButton(
                 dic.strings.getString(StringId::Back),
-                [&] { onBack(); },
+                [&]
+                {
+                    AppStorage::saveFile(
+                        "settings.json", fromAppSettingsModel(dic.settings));
+                    onBack();
+                },
                 dic.sizer))
             .withNoBottomRightButton()
             .build());

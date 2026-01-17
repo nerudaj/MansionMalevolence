@@ -3,6 +3,7 @@
 #include "appstate/AppStateGameOverScreen.hpp"
 #include "appstate/AppStatePause.hpp"
 #include "appstate/Messaging.hpp"
+#include <filesystem/AppStorage.hpp>
 
 void AppStateGame::input()
 {
@@ -83,6 +84,8 @@ void AppStateGame::onGameEnded()
     {
         dic.settings.save.clearedScenarioNames.insert(
             nlohmann::json(scenario).dump());
+        AppStorage::saveFile(
+            "settings.json", fromAppSettingsModel(dic.settings));
         app.pushState<AppStateEndGameScreen>(dic, scene.stats);
     }
     else
