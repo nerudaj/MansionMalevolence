@@ -57,10 +57,10 @@ tgui::Container::Ptr ButtonListBuilder::build(
 
         if (props.cleared)
         {
-            auto clearedMark = tgui::Panel::create({ "height", "80%" });
+            auto clearedMark = tgui::Panel::create({ "height", "60%" });
             clearedMark->getRenderer()->setTextureBackground(
                 resmgr.get<tgui::Texture>("checkmark.png"));
-            clearedMark->setPosition({ "80%", "10%" });
+            clearedMark->setPosition({ "80%", "20%" });
             group->add(clearedMark);
         }
 
