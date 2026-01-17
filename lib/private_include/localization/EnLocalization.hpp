@@ -39,6 +39,7 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { BindingHeadingAction, "action" },
     { BindingHeadingKMB, "keyboard/Mouse" },
     { BindingsHeadingGamepad, "gamepad" },
+    { MenuLanguage, "menu language" },
 
     // Level select
     { LevelSelect, "select scenario" },

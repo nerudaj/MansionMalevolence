@@ -36,6 +36,7 @@ fromAppSettingsModel(const AppSettings& s)
         .audio = {
             .soundVolume = s.audio.soundVolume,
             .musicVolume = s.audio.musicVolume,
+            .language = s.audio.language,
         },
         .video = s.video,
         .input = s.input,

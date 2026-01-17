@@ -1,21 +1,24 @@
 #pragma once
 
 #include "misc/Observable.hpp"
+#include "strings/Language.hpp"
 #include <nlohmann/json.hpp>
 
 struct [[nodiscard]] AudioSettings_StorageModel final
 {
     float soundVolume = 50.f;
     float musicVolume = 50.f;
+    Language language = Language::English;
 };
 
 NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-    AudioSettings_StorageModel, soundVolume, musicVolume);
+    AudioSettings_StorageModel, soundVolume, musicVolume, language);
 
 struct [[nodiscard]] AudioSettings_AppModel final
 {
     Observable<float> soundVolume;
     Observable<float> musicVolume;
+    Language language = Language::English;
 };
 
 /*

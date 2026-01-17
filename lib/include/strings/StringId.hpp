@@ -32,6 +32,7 @@ enum class [[nodiscard]] StringId
     BindingHeadingAction,
     BindingHeadingKMB,
     BindingsHeadingGamepad,
+    MenuLanguage,
 
     // Level select
     LevelSelect,

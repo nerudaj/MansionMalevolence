@@ -71,6 +71,12 @@ void AppStateOptions::draw()
 
 void AppStateOptions::buildLayout()
 {
+    const auto languages = std::vector<std::string> {
+        "english",
+        "cesky",
+        "polski",
+    };
+
     dic.gui.rebuildWith(
         DefaultLayoutBuilder(dic.sizer)
             .withNoBackgroundImage()
@@ -130,6 +136,20 @@ void AppStateOptions::buildLayout()
                                     .setMouseCursorVisible(false);
                             }))
 #endif
+                    .addOption(
+                        StringId::MenuLanguage,
+                        WidgetBuilder::createDropdown(
+                            languages,
+                            languages.at(std::to_underlying(
+                                dic.settings.audio.language)),
+                            [&](size_t idx)
+                            {
+                                const auto lang = static_cast<Language>(idx);
+                                dic.settings.audio.language = lang;
+                                dic.strings.changeLanguage(lang);
+                                refresh();
+                            },
+                            dic.sizer))
                     .build())
             .withNoTopLeftButton()
             .withNoTopRightButton()

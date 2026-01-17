@@ -305,9 +305,7 @@ const std::map<CardType, Card> CARD_DEFS = {
              .name = "tyrant t-002",
              .texts = {
                  "retaliate",
-                 "",
                  "vigilant",
-                 "",
              } } },
 
     // Misc

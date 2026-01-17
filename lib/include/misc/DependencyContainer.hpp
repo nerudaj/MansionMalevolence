@@ -16,7 +16,7 @@ struct [[nodiscard]] DependencyContainer final
 {
     Gui gui;
     dgm::ResourceManager resmgr;
-    const StringProvider strings;
+    StringProvider strings;
     Jukebox jukebox;
     AudioEngine audioEngine;
     AppSettings settings;
@@ -35,13 +35,14 @@ struct [[nodiscard]] DependencyContainer final
         // other tgui objects (like fonts) can be created.
         : gui(window)
         , resmgr(ResourceLoader::loadResources(rootDir))
-        , strings(primaryLang)
+        , strings(settingsSM.audio.language)
         , jukebox(resmgr)
         , audioEngine(resmgr)
         , settings(AppSettings {
             .audio = {
                 .soundVolume = Observable<float>(settingsSM.audio.soundVolume, [this](float v){ audioEngine.setVolume(v); }),
                 .musicVolume = Observable<float>(settingsSM.audio.musicVolume, [this](float v) { jukebox.setVolume(v); }),
+                .language = settingsSM.audio.language,
             },
             .video = settingsSM.video,
             .input = settingsSM.input,

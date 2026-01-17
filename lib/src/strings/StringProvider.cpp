@@ -1,11 +1,15 @@
 #include "strings/StringProvider.hpp"
+#include "localization/CzLocalization.hpp"
 #include "localization/EnLocalization.hpp"
+#include "localization/PlLocalization.hpp"
 #include <ranges>
 
 StringProvider::StringProvider(Language primary) : current(primary)
 {
     const std::map<Language, Localization>& localizations = {
         { Language::English, EN_LOCALIZATION },
+        { Language::Czech, CZ_LOCALIZATION },
+        { Language::Polish, PL_LOCALIZATION },
     };
 
     strings.resize(localizations.size());
