@@ -41,12 +41,13 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
     { BindingsHeadingGamepad, "gamepad" },
 
     // Level select
-    { LevelSelect, "level select" },
+    { LevelSelect, "select scenario" },
     { LevelTutorial1, "tutorial" },
     { LevelEasy, "easy scenario" },
     { LevelNormal, "normal scenario" },
     { LevelHard, "hard scenario" },
     { LevelNightmare, "nightmare scenario" },
+    { LevelNightmare2, "one-room scenario" },
 
     // InputKind
     { InputKind_BackButton, "back" },

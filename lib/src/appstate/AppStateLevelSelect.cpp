@@ -78,6 +78,13 @@ void AppStateLevelSelect::buildLayout()
                             app.pushState<AppStatePreGame>(
                                 dic, settings, GameScenario::Nightmare);
                         })
+                    .addButton(
+                        StringId::LevelNightmare2,
+                        [this]
+                        {
+                            app.pushState<AppStatePreGame>(
+                                dic, settings, GameScenario::OneRoom);
+                        })
                     .build())
             .withNoTopLeftButton()
             .withNoTopRightButton()

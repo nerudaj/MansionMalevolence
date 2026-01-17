@@ -21,7 +21,11 @@ makeBuilder(const GameScenario scenario)
         return std::make_unique<NormalScenarioBuilder>();
     else if (scenario == GameScenario::Hard)
         return std::make_unique<HardScenarioBuilder>();
-    return std::make_unique<NightmareScenarioBuilder>();
+    else if (scenario == GameScenario::Nightmare)
+        return std::make_unique<NightmareScenarioBuilder>();
+    else if (scenario == GameScenario::OneRoom)
+        return std::make_unique<OneRoomScenarioBuilder>();
+    throw std::runtime_error("unsupported scenario");
 }
 
 Scene SceneBuilder::createScene(const GameScenario scenario)
@@ -376,6 +380,65 @@ std::list<Card> NightmareScenarioBuilder::generateRoomDeck(const int linkID)
         auto deck = std::vector {
             CardBuilder::createCard(CardType::Crate),
             CardBuilder::createCard(CardType::Licker),
+            CardBuilder::createCard(CardType::Crate),
+            CardBuilder::createCard(CardType::Tyrant),
+            CardBuilder::createCard(CardType::Vaccine),
+        };
+
+        // Not shuffling on purpose
+
+        return deck | uniranges::to<std::list>();
+    }
+
+    return std::list<Card>();
+}
+
+int OneRoomScenarioBuilder::getInfectionLimit() const noexcept
+{
+    return 100;
+}
+
+std::list<Card> OneRoomScenarioBuilder::generateStartRoom()
+{
+    auto deck = std::vector {
+        CardBuilder::createCard(CardType::GreenHerb),
+        CardBuilder::createCard(CardType::RedHerb),
+        CardBuilder::createCard(CardType::FirstAid),
+        CardBuilder::createCard(CardType::WeaponLockerKey),
+        CardBuilder::createCard(CardType::LockedWeaponLocker),
+        CardBuilder::createCard(CardType::Crate),
+        CardBuilder::createCard(CardType::Crate),
+        CardBuilder::createCard(CardType::SunCrest),
+        CardBuilder::createCard(CardType::CrestDoorEmpty),
+        CardBuilder::createCard(CardType::RedJewel),
+        CardBuilder::createCard(CardType::RedJewelBox),
+        CardBuilder::createCard(CardType::YellowJewel),
+        CardBuilder::createCard(CardType::YellowJewelBox),
+        CardBuilder::createCard(CardType::MoonCrestLeft),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::Zombie),
+        CardBuilder::createCard(CardType::CrimsonHead),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::Cerberus),
+        CardBuilder::createCard(CardType::Licker),
+        CardBuilder::createCard(CardType::Licker),
+
+    };
+
+    shuffleVec(deck);
+
+    return deck | uniranges::to<std::list>();
+}
+
+std::list<Card> OneRoomScenarioBuilder::generateRoomDeck(const int linkID)
+{
+    if (linkID == SPECIAL_CREST_DOOR)
+    {
+        auto deck = std::vector {
             CardBuilder::createCard(CardType::Crate),
             CardBuilder::createCard(CardType::Tyrant),
             CardBuilder::createCard(CardType::Vaccine),
