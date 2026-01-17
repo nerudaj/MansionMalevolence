@@ -246,7 +246,7 @@ void RenderingEngine::operator()(const AnimationTrashMainCard& a)
 
 void RenderingEngine::operator()(const AnimationHeal& a)
 {
-    if (!scene.deck.empty()) renderCard(*scene.mainCard, getMainCardOffset());
+    if (scene.mainCard) renderCard(*scene.mainCard, getMainCardOffset());
 
     const auto travelAmount =
         (scene.hearts + a.healAmount) * 63.f / scene.maxHearts;
@@ -455,9 +455,6 @@ void RenderingEngine::renderTopDeckCard()
     {
         const auto isDraggingMainCard =
             scene.dragDrop.value_or(DragDrop {}).draggingMainCard;
-
-        if (isDraggingMainCard && !scene.deck.empty())
-            renderCardBack(getMainCardOffset());
 
         const auto offset =
             isDraggingMainCard ? scene.dragDrop->position : getMainCardOffset();
