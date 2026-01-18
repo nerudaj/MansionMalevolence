@@ -108,13 +108,10 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     assert(!scene.activeAnimation);
     auto& card = scene.inventory[e.inventorySlotIdx].value();
     auto& deckCard = *scene.mainCard;
-    if (card.traits & CardTrait::Weapon && deckCard.traits & CardTrait::Enemy)
+    if (card.traits & CardTrait::Weapon && deckCard.traits & CardTrait::Enemy
+        && card.quantity > 0)
     {
-        if (card.quantity != 0)
-        {
-            gameEventQueue.pushEvent<MonsterShotAtGameEvent>(
-                e.inventorySlotIdx);
-        }
+        gameEventQueue.pushEvent<MonsterShotAtGameEvent>(e.inventorySlotIdx);
     }
     else if (
         card.traits & CardTrait::KeyItem
@@ -614,7 +611,8 @@ bool GameRulesEngine::canCardInteractWithMainCard(
     const Card& a, const Card& mainCard)
 {
     const auto deckTraits = mainCard.traits;
-    return deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
+    return (deckTraits & CardTrait::Enemy && a.traits & CardTrait::Weapon
+            && a.quantity > 0)
            || deckTraits & CardTrait::KeyTarget && a.traits & CardTrait::KeyItem
                   && mainCard.link == a.link;
 }
