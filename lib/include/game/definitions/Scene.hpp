@@ -66,8 +66,8 @@ struct [[nodiscard]] Scene final
 
     dgm::Rect mainCardBody = dgm::Rect(sf::Vector2f { 6.f, 27.f }, CARD_SIZE);
     dgm::Rect healthbarBody = dgm::Rect({ 3.f, 150.f }, { 80.f, 24.f });
-    dgm::Rect trashBody = dgm::Rect({ 94.f, 102.f }, CARD_SIZE / 3.f);
-    dgm::Rect wholeInventoryBody = dgm::Rect({ 3.f, 178.f }, { 123.f, 47.f });
+    dgm::Rect trashBody = dgm::Rect({ 83.f, 66.f }, { 45.f, 81.f });
+    dgm::Rect wholeInventoryBody = dgm::Rect({ 0.f, 147.f }, { 128.f, 81.f });
     std::array<dgm::Rect, 3u> inventoryBodies = {
         dgm::Rect(getNthInventoryCardOffset(0), CARD_SIZE / 3.f),
         dgm::Rect(getNthInventoryCardOffset(1), CARD_SIZE / 3.f),

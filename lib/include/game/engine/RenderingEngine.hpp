@@ -32,9 +32,9 @@ public:
         return scene.mainCardBody.getPosition();
     }
 
-    [[nodiscard]] static sf::Vector2f getTrashIconOffset() noexcept
+    [[nodiscard]] static sf::Vector2f getDiscardOffset() noexcept
     {
-        return sf::Vector2f { 54.f, 204.f };
+        return sf::Vector2f { 94.f, 102.f };
     }
 
     [[nodiscard]] sf::Vector2f getNthHeartOffset(size_t idx) noexcept
@@ -54,7 +54,7 @@ public:
     [[nodiscard]] sf::Vector2f getDeckOffset() noexcept
     {
         return {
-            scene.trashBody.getPosition().x,
+            getDiscardOffset().x,
             scene.mainCardBody.getPosition().y,
         };
     }

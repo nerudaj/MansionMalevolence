@@ -77,7 +77,7 @@ void RenderingEngine::draw()
 void RenderingEngine::operator()(const AnimationMainCardToDiscard& a)
 {
     const auto transitionOffset =
-        (scene.trashBody.getPosition() - a.origin) * Easing::easeInOut(a.perc);
+        (getDiscardOffset() - a.origin) * Easing::easeInOut(a.perc);
     const auto scale = std::lerp(1.f, 1.f / 3.f, Easing::easeInOut(a.perc));
 
     renderCard(*scene.mainCard, a.origin + transitionOffset, scale);
@@ -86,7 +86,7 @@ void RenderingEngine::operator()(const AnimationMainCardToDiscard& a)
 void RenderingEngine::operator()(const AnimationInventoryCardToDiscard& a)
 {
     const auto transitionOffset =
-        (scene.trashBody.getPosition() - a.origin) * Easing::easeInOut(a.perc);
+        (getDiscardOffset() - a.origin) * Easing::easeInOut(a.perc);
 
     if (scene.mainCard) renderCard(*scene.mainCard, getMainCardOffset());
     renderCard(a.card, a.origin + transitionOffset, 1.f / 3.f);
@@ -108,7 +108,7 @@ void RenderingEngine::operator()(const AnimationCardTransform& a)
 
 void RenderingEngine::operator()(const AnimationReturnDiscardToDeck& a)
 {
-    const auto direction = getDeckOffset() - scene.trashBody.getPosition();
+    const auto direction = getDeckOffset() - getDiscardOffset();
     const auto transitionOffset = direction * a.perc;
 
     const auto easedF = Easing::easeValley(a.perc);
@@ -119,13 +119,13 @@ void RenderingEngine::operator()(const AnimationReturnDiscardToDeck& a)
     {
         renderCard(
             scene.cardsToAdd.front(),
-            scene.trashBody.getPosition() + transitionOffset + flipOffset,
+            getDiscardOffset() + transitionOffset + flipOffset,
             sf::Vector2f { easedF, 1.f } / 3.f);
     }
     else
     {
         renderCardBack(
-            scene.trashBody.getPosition() + transitionOffset + flipOffset,
+            getDiscardOffset() + transitionOffset + flipOffset,
             sf::Vector2f { easedF, 1.f } / 3.f);
     }
 }
@@ -345,8 +345,7 @@ void RenderingEngine::renderWorld()
 
     if (!scene.deck.empty()) renderCardBack(getDeckOffset(), 1.f / 3.f);
     if (!scene.discard.empty())
-        renderCard(
-            scene.discard.back(), scene.trashBody.getPosition(), 1.f / 3.f);
+        renderCard(scene.discard.back(), getDiscardOffset(), 1.f / 3.f);
 
     renderTopDeckCard();
 
