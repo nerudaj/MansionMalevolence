@@ -10,6 +10,7 @@ AppStateGallery::AppStateGallery(dgm::App& app, DependencyContainer& dic)
     , canvas(tgui::CanvasSFML::create())
 {
     buildLayout();
+    dic.touchController.clearInputs();
 }
 
 void AppStateGallery::input()

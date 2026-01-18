@@ -12,6 +12,7 @@ public:
         : dgm::AppState(app), dic(dic), settings(settings)
     {
         buildLayout();
+        dic.touchController.clearInputs();
     }
 
 public:

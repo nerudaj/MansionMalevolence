@@ -21,7 +21,7 @@ TouchModel::TouchModel(const sf::Vector2u& windowSize)
           TouchInput(
               TouchObjectKind::Button,
               CoordConverter::worldToScreen(
-                  { 15.f, 15.f }, INTERNAL_GAME_RESOLUTION_U, windowSize),
+                  { 12.f, 12.f }, INTERNAL_GAME_RESOLUTION_U, windowSize),
               CoordConverter::worldToScreen(
                   10.f, INTERNAL_GAME_RESOLUTION_U, windowSize)),
           TouchInput(TouchObjectKind::Button, { -1.f, -1.f }, 0.5f),
@@ -30,7 +30,22 @@ TouchModel::TouchModel(const sf::Vector2u& windowSize)
               TouchObjectKind::Joystick,
               { 0.f, 0.f },
               sf::Vector2f(windowSize).length()),
-      })
+          TouchInput(
+              TouchObjectKind::Button,
+              CoordConverter::worldToScreen(
+                  { INTERNAL_GAME_RESOLUTION.x / 2.f, 12.f },
+                  INTERNAL_GAME_RESOLUTION_U,
+                  windowSize),
+              CoordConverter::worldToScreen(
+                  10.f, INTERNAL_GAME_RESOLUTION_U, windowSize)),
+          TouchInput(
+              TouchObjectKind::Button,
+              CoordConverter::worldToScreen(
+                  { INTERNAL_GAME_RESOLUTION.x - 12.f, 12.f },
+                  INTERNAL_GAME_RESOLUTION_U,
+                  windowSize),
+              CoordConverter::worldToScreen(
+                  10.f, INTERNAL_GAME_RESOLUTION_U, windowSize)) })
 {
 }
 
@@ -78,9 +93,27 @@ bool TouchController::isSkipPressed() const
     return model.skipButton.readButton();
 }
 
+bool TouchController::isHowToPlayPressed() const
+{
+    return model.howtoplayButton.readButton();
+}
+
+bool TouchController::isGalleryPressed() const
+{
+    return model.galleryButton.readButton();
+}
+
 sf::Vector2f TouchController::getDragPosition() const
 {
     return model.dragJoystick.readJoystick();
+}
+
+void TouchController::clearInputs()
+{
+    for (auto&& input : model.objects)
+    {
+        input.reset();
+    }
 }
 
 void TouchController::processEvent(const sf::Event::TouchBegan& e)

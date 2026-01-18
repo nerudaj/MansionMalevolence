@@ -47,6 +47,16 @@ bool Input::isConfirmPressed() const
     return readAndRelease(InputKind::ConfirmButton);
 }
 
+bool Input::isHowToPlayPressed() const
+{
+    return touchController.isHowToPlayPressed();
+}
+
+bool Input::isGalleryPressed() const
+{
+    return touchController.isGalleryPressed();
+}
+
 sf::Vector2f Input::getCursorDelta() const
 {
     return sf::Vector2f {

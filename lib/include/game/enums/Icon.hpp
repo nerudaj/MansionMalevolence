@@ -3,6 +3,8 @@
 enum class [[nodiscard]] Icon
 {
     Pause,
+    QuestionMark,
+    LookingGlass,
     Drop,
     BulletBig,
     Bullet,

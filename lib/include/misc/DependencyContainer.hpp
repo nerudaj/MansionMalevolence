@@ -28,7 +28,7 @@ struct [[nodiscard]] DependencyContainer final
     DependencyContainer(
         dgm::Window& window,
         const std::filesystem::path& rootDir,
-        Language primaryLang,
+        Language,
         const AppSettings_StorageModel& settingsSM)
         // Gui needs to be instantiated before Resource manager
         // since we need to have gui backend defined before

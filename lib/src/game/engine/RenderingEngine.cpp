@@ -252,8 +252,8 @@ void RenderingEngine::operator()(const AnimationHeal& a)
         (scene.hearts + a.healAmount) * 63.f / scene.maxHearts;
     const auto offset = sf::Vector2f { travelAmount, 0.f } * a.perc;
 
-    sprite.setTextureRect(atlas.getClip(iconsLocation)
-                              .getFrame(std::to_underlying(Icon::HealEffect)));
+    sprite.setTextureRect(
+        atlas.getClip(iconsLocation).getFrame(Icon::HealEffect));
     sprite.setPosition(sf::Vector2f { 8.f, 150.f } + offset);
     window.draw(sprite);
 }
@@ -362,23 +362,33 @@ void RenderingEngine::renderWorld()
 
 void RenderingEngine::renderBackground()
 {
-    sprite.setTextureRect(
-        atlas.getClip(playbgrLocation)
-            .getFrame(std::to_underlying(getAppropriateBackgroundType())));
+    sprite.setTextureRect(atlas.getClip(playbgrLocation)
+                              .getFrame(getAppropriateBackgroundType()));
     sprite.setPosition({ 0.f, 0.f });
     window.draw(sprite);
 }
 
 void RenderingEngine::renderHud()
 {
-    // Pause button
     auto& iconsClip = atlas.getClip(iconsLocation);
-    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Pause)));
-    sprite.setPosition({ 3.f, 3.f });
+
+    // Pause button
+    sprite.setTextureRect(iconsClip.getFrame(Icon::Pause));
+    sprite.setPosition({ 0.f, 0.f });
+    window.draw(sprite);
+
+    // Question
+    sprite.setTextureRect(iconsClip.getFrame(Icon::QuestionMark));
+    sprite.setPosition({ INTERNAL_GAME_RESOLUTION.x / 2.f - 12.f, 0.f });
+    window.draw(sprite);
+
+    // Looking glass
+    sprite.setTextureRect(iconsClip.getFrame(Icon::LookingGlass));
+    sprite.setPosition({ INTERNAL_GAME_RESOLUTION.x - 24.f - 0.f, 0.f });
     window.draw(sprite);
 
     // Hearts
-    sprite.setTextureRect(iconsClip.getFrame(std::to_underlying(Icon::Heart)));
+    sprite.setTextureRect(iconsClip.getFrame(Icon::Heart));
     const auto isHealAnimationActive =
         scene.activeAnimation
         && std::holds_alternative<AnimationHeal>(*scene.activeAnimation);
@@ -401,19 +411,6 @@ void RenderingEngine::renderHud()
     text.setPosition(getInfectionTextOffset());
     window.draw(text);
     text.setFillColor(WHITE_COLOR);
-
-    /*
-    text.set{ 0.f, 0.f });
-    text.setString(fpsCounter.getText());
-    window.draw(text);
-    */
-
-    /*scene.mainCardBody.debugRender(window);
-    scene.healthbarBody.debugRender(window);
-    scene.trashBody.debugRender(window);
-    scene.inventoryBodies[0].debugRender(window);
-    scene.inventoryBodies[1].debugRender(window);
-    scene.inventoryBodies[2].debugRender(window);*/
 }
 
 void RenderingEngine::renderTouchControls()
@@ -437,8 +434,7 @@ void RenderingEngine::renderCardBack(
 {
     sprite.setScale(scale);
     sprite.setTextureRect(
-        atlas.getClip(cardbgrLocation)
-            .getFrame(std::to_underlying(CardBackground::Backside)));
+        atlas.getClip(cardbgrLocation).getFrame(CardBackground::Backside));
     sprite.setPosition(offset);
     window.draw(sprite);
     sprite.setScale({ 1.f, 1.f });
@@ -466,8 +462,7 @@ void RenderingEngine::renderBoosterChoice()
     if (!scene.boosterChoice) return;
 
     sprite.setTextureRect(
-        atlas.getClip(playbgrLocation)
-            .getFrame(std::to_underlying(BackgroundType::PickOne)));
+        atlas.getClip(playbgrLocation).getFrame(BackgroundType::PickOne));
     sprite.setPosition({ 0.f, 0.f });
     window.draw(sprite);
 

@@ -69,7 +69,7 @@ public:
     void updateFromNewWindowSize(const sf::Vector2u& windowSize);
 
 public:
-    mutable std::array<TouchInput, 4u> objects;
+    mutable std::array<TouchInput, 6u> objects;
     std::map<unsigned, size_t>
         fingerToTouchObject = {}; ///< Each event has finger index associated
                                   ///< with it so we can pair touch begin, touch
@@ -80,6 +80,8 @@ public:
     TouchInput& takeButton = objects[1];
     TouchInput& skipButton = objects[2];
     TouchInput& dragJoystick = objects[3];
+    TouchInput& howtoplayButton = objects[4];
+    TouchInput& galleryButton = objects[5];
 };
 
 class [[nodiscard]] TouchController final
@@ -105,7 +107,13 @@ public:
 
     [[nodiscard]] bool isSkipPressed() const;
 
+    [[nodiscard]] bool isHowToPlayPressed() const;
+
+    [[nodiscard]] bool isGalleryPressed() const;
+
     [[nodiscard]] sf::Vector2f getDragPosition() const;
+
+    void clearInputs();
 
 private:
     void processEvent(const sf::Event::TouchBegan& e);

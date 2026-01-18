@@ -6,6 +6,7 @@ AppStateTutorial::AppStateTutorial(dgm::App& app, DependencyContainer& dic)
     : dgm::AppState(app), dic(dic)
 {
     buildLayout();
+    dic.touchController.clearInputs();
 }
 
 void AppStateTutorial::input()

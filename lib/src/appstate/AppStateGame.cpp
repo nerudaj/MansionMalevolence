@@ -1,7 +1,9 @@
 #include "appstate/AppStateGame.hpp"
 #include "appstate/AppStateEndGameScreen.hpp"
+#include "appstate/AppStateGallery.hpp"
 #include "appstate/AppStateGameOverScreen.hpp"
 #include "appstate/AppStatePause.hpp"
+#include "appstate/AppStateTutorial.hpp"
 #include "appstate/Messaging.hpp"
 #include <filesystem/AppStorage.hpp>
 
@@ -10,6 +12,14 @@ void AppStateGame::input()
     if (dic.input.isBackButtonPressed())
     {
         app.pushState<AppStatePause>(dic, settings);
+    }
+    else if (dic.input.isHowToPlayPressed())
+    {
+        app.pushState<AppStateTutorial>(dic);
+    }
+    else if (dic.input.isGalleryPressed())
+    {
+        app.pushState<AppStateGallery>(dic);
     }
 
     dic.virtualCursor.update(app.time, settings.input.cursorSpeed);
@@ -98,4 +108,6 @@ void AppStateGame::restoreFocusImpl(const std::string& msg)
     {
         std::visit([&](auto) { app.popState(msg); }, *message);
     }
+
+    dic.touchController.clearInputs();
 }

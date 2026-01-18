@@ -44,6 +44,10 @@ public:
 
     [[nodiscard]] bool isConfirmPressed() const;
 
+    [[nodiscard]] bool isHowToPlayPressed() const;
+
+    [[nodiscard]] bool isGalleryPressed() const;
+
     [[nodiscard]] sf::Vector2f getCursorDelta() const;
 
 private:
