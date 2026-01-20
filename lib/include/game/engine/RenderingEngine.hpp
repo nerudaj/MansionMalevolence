@@ -80,6 +80,8 @@ public:
 
     void operator()(const AnimationInvalidOperation& a);
 
+    void operator()(const AnimationOutOfAmmo& a);
+
     void operator()(const AnimationNewCardsShufflingIntoDeck& a);
 
     void operator()(const AnimationTakeCard& a);

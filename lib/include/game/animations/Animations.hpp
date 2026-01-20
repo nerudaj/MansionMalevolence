@@ -125,6 +125,11 @@ struct [[nodiscard]] AnimationInvalidOperation final : AnimationBase
     AnimationInvalidOperation() : AnimationBase(sf::seconds(0.25f)) {}
 };
 
+struct [[nodiscard]] AnimationOutOfAmmo final : AnimationBase
+{
+    AnimationOutOfAmmo() : AnimationBase(sf::seconds(0.4f)) {}
+};
+
 struct [[nodiscard]] AnimationNewCardsShufflingIntoDeck final : AnimationBase
 {
     AnimationNewCardsShufflingIntoDeck() : AnimationBase(sf::seconds(0.3f)) {}
@@ -191,4 +196,5 @@ using Animation = std::variant<
     AnimationTrashMainCard,
     AnimationHeal,
     AnimationReturnDraggedMainCard,
-    AnimationDrawCard>;
+    AnimationDrawCard,
+    AnimationOutOfAmmo>;

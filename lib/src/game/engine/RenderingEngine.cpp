@@ -220,6 +220,24 @@ void RenderingEngine::operator()(const AnimationInvalidOperation& a)
     renderCard(*scene.mainCard, getMainCardOffset() + animationOffset);
 }
 
+void RenderingEngine::operator()(const AnimationOutOfAmmo& a)
+{
+    const auto animationOffset =
+        sf::Vector2f { 4.f, 4.f } * Easing::easeDamage(a.perc);
+    renderCard(*scene.mainCard, getMainCardOffset() + animationOffset);
+
+    const auto textOrigin =
+        sf::Vector2f { INTERNAL_GAME_RESOLUTION.x / 2.f, 91.f };
+    const auto textAnimationOffset =
+        (sf::Vector2f { INTERNAL_GAME_RESOLUTION.x / 2.f, 79.f } - textOrigin)
+        * a.perc;
+    text.setString("out of ammo");
+    text.setFillColor(YELLOW_COLOR);
+    text.setPosition(
+        textOrigin + textAnimationOffset - text.getGlobalBounds().size / 2.f);
+    window.draw(text);
+}
+
 void RenderingEngine::operator()(const AnimationNewCardsShufflingIntoDeck& a)
 {
     const auto count = scene.cardsToAdd.size();

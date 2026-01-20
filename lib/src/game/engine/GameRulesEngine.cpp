@@ -108,8 +108,9 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     assert(!scene.activeAnimation);
     auto& card = scene.inventory[e.inventorySlotIdx].value();
     auto& deckCard = *scene.mainCard;
-    if (card.traits & CardTrait::Weapon && deckCard.traits & CardTrait::Enemy
-        && card.quantity > 0)
+    const bool isAttackingEnemy =
+        card.traits & CardTrait::Weapon && deckCard.traits & CardTrait::Enemy;
+    if (isAttackingEnemy && card.quantity > 0)
     {
         gameEventQueue.pushEvent<MonsterShotAtGameEvent>(e.inventorySlotIdx);
     }
@@ -149,7 +150,10 @@ void GameRulesEngine::operator()(const InventoryCardUsedOnMainCardGameEvent& e)
     else
     {
         audioEngine.playSound(SoundId::Error);
-        scene.activeAnimation = AnimationInvalidOperation();
+        if (isAttackingEnemy && card.quantity == 0)
+            scene.activeAnimation = AnimationOutOfAmmo();
+        else
+            scene.activeAnimation = AnimationInvalidOperation();
         return; // skip stats increment
     }
 
@@ -535,6 +539,7 @@ void GameRulesEngine::handleFinishedAnimation()
             },
             NULL_ANIMATION_HANDLER(AnimationEnemyDodgedAttack),
             NULL_ANIMATION_HANDLER(AnimationInvalidOperation),
+            NULL_ANIMATION_HANDLER(AnimationOutOfAmmo),
             [&](const AnimationNewCardsShufflingIntoDeck&)
             {
                 scene.deck.push_back(scene.cardsToAdd.front());
