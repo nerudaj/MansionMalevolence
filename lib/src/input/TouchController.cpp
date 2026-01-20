@@ -21,7 +21,7 @@ TouchModel::TouchModel(const sf::Vector2u& windowSize)
           TouchInput(
               TouchObjectKind::Button,
               CoordConverter::worldToScreen(
-                  { 12.f, 12.f }, INTERNAL_GAME_RESOLUTION_U, windowSize),
+                  { 10.f, 11.f }, INTERNAL_GAME_RESOLUTION_U, windowSize),
               CoordConverter::worldToScreen(
                   10.f, INTERNAL_GAME_RESOLUTION_U, windowSize)),
           TouchInput(TouchObjectKind::Button, { -1.f, -1.f }, 0.5f),
@@ -33,7 +33,7 @@ TouchModel::TouchModel(const sf::Vector2u& windowSize)
           TouchInput(
               TouchObjectKind::Button,
               CoordConverter::worldToScreen(
-                  { INTERNAL_GAME_RESOLUTION.x / 2.f, 12.f },
+                  { INTERNAL_GAME_RESOLUTION.x / 2.f, 11.f },
                   INTERNAL_GAME_RESOLUTION_U,
                   windowSize),
               CoordConverter::worldToScreen(
@@ -41,7 +41,7 @@ TouchModel::TouchModel(const sf::Vector2u& windowSize)
           TouchInput(
               TouchObjectKind::Button,
               CoordConverter::worldToScreen(
-                  { INTERNAL_GAME_RESOLUTION.x - 12.f, 12.f },
+                  { INTERNAL_GAME_RESOLUTION.x - 10.f, 11.f },
                   INTERNAL_GAME_RESOLUTION_U,
                   windowSize),
               CoordConverter::worldToScreen(

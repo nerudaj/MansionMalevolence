@@ -374,17 +374,17 @@ void RenderingEngine::renderHud()
 
     // Pause button
     sprite.setTextureRect(iconsClip.getFrame(Icon::Pause));
-    sprite.setPosition({ 0.f, 0.f });
+    sprite.setPosition({ 0.f, 1.f });
     window.draw(sprite);
 
     // Question
     sprite.setTextureRect(iconsClip.getFrame(Icon::QuestionMark));
-    sprite.setPosition({ INTERNAL_GAME_RESOLUTION.x / 2.f - 12.f, 0.f });
+    sprite.setPosition({ INTERNAL_GAME_RESOLUTION.x / 2.f - 10.f, 1.f });
     window.draw(sprite);
 
     // Looking glass
     sprite.setTextureRect(iconsClip.getFrame(Icon::LookingGlass));
-    sprite.setPosition({ INTERNAL_GAME_RESOLUTION.x - 24.f - 0.f, 0.f });
+    sprite.setPosition({ INTERNAL_GAME_RESOLUTION.x - 20.f - 0.f, 1.f });
     window.draw(sprite);
 
     // Hearts
