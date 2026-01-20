@@ -248,8 +248,9 @@ void RenderingEngine::operator()(const AnimationHeal& a)
 {
     if (scene.mainCard) renderCard(*scene.mainCard, getMainCardOffset());
 
-    const auto travelAmount =
-        (scene.hearts + a.healAmount) * 63.f / scene.maxHearts;
+    const auto travelAmount = a.isVaccineHeal ? 63.f
+                                              : (scene.hearts + a.healAmount)
+                                                    * 63.f / scene.maxHearts;
     const auto offset = sf::Vector2f { travelAmount, 0.f } * a.perc;
 
     sprite.setTextureRect(
