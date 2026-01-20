@@ -111,16 +111,16 @@ const std::map<StringId, StringViewType> PL_LOCALIZATION = {
       "uleczyc." },
 
     { DiscardText,
-      "mozesz odrzucic karte z ekwipunku aby zrobic miejsce na cos bardziej "
-      "przydatnego. pamietaj ze niektore karty lacza sie automatycznie nawet "
-      "gdy ekwipunek jest pelny!" },
+      "mozes odrzucic karte z ekwipunku, aby zrobic miejsce na cos bardziej "
+      "przydatnego." },
 
     { VaccineText,
       "znajdz i uzyj szczepionki na sobie aby wyleczyc infekcje!" },
 
     { DiamondsText,
-      "diamenty na broniach oznaczaja obrazenia, na kartach leczenia ilosc "
-      "punktow zdrowia, a na potworach zdrowie i obrazenia. zadawanie obrazen "
-      "potworowi zmniejsza obrazenia jakie moze zadac!" },
+      "diamenty wskazuja sile broni, skutecznosc przedmiotow leczniczych oraz "
+      "zycie i moc potworow. zadawanie obrazen potworowi zmniejszy obrazenia, "
+      "jakie moze zadac!" },
 
+    { AmmoText, "bronie maja ograniczona amunicje, uzywaj jej ostroznie!" },
 };

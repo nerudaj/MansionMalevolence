@@ -22,13 +22,13 @@ private:
 
 private:
     const std::vector<std::string> images = {
-        "skip.png", "take.png",    "attack.png",   "combine.png",
-        "heal.png", "discard.png", "diamonds.png", "vaccine.png",
+        "skip.png",    "take.png",     "attack.png", "combine.png", "heal.png",
+        "discard.png", "diamonds.png", "ammo.png",   "vaccine.png",
     };
     const std::vector<StringId> labelIds = {
-        StringId::SkipText,     StringId::TakeText,    StringId::AttackText,
-        StringId::CombineText,  StringId::HealText,    StringId::DiscardText,
-        StringId::DiamondsText, StringId::VaccineText,
+        StringId::SkipText,     StringId::TakeText, StringId::AttackText,
+        StringId::CombineText,  StringId::HealText, StringId::DiscardText,
+        StringId::DiamondsText, StringId::AmmoText, StringId::VaccineText,
     };
     DependencyContainer& dic;
 };

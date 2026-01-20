@@ -49,7 +49,7 @@ void AppStateTutorial::onPageChanged(
 {
     auto label = WidgetBuilder::createTextLabel(
         dic.strings.getString(labelIds[pageIdx]), dic.sizer, "justify"_true);
-    label->setSize({ "100%", dic.sizer.getBaseContainerHeight() * 2 });
+    label->setSize({ "100%", dic.sizer.getBaseContainerHeight() * 4 });
     label->setPosition({ "0%", "parent.height - height" });
     content->add(label, "DescriptionLabel");
 

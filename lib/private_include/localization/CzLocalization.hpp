@@ -110,8 +110,8 @@ const std::map<StringId, StringViewType> CZ_LOCALIZATION = {
       "pretahni lecivy predmet z inventare na ukazatel zdravi pro leceni." },
 
     { DiscardText,
-      "muzes odhodit kartu z inventare aby sis udelal misto. poznamka: nektere "
-      "karty se spoji automaticky i kdyz je inventar plny!" },
+      "muzes odhodit kartu z inventare aby sis udelal misto na neco "
+      "uzitecnejsiho." },
 
     { VaccineText,
       "najdi a pouzij vakcinu na sebe aby ses vylecil z infekce!" },
@@ -120,4 +120,6 @@ const std::map<StringId, StringViewType> CZ_LOCALIZATION = {
       "diamanty na zbranich znaci poskozeni, na lecivych kartach mnozstvi "
       "obnoveneho zdravi a u monster zdravi i poskozeni. poskozeni monstra "
       "snizuje jeho utocnou silu!" },
+
+    { AmmoText, "zbrane maji limitovanou munici, strilej s rozmyslem!" },
 };

@@ -105,13 +105,12 @@ const std::map<StringId, StringViewType> EN_LOCALIZATION = {
       "drag healing item from the inventory onto your healthbar to heal." },
     { DiscardText,
       "you can discard a card from your inventory to make place for something "
-      "more useful. Note that certain cards can combine upon taking even if "
-      "inventory is "
-      "full!" },
+      "more useful." },
     { VaccineText,
       "find and use the vaccine on yourself to cure the infection!" },
     { DiamondsText,
-      "diamonds on weapons indicate damage, amount of hitpoints healed on "
-      "healing cards and both health and damage for monsters. damaging a "
+      "diamonds indicate weapon power, effectivity of healing items, and both "
+      "lives and power of monsters. damaging a "
       "monster will reduce the damage it can deal!" },
+    { AmmoText, "weapons have limited ammo, use it with caution!" }
 };
