@@ -4,6 +4,7 @@
 
 const auto WHITE_COLOR = sf::Color { 0xff, 0xf1, 0xe8 };
 const auto RED_COLOR = sf::Color { 0xff, 0x00, 0x4d };
+const auto YELLOW_COLOR = sf::Color { 0xff, 0xec, 0x27 };
 
 RenderingEngine::RenderingEngine(
     dgm::Window& window,
@@ -199,6 +200,17 @@ void RenderingEngine::operator()(const AnimationEnemyDodgedAttack& a)
     const auto animationOffset =
         sf::Vector2f { -15.f, 0.f } * Easing::easeOutThenBack(a.perc);
     renderCard(*scene.mainCard, getMainCardOffset() + animationOffset);
+
+    const auto textOrigin =
+        sf::Vector2f { INTERNAL_GAME_RESOLUTION.x / 2.f, 91.f };
+    const auto textAnimationOffset =
+        (sf::Vector2f { INTERNAL_GAME_RESOLUTION.x / 2.f, 79.f } - textOrigin)
+        * a.perc;
+    text.setString("dodged");
+    text.setFillColor(YELLOW_COLOR);
+    text.setPosition(
+        textOrigin + textAnimationOffset - text.getGlobalBounds().size / 2.f);
+    window.draw(text);
 }
 
 void RenderingEngine::operator()(const AnimationInvalidOperation& a)

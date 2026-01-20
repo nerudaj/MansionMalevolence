@@ -115,7 +115,7 @@ struct [[nodiscard]] AnimationEnemyDamaged final : AnimationBase
 struct [[nodiscard]] AnimationEnemyDodgedAttack final : AnimationBase
 {
     explicit AnimationEnemyDodgedAttack(sf::Time duration)
-        : AnimationBase(sf::seconds(std::max(duration.asSeconds(), 0.3f)))
+        : AnimationBase(sf::seconds(std::max(duration.asSeconds(), 0.4f)))
     {
     }
 };
