@@ -374,7 +374,13 @@ void RenderingEngine::renderWorld()
         renderCard(card.value(), getNthInventoryCardOffset(idx), 1.f / 3.f);
     }
 
-    if (!scene.deck.empty()) renderCardBack(getDeckOffset(), 1.f / 3.f);
+    const auto activeAnimationIsDrawCard =
+        scene.activeAnimation
+        && std::holds_alternative<AnimationDrawCard>(*scene.activeAnimation);
+    const auto shouldRenderDeck =
+        activeAnimationIsDrawCard && scene.deck.size() > 1
+        || !activeAnimationIsDrawCard && !scene.deck.empty();
+    if (shouldRenderDeck) renderCardBack(getDeckOffset(), 1.f / 3.f);
     if (!scene.discard.empty())
         renderCard(scene.discard.back(), getDiscardOffset(), 1.f / 3.f);
 
