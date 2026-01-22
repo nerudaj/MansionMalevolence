@@ -325,6 +325,14 @@ void RenderingEngine::operator()(const AnimationDrawCard& a)
     }
 }
 
+void RenderingEngine::operator()(const AnimationFadeIn& a)
+{
+    auto&& rect = sf::RectangleShape(INTERNAL_GAME_RESOLUTION);
+    rect.setFillColor(
+        sf::Color(0, 0, 0, 255 - static_cast<uint8_t>(a.perc * 255)));
+    window.draw(rect);
+}
+
 dgm::Camera RenderingEngine::createFullscreenCamera(
     const sf::Vector2f& currentResolution,
     const sf::Vector2f& desiredResolution)

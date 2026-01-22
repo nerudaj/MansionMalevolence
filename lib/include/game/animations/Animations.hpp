@@ -180,6 +180,12 @@ struct [[nodiscard]] AnimationDrawCard final : public AnimationBase
 {
 };
 
+struct [[nodiscard]] AnimationFadeIn final : public AnimationBase
+{
+public:
+    AnimationFadeIn() : AnimationBase(sf::seconds(2.f)) {}
+};
+
 using Animation = std::variant<
     AnimationMainCardToDiscard,
     AnimationInventoryCardToDiscard,
@@ -197,4 +203,5 @@ using Animation = std::variant<
     AnimationHeal,
     AnimationReturnDraggedMainCard,
     AnimationDrawCard,
-    AnimationOutOfAmmo>;
+    AnimationOutOfAmmo,
+    AnimationFadeIn>;

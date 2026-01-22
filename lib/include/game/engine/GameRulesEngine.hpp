@@ -23,6 +23,7 @@ public:
         , input(input)
         , settings(settings)
     {
+        scene.activeAnimation = AnimationFadeIn();
     }
 
     GameRulesEngine(GameRulesEngine&&) = delete;

@@ -495,7 +495,12 @@ void GameRulesEngine::handleDragEnded()
     }
 }
 
-#define NULL_ANIMATION_HANDLER(AnimationType) [](const AnimationType&) {}
+template<class T>
+class NoOp
+{
+public:
+    void operator()(const T&) {}
+};
 
 void GameRulesEngine::handleFinishedAnimation()
 {
@@ -510,7 +515,7 @@ void GameRulesEngine::handleFinishedAnimation()
             },
             [&](const AnimationInventoryCardToDiscard& a)
             { scene.discard.push_back(a.card); },
-            NULL_ANIMATION_HANDLER(AnimationCardTransform),
+            NoOp<AnimationCardTransform>(),
             [&](const AnimationReturnDiscardToDeck&)
             {
                 scene.deck = scene.cardsToAdd;
@@ -537,9 +542,9 @@ void GameRulesEngine::handleFinishedAnimation()
                 gameEventQueue.pushEvent<MonsterStaggerEndedGameEvent>(
                     a.damage, a.usedWeaponInventoryIdx);
             },
-            NULL_ANIMATION_HANDLER(AnimationEnemyDodgedAttack),
-            NULL_ANIMATION_HANDLER(AnimationInvalidOperation),
-            NULL_ANIMATION_HANDLER(AnimationOutOfAmmo),
+            NoOp<AnimationEnemyDodgedAttack>(),
+            NoOp<AnimationInvalidOperation>(),
+            NoOp<AnimationOutOfAmmo>(),
             [&](const AnimationNewCardsShufflingIntoDeck&)
             {
                 scene.deck.push_back(scene.cardsToAdd.front());
@@ -553,18 +558,17 @@ void GameRulesEngine::handleFinishedAnimation()
             },
             [&](const AnimationTrashMainCard&) { scene.mainCard.reset(); },
             [&](const AnimationHeal& a) { scene.hearts += a.healAmount; },
-            NULL_ANIMATION_HANDLER(AnimationReturnDraggedMainCard),
+            NoOp<AnimationReturnDraggedMainCard>(),
             [&](const AnimationDrawCard&)
             {
                 assert(!scene.mainCard);
                 scene.mainCard = scene.deck.front();
                 scene.deck.pop_front();
             },
+            NoOp<AnimationFadeIn>(),
         },
         animation);
 }
-
-#undef NULL_ANIMATION_HANDLER
 
 void GameRulesEngine::updateActiveAnimation(const dgm::Time& time)
 {
