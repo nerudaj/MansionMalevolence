@@ -5,7 +5,8 @@ namespace SoundId
     using IdType = const char*;
 
     const IdType None = "buzzer.wav";
-    const IdType CardShuffle = "zombiecard_skip.wav";
+    const IdType Draw = "zombiecard_draw.wav";
+    const IdType Skip = "zombiecard_skip.wav";
     const IdType CardDestroy = "zombiecards_paper_crumple.wav";
     const IdType Crafting = "crafting.wav";
     const IdType DogGrowl = "zombiecards_dog.wav";

@@ -30,7 +30,7 @@ void GameRulesEngine::operator()(const CardSkipStartedGameEvent&)
     scene.stats.turnsTaken++;
     scene.activeAnimation =
         AnimationMainCardToDiscard(scene.mainCardBody.getPosition());
-    audioEngine.playSound(SoundId::CardShuffle);
+    audioEngine.playSound(SoundId::Skip);
 }
 
 void GameRulesEngine::operator()(const CardSkipEndedGameEvent& e)
@@ -331,6 +331,7 @@ void GameRulesEngine::update(const dgm::Time& time)
     }
     else if (!scene.mainCard)
     {
+        audioEngine.playSound(SoundId::Draw);
         scene.activeAnimation = AnimationDrawCard();
         return;
     }
@@ -714,7 +715,7 @@ void GameRulesEngine::shuffleNewCardIntoDeck()
 {
     if (scene.cardsToAdd.empty()) return;
     assert(!scene.activeAnimation);
-    audioEngine.playSound(SoundId::CardShuffle);
+    audioEngine.playSound(SoundId::Draw);
     scene.activeAnimation = AnimationNewCardsShufflingIntoDeck();
 }
 
