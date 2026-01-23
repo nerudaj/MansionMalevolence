@@ -483,13 +483,19 @@ void GameRulesEngine::handleDragEnded()
                 || static_cast<size_t>(idx) == inventoryIdx)
                 continue;
 
-            if (dgm::Collision::basic(inventoryBody, dragPos)
-                && canInventoryCardCombineWithIncoming(
-                    *scene.inventory[idx], *scene.inventory[inventoryIdx]))
+            if (dgm::Collision::basic(inventoryBody, dragPos))
             {
-                gameEventQueue
-                    .pushEvent<CardUsedOnAnotherInventoryCardGameEvent>(
-                        inventoryIdx, static_cast<size_t>(idx));
+                if (canInventoryCardCombineWithIncoming(
+                        *scene.inventory[idx], *scene.inventory[inventoryIdx]))
+                {
+                    gameEventQueue
+                        .pushEvent<CardUsedOnAnotherInventoryCardGameEvent>(
+                            inventoryIdx, static_cast<size_t>(idx));
+                }
+                else
+                {
+                    audioEngine.playSound(SoundId::Error);
+                }
             }
         }
     }
