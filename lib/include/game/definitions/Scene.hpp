@@ -65,7 +65,7 @@ struct [[nodiscard]] Scene final
     std::optional<std::array<CardType, 3u>> boosterChoice = std::nullopt;
 
     dgm::Rect mainCardBody = dgm::Rect(sf::Vector2f { 6.f, 27.f }, CARD_SIZE);
-    dgm::Rect healthbarBody = dgm::Rect({ 3.f, 150.f }, { 80.f, 24.f });
+    dgm::Rect healthbarBody = dgm::Rect({ 0.f, 150.f }, { 128.f, 24.f });
     dgm::Rect trashBody = dgm::Rect({ 83.f, 66.f }, { 45.f, 81.f });
     dgm::Rect wholeInventoryBody = dgm::Rect({ 0.f, 147.f }, { 128.f, 81.f });
     std::array<dgm::Rect, 3u> inventoryBodies = {
