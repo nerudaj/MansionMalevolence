@@ -51,6 +51,7 @@ public:
 
 struct [[nodiscard]] Scene final
 {
+    bool gameEnded = false;
     std::optional<Card> mainCard = std::nullopt;
     std::list<Card> deck;
     std::list<Card> discard = {};

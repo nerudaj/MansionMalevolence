@@ -67,12 +67,17 @@ SceneBuilder::generateBooster(CardImage boosterCardImage)
 
 int TutorialScenarioBuilder::getInfectionLimit() const noexcept
 {
-    return 20;
+    return 10;
 }
 
 std::list<Card> TutorialScenarioBuilder::generateStartRoom()
 {
     return {
+        CardBuilder::createCard(CardType::MixedHerbs),
+        CardBuilder::createCard(CardType::Shotgun),
+        CardBuilder::createCard(CardType::Ammo),
+        CardBuilder::createCard(CardType::Tyrant),
+        CardBuilder::createCard(CardType::Vaccine),
         CardBuilder::createCard(CardType::WeaponLockerKey),
         CardBuilder::createCard(CardType::LockedWeaponLocker),
         CardBuilder::createCard(CardType::MoonCrestLeft),

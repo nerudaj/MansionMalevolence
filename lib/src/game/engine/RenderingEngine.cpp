@@ -333,6 +333,15 @@ void RenderingEngine::operator()(const AnimationFadeIn& a)
     window.draw(rect);
 }
 
+void RenderingEngine::operator()(const AnimationFadeOut& a)
+{
+    auto&& rect = sf::RectangleShape(INTERNAL_GAME_RESOLUTION);
+    auto color = a.winFadeOut ? WHITE_COLOR : RED_COLOR;
+    color.a = static_cast<uint8_t>(a.perc * 255);
+    rect.setFillColor(color);
+    window.draw(rect);
+}
+
 dgm::Camera RenderingEngine::createFullscreenCamera(
     const sf::Vector2f& currentResolution,
     const sf::Vector2f& desiredResolution)

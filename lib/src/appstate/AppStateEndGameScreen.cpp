@@ -22,12 +22,29 @@ void AppStateEndGameScreen::input()
         });
 }
 
-void AppStateEndGameScreen::update() {}
+void AppStateEndGameScreen::update()
+{
+    if (fadeInAnimation.elapsed <= fadeInAnimation.duration)
+    {
+        updateAnimation(fadeInAnimation, app.time);
+    }
+}
 
 void AppStateEndGameScreen::draw()
 {
     dic.gui.draw();
     dic.virtualCursor.draw();
+
+    if (fadeInAnimation.elapsed <= fadeInAnimation.duration)
+    {
+        auto&& rect = sf::RectangleShape(sf::Vector2f(app.window.getSize()));
+        rect.setFillColor(sf::Color {
+            0xff,
+            0xf1,
+            0xe8,
+            static_cast<uint8_t>((1.f - fadeInAnimation.perc) * 255) });
+        app.window.draw(rect);
+    }
 }
 
 void AppStateEndGameScreen::buildLayout()

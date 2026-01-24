@@ -296,11 +296,21 @@ void GameRulesEngine::operator()(const FlipCardAnimationEndedGameEvent&)
 
 void GameRulesEngine::update(const dgm::Time& time)
 {
-    scene.infection.progress = scene.stats.turnsTaken;
+    if (!gameEnded())
+    {
+        scene.infection.progress = scene.stats.turnsTaken;
+    }
 
     if (scene.activeAnimation)
     {
         updateActiveAnimation(time);
+        return;
+    }
+
+    if (gameEnded())
+    {
+        auto ending = getGameEnding();
+        scene.activeAnimation = AnimationFadeOut(ending == GameEndReason::Won);
         return;
     }
 
@@ -564,7 +574,11 @@ void GameRulesEngine::handleFinishedAnimation()
                     a.inventorySlotIdx);
             },
             [&](const AnimationTrashMainCard&) { scene.mainCard.reset(); },
-            [&](const AnimationHeal& a) { scene.hearts += a.healAmount; },
+            [&](const AnimationHeal& a)
+            {
+                scene.hearts += a.healAmount;
+                if (a.isVaccineHeal) scene.infection.progress = -1;
+            },
             NoOp<AnimationReturnDraggedMainCard>(),
             [&](const AnimationDrawCard&)
             {
@@ -573,6 +587,11 @@ void GameRulesEngine::handleFinishedAnimation()
                 scene.deck.pop_front();
             },
             NoOp<AnimationFadeIn>(),
+            [&](const AnimationFadeOut& a)
+            {
+                scene.gameEnded = true;
+                if (a.winFadeOut) scene.infection.progress = -1;
+            },
         },
         animation);
 }
@@ -663,7 +682,7 @@ GameEndReason GameRulesEngine::getGameEnding() const noexcept
 
 bool GameRulesEngine::gameWon() const noexcept
 {
-    return scene.infection.progress == -1;
+    return scene.infection.progress < 0;
 }
 
 dgm::Animation::PlaybackStatus

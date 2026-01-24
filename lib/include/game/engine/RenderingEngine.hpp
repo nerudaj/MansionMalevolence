@@ -96,6 +96,8 @@ public:
 
     void operator()(const AnimationFadeIn& a);
 
+    void operator()(const AnimationFadeOut& a);
+
 public:
     /**
      * \brief Create fullscreen camera with a fixed resolution and aspect ratio

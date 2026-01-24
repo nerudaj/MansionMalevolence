@@ -1,5 +1,6 @@
 #pragma once
 
+#include "game/animations/Animations.hpp"
 #include "game/definitions/GameStats.hpp"
 #include "game/enums/GameEndReason.hpp"
 #include "misc/DependencyContainer.hpp"
@@ -27,4 +28,5 @@ private:
 private:
     DependencyContainer& dic;
     GameStats stats;
+    AnimationBase fadeInAnimation;
 };

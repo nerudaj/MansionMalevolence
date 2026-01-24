@@ -74,7 +74,7 @@ void AppStateGame::update()
 
     gameEvents.processEvents(gameRulesEngine);
 
-    if (gameRulesEngine.gameEnded())
+    if (scene.gameEnded)
     {
         onGameEnded();
     }
