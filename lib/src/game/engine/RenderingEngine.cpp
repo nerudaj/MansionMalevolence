@@ -167,9 +167,17 @@ void RenderingEngine::operator()(const AnimationEnemyAttack& a)
     renderCard(*scene.mainCard, getMainCardOffset() + animationOffset);
 }
 
-void RenderingEngine::operator()(const AnimationEnemyDamagedWindup&)
+void RenderingEngine::operator()(const AnimationEnemyDamagedWindup& a)
 {
     renderCard(*scene.mainCard, getMainCardOffset());
+
+    const auto&& rocketTarget = getMainCardOffset() + sf::Vector2f(30.f, 30.f);
+    const auto&& rocketOrigin = getMainCardOffset() + sf::Vector2f(72.f, 72.f);
+    const auto animationOffset = (rocketTarget - rocketOrigin) * a.perc;
+
+    sprite.setTextureRect(atlas.getClip(iconsLocation).getFrame(Icon::Rocket));
+    sprite.setPosition(animationOffset + rocketOrigin);
+    window.draw(sprite);
 }
 
 void RenderingEngine::operator()(const AnimationEnemyDamaged& a)

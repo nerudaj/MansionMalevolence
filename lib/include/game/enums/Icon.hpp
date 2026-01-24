@@ -22,6 +22,7 @@ enum class [[nodiscard]] Icon
     BulletHole,
     ThreeBulletHole,
     Dart,
+    Rocket,
     Explosion1,
     Explosion2,
     Explosion3,
