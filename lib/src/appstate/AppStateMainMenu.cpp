@@ -14,6 +14,7 @@ AppStateMainMenu::AppStateMainMenu(
 {
     buildLayout();
     dic.jukebox.switchMode(JukeboxMode::Menu);
+    srand(time(nullptr));
 }
 
 void AppStateMainMenu::input()
