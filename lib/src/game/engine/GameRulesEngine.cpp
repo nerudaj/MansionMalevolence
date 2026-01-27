@@ -592,6 +592,7 @@ void GameRulesEngine::handleFinishedAnimation()
                 scene.gameEnded = true;
                 if (a.winFadeOut) scene.infection.progress = -1;
             },
+            NoOp<AnimationSoundPlaying>(),
         },
         animation);
 }
@@ -719,7 +720,9 @@ GameRulesEngine::findCollidingInventoryIdx(const sf::Vector2f& pointerPos)
 
 void GameRulesEngine::reloadWeapon(Card& weapon, int quantity)
 {
-    audioEngine.playSound(SoundId::WeaponReload);
+    assert(!scene.activeAnimation);
+    auto&& duration = audioEngine.playSound(SoundId::WeaponReload);
+    scene.activeAnimation = AnimationSoundPlaying(duration);
     weapon.quantity = std::clamp(weapon.quantity + quantity, 0, MAX_AMMO);
 }
 
@@ -743,7 +746,9 @@ void GameRulesEngine::combineCards(Card& inventoryCard, const Card& incoming)
     if (inventoryCard.special & CardSpecial::Combines
         && incoming.special & CardSpecial::Combines)
     {
-        audioEngine.playSound(incoming.specialSound);
+        assert(!scene.activeAnimation);
+        auto&& duration = audioEngine.playSound(incoming.specialSound);
+        scene.activeAnimation = AnimationSoundPlaying(duration);
         inventoryCard = CardBuilder::combineCards(inventoryCard, incoming);
     }
     else if (

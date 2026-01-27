@@ -350,6 +350,11 @@ void RenderingEngine::operator()(const AnimationFadeOut& a)
     window.draw(rect);
 }
 
+void RenderingEngine::operator()(const AnimationSoundPlaying& a)
+{
+    if (scene.mainCard) renderCard(*scene.mainCard, getMainCardOffset());
+}
+
 dgm::Camera RenderingEngine::createFullscreenCamera(
     const sf::Vector2f& currentResolution,
     const sf::Vector2f& desiredResolution)

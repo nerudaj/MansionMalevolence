@@ -195,6 +195,13 @@ struct [[nodiscard]] AnimationFadeOut final : public AnimationBase
     }
 };
 
+// This animation prevents other actions from executing and overriding
+// the single audio channel I have
+struct [[nodiscard]] AnimationSoundPlaying final : public AnimationBase
+{
+    explicit AnimationSoundPlaying(sf::Time time) : AnimationBase(time) {}
+};
+
 using Animation = std::variant<
     AnimationMainCardToDiscard,
     AnimationInventoryCardToDiscard,
@@ -214,4 +221,5 @@ using Animation = std::variant<
     AnimationDrawCard,
     AnimationOutOfAmmo,
     AnimationFadeIn,
-    AnimationFadeOut>;
+    AnimationFadeOut,
+    AnimationSoundPlaying>;
