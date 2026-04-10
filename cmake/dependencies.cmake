@@ -8,7 +8,7 @@ set ( FSM_LIB_VERSION "2.1.1" )
 set ( TGUI_VERSION "1.x" )
 set ( CATCH2_VERSION "v3.8.0" )
 set ( RANGEV3_VERSION "master" )
-set ( FMTLIB_VERSION "master" )
+set ( FMTLIB_VERSION "12.1.0" )
 
 CPMAddPackage("gh:jarro2783/cxxopts#v${CXXOPTS_VERSION}")
 CPMAddPackage("gh:nlohmann/json#v${NLOHMANN_VERSION}")
