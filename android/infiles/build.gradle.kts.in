@@ -27,6 +27,8 @@ android {
             cmake {
                 arguments.add("-DANDROID_STL=c++_shared")
                 arguments.add("-DSFML_STATIC_LIBRARIES=OFF")
+                arguments.add("-DCMAKE_CXX_STANDARD=23")
+                arguments.add("-DCMAKE_CXX_STANDARD_REQUIRED=ON")
             }
         }
     }

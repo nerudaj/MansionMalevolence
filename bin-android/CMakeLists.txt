@@ -10,9 +10,6 @@ include ( ../cmake/dependencies.cmake )
 
 project ( ${ANDROID_NATIVE_LIB_NAME} )
 
-set ( CMAKE_CXX_STANDARD 23 )
-set ( CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(CMAKE_SHARED_LINKER_FLAGS
         "${CMAKE_SHARED_LINKER_FLAGS} -u \
     Java_com_google_androidgamesdk_GameActivity_initializeNativeCode")
